@@ -296,15 +296,18 @@ class AccountContext(InstanceContext):
 
         return AccountInstance(self._version, payload, id=self._solution['id'], )
 
-    def delete(self):
+    def delete(self, remove=False):
         """
         Deletes the AccountInstance
 
         :returns: True if delete succeeds, False otherwise
         :rtype: bool
         """
-        return self._version.delete('delete', self._uri)
-
+        if remove:
+            return self._version.delete('delete', self._uri + '?hard=true')
+        else:
+            return self._version.delete('delete', self._uri)
+            
     @property
     def users(self):
         """
@@ -505,14 +508,14 @@ class AccountInstance(InstanceResource):
         """
         return self._properties['status']
 
-    def delete(self):
+    def delete(self, remove=False):
         """
         Deletes the AccountInstance
 
         :returns: True if delete succeeds, False otherwise
         :rtype: bool
         """
-        return self._proxy.delete()
+        return self._proxy.delete(remove)
 
     def fetch(self):
         """

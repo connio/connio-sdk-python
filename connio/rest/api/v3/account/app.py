@@ -287,7 +287,6 @@ class AppContext(InstanceContext):
         data = values.of({
             'name': name,
             'friendlyName': friendly_name,
-            'friendlyName': friendly_name,
             'description': description,
             'tags': tags,
             'status': status,

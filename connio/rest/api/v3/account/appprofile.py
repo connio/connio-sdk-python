@@ -314,6 +314,15 @@ class AppProfileContext(InstanceContext):
             id=self._solution['id'],
         )
 
+    def delete(self):
+        """
+        Deletes the AppProfileContext
+
+        :returns: True if delete succeeds, False otherwise
+        :rtype: bool
+        """
+        return self._version.delete('delete', self._uri)
+
     def __repr__(self):
         """
         Provide a friendly representation
@@ -511,6 +520,15 @@ class AppProfileInstance(InstanceResource):
             friendly_name=friendly_name,
             name=name,
         )
+
+    def delete(self):
+        """
+        Deletes the AppProfileInstance
+
+        :returns: True if delete succeeds, False otherwise
+        :rtype: bool
+        """
+        return self._proxy.delete()     
 
     def __getitem__(self, key):
         return self._properties[key]
