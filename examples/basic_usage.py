@@ -42,6 +42,7 @@ def example():
                                tags=['test']
                               )
 
+    # Create a provisioning key
     client.account.apiclients.create(name='ProvisioningClient',
                                     friendly_name='Provisioning Key',
                                     description='An API Client for device provisioning',
@@ -50,7 +51,7 @@ def example():
                                     scope=['device:read'],
                                     )
                                          
-    # original = client.account.deviceprofiles.get('compressor3').fetch()
+    # Create new device profile
     compressor = client.account.deviceprofiles.create(name='Compressor', 
                                                   friendly_name='Compressor Machine',
                                                   base_profile='ConnectedDevice',
@@ -61,6 +62,7 @@ def example():
                                                   vendor_name='Dalgakiran'
                                                 )
 
+    # Add property to the device profile
     client.account.properties(compressor.id).create(name='temperature',
                                             friendly_name='Temperature',
                                             description='Temperature Sensor',
@@ -91,6 +93,7 @@ def example():
                                             # retention=prp.retention
                                         )
 
+    # Create devices generated from this device profile
     for i in range(1, 11):
         device = client.account.devices.create(name='Device.{}'.format(i), 
                                                profile='compressor',
