@@ -26,7 +26,7 @@ class DeviceProfileList(ListResource):
         self._solution = {'account_id': account_id, }
         self._uri = '/accounts/{account_id}/deviceprofiles'.format(**self._solution)
 
-    def create(self, name, base_profile, friendly_name=values.unset, description=values.unset,
+    def create(self, name, base_profile=values.unset, friendly_name=values.unset, description=values.unset,
                 tags=values.unset, device_class=values.unset, vendor_name=values.unset, product_name=values.unset):
         """
         Create a new DeviceProfileInstance

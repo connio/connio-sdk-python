@@ -26,7 +26,7 @@ class AppProfileList(ListResource):
         self._solution = {'account_id': account_id, }
         self._uri = '/accounts/{account_id}/appprofiles'.format(**self._solution)
 
-    def create(self, name, base_profile, friendly_name=values.unset, description=values.unset,
+    def create(self, name, base_profile=values.unset, friendly_name=values.unset, description=values.unset,
                 tags=values.unset, version=values.unset, vendor_name=values.unset, product_name=values.unset, system=values.unset):
         """
         Create a new AppProfileInstance
