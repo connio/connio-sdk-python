@@ -27,11 +27,11 @@ def migrate(migration_path):
     #                 password="xxx",
     #                 host="https://api3.inv.connio.net")
 
-    fromCli = Client(username="_key_381845811449612485", 
-                    password="3dc37bf89ad94f199adc11463099337d")
+    fromCli = Client(username="_key_374124260603227708", 
+                    password="64d1a0e733a3498b80d20ddf0d68007c")
 
-    toCli = Client(username="_key_378022407411318644", 
-                    password="0e3915d079fa4da38cb478f84c707333",
+    toCli = Client(username="_key_384831645183024648", 
+                    password="3632bba47b4e4bfba78eaec717c32ad5",
                     host="http://localhost:8081")
 
     # Cleanup existing profiles     

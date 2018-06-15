@@ -559,9 +559,18 @@ class DeviceInstance(InstanceResource):
         """
         return self._proxy.fetch()
 
-    def update(self, friendly_name=values.unset, name=values.unset, apps=values.unset, 
-                description=values.unset, tags=values.unset, period=values.unset, location=values.unset,
-                custom_ids=values.unset, status=values.unset, annotate_with_location=values.unset, annotate_with_meta=values.unset):
+    def update(self, 
+                name=values.unset, 
+                friendly_name=values.unset,
+                apps=values.unset, 
+                description=values.unset, 
+                tags=values.unset, 
+                period=values.unset, 
+                location=values.unset,
+                custom_ids=values.unset, 
+                status=values.unset, 
+                annotate_with_location=values.unset, 
+                annotate_with_meta=values.unset):
         """
         Update the DeviceInstance
 

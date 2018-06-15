@@ -71,7 +71,6 @@ def example():
     for i in range(1, 11):
         client.account.properties(compressor.id).create(name='Cntrl_Identifier' + str(i), data_type='number', access_type='protected', publish_type='always')
 
-
     client.account.properties(compressor.id).create(name='con', data_type='number', access_type='protected', publish_type='always')
     client.account.properties(compressor.id).create(name='ControlCommand', data_type='number', access_type='public', publish_type='always')
     client.account.properties(compressor.id).create(name='CSF', data_type='number', access_type='protected', publish_type='always')
@@ -156,7 +155,6 @@ def example():
 
     for i in range(1, 8):
         client.account.properties(compressor.id).create(name='WT' + str(i), data_type='number', access_type='protected', publish_type='always')
-
 
     # Create new app profile
     client.account.appprofiles.create(name='CompressorManagement',                                                   
