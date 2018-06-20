@@ -27,7 +27,7 @@ class DeviceProfileList(ListResource):
         self._uri = '/accounts/{account_id}/deviceprofiles'.format(**self._solution)
 
     def create(self, name, base_profile=values.unset, friendly_name=values.unset, description=values.unset,
-                tags=values.unset, device_class=values.unset, vendor_name=values.unset, product_name=values.unset):
+                tags=values.unset, device_class=values.unset, vendor_name=values.unset, product_name=values.unset, image_url=values.unset):
         """
         Create a new DeviceProfileInstance
 
@@ -51,6 +51,7 @@ class DeviceProfileList(ListResource):
             'deviceClass': device_class,
             'vendorName': vendor_name,
             'productName': product_name,  
+            'imageUrl': image_url,
         })
 
         payload = self._version.create(
@@ -278,7 +279,7 @@ class DeviceProfileContext(InstanceContext):
         )
 
     def update(self, name=values.unset, friendly_name=values.unset, description=values.unset,
-                tags=values.unset, device_class=values.unset, vendor_name=values.unset, product_name=values.unset):
+                tags=values.unset, device_class=values.unset, vendor_name=values.unset, product_name=values.unset, image_url=values.unset):
         """
         Update the DeviceProfileInstance
 
@@ -296,6 +297,7 @@ class DeviceProfileContext(InstanceContext):
             'deviceClass': device_class,
             'vendorName': vendor_name,
             'productName': product_name,
+            'imageUrl': image_url,
         })
 
         payload = self._version.update(
@@ -355,6 +357,7 @@ class DeviceProfileInstance(InstanceResource):
             'device_class': payload.get('deviceClass'),
             'vendor_name': payload.get('vendorName'),
             'product_name': payload.get('productName'),
+            'image_url': payload.get('imageUrl'),
             'locked': payload['locked'],
             'date_created': deserialize.iso8601_datetime(payload['dateCreated']),
             'date_updated': deserialize.iso8601_datetime(payload['dateModified']),
@@ -460,6 +463,14 @@ class DeviceProfileInstance(InstanceResource):
         :rtype: unicode
         """
         return self._properties['vendor_name']
+
+    @property
+    def image_url(self):
+        """
+        :returns:
+        :rtype: unicode
+        """
+        return self._properties['image_url']
 
     @property
     def locked(self):

@@ -16,6 +16,12 @@ from connio.rest.api.v3.account.propertyy import PropertyList
 # from connio.rest.api.v3.account.method import MethodList
 # from connio.rest.api.v3.account.alert import AlertList
 
+class UserInfo(object):
+    def __init__(self, email, role, name=values.unset):
+        self.email = email
+        self.role = role
+        self.name = name
+
 
 class AccountList(ListResource):
     """  """
@@ -35,7 +41,7 @@ class AccountList(ListResource):
         self._solution = {}
         self._uri = '/accounts'.format(**self._solution)
 
-    def create(self, name, friendly_name=values.unset):
+    def create(self, name, friendly_name=values.unset, userInfo=None):
         """
         Create a new AccountInstance
 
@@ -44,7 +50,15 @@ class AccountList(ListResource):
         :returns: Newly created AccountInstance
         :rtype: connio.rest.api.v3.account.AccountInstance
         """
-        data = values.of({'name': name, 'friendlyName': friendly_name, })
+        adminInfo = None
+        if userInfo is not None:
+            adminInfo = {'email': userInfo.email, 'role': userInfo.role, 'name': userInfo.name}
+
+        data = values.of({
+            'name': name, 
+            'friendlyName': friendly_name, 
+            'user': adminInfo
+        })
 
         payload = self._version.create(
             'POST',
@@ -52,7 +66,11 @@ class AccountList(ListResource):
             data=data,
         )
 
-        return AccountInstance(self._version, payload, )
+        if userInfo is not None:
+            # System returns a token
+            return payload
+        else:             
+            return AccountInstance(self._version, payload, )
 
     def stream(self, friendly_name=values.unset, status=values.unset, limit=None,
                page_size=None):
@@ -248,7 +266,7 @@ class AccountContext(InstanceContext):
         self._solution = {'id': id }        
         self._uri = '/accounts/{id}'.format(**self._solution)
 
-        # Dependents
+        # Account Entities
         self._users = None
         self._apiclients = None
         self._deviceprofiles = None
@@ -304,6 +322,7 @@ class AccountContext(InstanceContext):
         :rtype: bool
         """
         if remove:
+            self._version.delete('delete', self._uri)
             return self._version.delete('delete', self._uri + '?hard=true')
         else:
             return self._version.delete('delete', self._uri)
@@ -427,12 +446,12 @@ class AccountInstance(InstanceResource):
         self._properties = {
             'id': payload['id'],
             'name': payload['name'],
-            'friendly_name': payload['friendlyName'],
+            'friendly_name': payload.get('friendlyName'),
             'status': payload['status'],
             'owner_account_id': payload.get('ownerId'),
             'locked': payload['locked'],
             'date_created': deserialize.iso8601_datetime(payload['dateCreated']),
-            'date_modified': deserialize.iso8601_datetime(payload['dateModified'])
+            'date_modified': deserialize.iso8601_datetime(payload.get('dateModified'))
         }
 
         # Context
@@ -522,7 +541,7 @@ class AccountInstance(InstanceResource):
         Fetch a AccountInstance
 
         :returns: Fetched AccountInstance
-        :rtype: twilio.rest.api.v2010.account.AccountInstance
+        :rtype: connio.rest.api.v3.account.AccountInstance
         """
         return self._proxy.fetch()
 
@@ -534,7 +553,7 @@ class AccountInstance(InstanceResource):
         :param AccountInstance.Status status: Status to update the Account with
 
         :returns: Updated AccountInstance
-        :rtype: twilio.rest.api.v2010.account.AccountInstance
+        :rtype: connio.rest.api.v3.account.AccountInstance
         """
         return self._proxy.update(friendly_name=friendly_name, status=status, )
 

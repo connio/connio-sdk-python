@@ -23,7 +23,7 @@ class AlertList(ListResource):
 
         # Path Solution
         self._solution = {'account_id': account_id, 'owner_id': owner_id, }
-        self._uri = '/accounts/{account_id}/alerts?ownerId={owner_id}'.format(**self._solution)
+        self._uri = '/accounts/{account_id}/alerts?owner={owner_id}'.format(**self._solution)
 
 
     def create(self, name, friendly_name=values.unset, status=values.unset,  

@@ -23,7 +23,7 @@ class MethodList(ListResource):
 
         # Path Solution
         self._solution = {'account_id': account_id, 'owner_id': owner_id, }
-        self._uri = '/accounts/{account_id}/methods?ownerId={owner_id}'.format(**self._solution)
+        self._uri = '/accounts/{account_id}/methods?owner={owner_id}'.format(**self._solution)
 
 
     def create(self, name, access_type, methodImpl=values.unset, friendly_name=values.unset, 

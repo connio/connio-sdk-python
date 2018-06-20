@@ -10,13 +10,14 @@ from connio.http.http_client import ConnioHttpClient
 class Client(object):
     """ A client for accessing the Connio API. """
 
-    def __init__(self, username=None, password=None, host=None, region=None,
+    def __init__(self, username=None, password=None, host=None, sysadmin=False, region=None,
                  http_client=None, environment=None):
         """
         Initializes the Connio Client
 
         :param str username: Username to authenticate with
         :param str password: Password to authenticate with
+        :param bool sysadmin: Access system with system admin privileges - must provide sys admin credentials
         :param str region: Connio Region to make requests to
         :param HttpClient http_client: HttpClient, defaults to ConnioHttpClient
         :param dict environment: Environment to look for auth details, defaults to os.environ
@@ -30,6 +31,10 @@ class Client(object):
         """ :type : str """
         self.password = password or environment.get('CONNIO_ACCOUNT_KEYSECRET')
         """ :type : str """
+        self.sys = None
+        if sysadmin == True:
+            self.sys = '/sys'
+        """ :type : bool """
         self.region = region
         """ :type : str """
         self.host = host or 'https://api.connio.cloud'
@@ -127,3 +132,10 @@ class Client(object):
         :rtype: connio.rest.api.v3.account.account.AccountList
         """
         return self.api.accounts
+
+    @property
+    def users(self):
+        """
+        :rtype: connio.rest.api.v3.user.SysUserList
+        """
+        return self.api.users

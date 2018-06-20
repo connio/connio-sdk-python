@@ -73,3 +73,26 @@ def map(lst, serialize_func):
         return lst
     return [serialize_func(e) for e in lst]
 
+
+def measurement(measurement):
+    """
+    Serialize a measurement object to measurement JSON
+    :param measurement: PropertyInstance.Measurement
+    :return: jsonified string represenation of obj 
+    """    
+    if measurement is None:
+        return None
+    return { 'type': measurement.type, 'unit': { 'label': measurement.unit.label, 'symbol': measurement.unit.symbol } }
+
+def location(loc):
+    """
+    
+    """    
+    if loc is None:
+        return None
+    if loc.zone is None: 
+        return { 'zone': None, 'geo': { 'lat': loc.geo.lat, 'lon': loc.geo.lon, 'alt': loc.geo.alt } }
+    elif loc.geo is None:
+        return { 'zone': loc.zone, 'geo': None }
+    else: 
+        return { 'zone': loc.zone, 'geo': { 'lat': loc.geo.lat, 'lon': loc.geo.lon, 'alt': loc.geo.alt } }

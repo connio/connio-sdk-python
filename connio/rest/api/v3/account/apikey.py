@@ -24,7 +24,7 @@ class ApiKeyContext(InstanceContext):
         # Path Solution
         self._solution = {'account_id': account_id, 'owner_type': owner_type,  'owner_id': owner_id, }
         self._uri = '/accounts/{account_id}/{owner_type}/{owner_id}/apikey'.format(**self._solution)
-
+            
     def fetch(self):
         """
         Fetch a ApiKeyInstance
@@ -68,6 +68,26 @@ class ApiKeyContext(InstanceContext):
             'PUT',
             self._uri,
             data=data,
+        )
+
+        return ApiKeyInstance(
+            self._version,
+            payload,
+            account_id=self._solution['account_id'],
+            owner_type=self._solution['owner_type'],
+            owner_id=self._solution['owner_id'],
+        )
+
+    def regen(self):
+        """
+        Regenerate the key credentials
+
+        :returns: Updated ApiKeyInstance
+        :rtype: connio.rest.api.v3.account.apikey.ApiKeyInstance
+        """
+        payload = self._version.update(
+            'POST',
+            self._uri,
         )
 
         return ApiKeyInstance(
@@ -234,6 +254,15 @@ class ApiKeyInstance(InstanceResource):
             scope=scope,
             rate_limit=rate_limit,
         )
+
+    def regen(self):
+        """
+        Regenerate the key credentials
+
+        :returns: Updated ApiKeyInstance
+        :rtype: connio.rest.api.v3.account.apikey.ApiKeyInstance
+        """
+        return self._proxy.regen()
 
     def __repr__(self):
         """

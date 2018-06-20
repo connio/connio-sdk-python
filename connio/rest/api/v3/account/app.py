@@ -351,7 +351,7 @@ class AppInstance(InstanceResource):
             'profile_id': payload['profileId'],
             'description': payload.get('description'),
             'tags': payload.get('tags'),
-            'status': payload['status'],
+            'status': payload.get('status') or 'enabled',
             'locked': payload['locked'],
             'date_created': deserialize.iso8601_datetime(payload['dateCreated']),
             'date_updated': deserialize.iso8601_datetime(payload['dateModified']),

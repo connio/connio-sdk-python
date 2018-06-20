@@ -1,5 +1,6 @@
 
 from connio.base import deserialize
+from connio.base import serialize
 from connio.base import values
 from connio.base.instance_context import InstanceContext
 from connio.base.instance_resource import InstanceResource
@@ -23,11 +24,11 @@ class PropertyList(ListResource):
 
         # Path Solution
         self._solution = {'account_id': account_id, 'owner_id': owner_id, }
-        self._uri = '/accounts/{account_id}/properties?ownerId={owner_id}'.format(**self._solution)
+        self._uri = '/accounts/{account_id}/properties?owner={owner_id}'.format(**self._solution)
 
 
     def create(self, name, data_type, access_type, publish_type, friendly_name=values.unset, description=values.unset,
-                tags=values.unset, retention=values.unset):
+                tags=values.unset, measurement=values.unset, retention=values.unset):
         """
         Create a new PropertyInstance
 
@@ -49,7 +50,8 @@ class PropertyList(ListResource):
             'tags': tags,
             'type': data_type,
             'access': access_type,
-            'publish': publish_type,        
+            'publish': publish_type,
+            'measurement': serialize.measurement(measurement),
             'retention': retention,
         })
 
@@ -274,7 +276,7 @@ class PropertyContext(InstanceContext):
             id=self._solution['id'],
         )
 
-    def update(self, name=values.unset, friendly_name=values.unset, ):
+    def update(self, name=values.unset, friendly_name=values.unset, measurement=values.unset):
         """
         Update the PropertyInstance
 
@@ -287,6 +289,7 @@ class PropertyContext(InstanceContext):
         data = values.of({
             'name': name,
             'friendlyName': friendly_name,
+            'measurement': serialize.measurement(measurement),
         })
 
         payload = self._version.update(
@@ -316,6 +319,16 @@ class PropertyContext(InstanceContext):
 class PropertyInstance(InstanceResource):
     """  """
 
+    class MeasurementUnit:
+        def __init__(self, label, symbol):
+            self.label = label
+            self.symbol = symbol
+        
+    class Measurement:
+        def __init__(self, type, unit):
+            self.type = type
+            self.unit = unit
+
     def __init__(self, version, payload, account_id, id=None):
         """
         Initialize the PropertyInstance
@@ -338,7 +351,8 @@ class PropertyInstance(InstanceResource):
             'data_type': payload['type'],
             'access_type': payload['access'],
             'publish_type': payload['publish'],
-            'retention': payload.get('retention'),            
+            'retention': payload.get('retention'),
+            'measurement': deserialize.measurement(payload.get('measurement')),
             'inherited': payload['inherited'],
             'locked': payload['locked'],        
             'date_created': deserialize.iso8601_datetime(payload['dateCreated']),
@@ -469,6 +483,14 @@ class PropertyInstance(InstanceResource):
         :rtype: unicode
         """
         return self._properties['retention']
+
+    @property
+    def measurement(self):
+        """
+        :returns:
+        :rtype: unicode
+        """
+        return self._properties['measurement']
 
     @property
     def locked(self):

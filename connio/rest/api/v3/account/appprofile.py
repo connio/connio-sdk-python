@@ -27,7 +27,7 @@ class AppProfileList(ListResource):
         self._uri = '/accounts/{account_id}/appprofiles'.format(**self._solution)
 
     def create(self, name, base_profile=values.unset, friendly_name=values.unset, description=values.unset,
-                tags=values.unset, version=values.unset, vendor_name=values.unset, product_name=values.unset, system=values.unset):
+                tags=values.unset, version=values.unset, vendor_name=values.unset, product_name=values.unset, system=values.unset, image_url=values.unset):
         """
         Create a new AppProfileInstance
 
@@ -51,7 +51,8 @@ class AppProfileList(ListResource):
             'version': version,            
             'vendorName': vendor_name,
             'productName': product_name,  
-            'system': system
+            'system': system,
+            'imageUrl': image_url,
         })
 
         payload = self._version.create(
@@ -280,7 +281,7 @@ class AppProfileContext(InstanceContext):
 
     def update(self, name=values.unset, friendly_name=values.unset, description=values.unset,
                 tags=values.unset, version=values.unset, vendor_name=values.unset, product_name=values.unset,
-                system=values.unset):
+                system=values.unset, image_url=values.unset):
         """
         Update the AppProfileInstance
 
@@ -299,6 +300,7 @@ class AppProfileContext(InstanceContext):
             'vendorName': vendor_name,
             'productName': product_name,
             'system': system,
+            'imageUrl': image_url,
         })
 
         payload = self._version.update(
@@ -359,6 +361,7 @@ class AppProfileInstance(InstanceResource):
             'vendor_name': payload.get('vendorName'),
             'product_name': payload.get('productName'),
             'system': payload['system'],
+            'image_url': payload.get('imageUrl'),
             'locked': payload['locked'],
             'date_created': deserialize.iso8601_datetime(payload['dateCreated']),
             'date_updated': deserialize.iso8601_datetime(payload['dateModified']),
@@ -472,6 +475,14 @@ class AppProfileInstance(InstanceResource):
         :rtype: unicode
         """
         return self._properties['system']
+
+    @property
+    def image_url(self):
+        """
+        :returns:
+        :rtype: unicode
+        """
+        return self._properties['image_url']
 
     @property
     def locked(self):

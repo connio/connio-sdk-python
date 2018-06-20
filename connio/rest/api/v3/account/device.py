@@ -1,5 +1,6 @@
 
 from connio.base import deserialize
+from connio.base import serialize
 from connio.base import values
 from connio.base.instance_context import InstanceContext
 from connio.base.instance_resource import InstanceResource
@@ -49,7 +50,7 @@ class DeviceList(ListResource):
             'friendlyName': friendly_name,
             'description': description,
             'tags': tags,
-            'loation': location,
+            'location': serialize.location(location),
             'customIds': custom_ids,
             'status': status,
             'period': period,
@@ -295,10 +296,9 @@ class DeviceContext(InstanceContext):
             'name': name,
             'friendlyName': friendly_name,
             'apps': apps,
-            'friendlyName': friendly_name,
             'description': description,
             'tags': tags,
-            'location': location,
+            'location': serialize.location(location),
             'custom_ids': custom_ids,
             'status': status,
             'period': period,
@@ -363,6 +363,17 @@ class DeviceInstance(InstanceResource):
         DISABLED = "disabed"
         DEBUG = "debug"
 
+    class GeoCoord:
+        def __init__(self, lat, lon, alt=None):
+            self.lat = lat
+            self.lon = lon
+            self.alt = alt
+        
+    class Location:
+        def __init__(self, zone, geo):
+            self.zone = zone
+            self.geo = geo
+
     def __init__(self, version, payload, account_id, id=None):
         """
         Initialize the DeviceInstance
@@ -382,7 +393,7 @@ class DeviceInstance(InstanceResource):
             'apps': payload['apps'],
             'description': payload.get('description'),
             'tags': payload.get('tags'),
-            'location': payload.get('location'),
+            'location': deserialize.location(payload.get('location')),
             'custom_ids': payload.get('customIds'),
             'status': payload['status'],
             'period': payload['period'],

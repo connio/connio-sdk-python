@@ -3,9 +3,17 @@ from paho.mqtt.client import connack_string
 from paho.mqtt.client import MQTTv311
 import json
 
+
 MqttClientID="_???_11111111111"
-UserName="_key_300296630590587668"
-Password="296582a04af241eb99fde15014423683"
+UserName="_key_382212017171338747"
+Password="162d97594bb04b4db4bc8195b91e2949"
+
+
+# INNOVA
+
+# MqttClientID="_???_11111111111"
+# UserName="_key_300296630590587668"
+# Password="296582a04af241eb99fde15014423683"
 
 # MqttClientID="_???_3bad22ba52ad482992"
 # UserName="_key_359151487716885388"
@@ -35,7 +43,10 @@ def on_message(client, userdata, msg):
 def on_subscribe(client, userdata, mid, granted_qos):
     print("Subscription is complete")
 
-    payload = json.dumps({'mac': '2c:4d:54:42:f1:a8'})
+    payload = json.dumps({'mac': '16:b4:12:7d:5d:da'})
+
+    #innova
+    #payload = json.dumps({'mac': '2c:4d:54:42:f1:a8'})
     client.publish("connio/provisions", payload)
 
 def on_publish(client, userdata, mid):
@@ -50,7 +61,10 @@ client.on_subscribe = on_subscribe
 client.on_publish = on_publish
 
 client.username_pw_set(username=UserName, password=Password)
-client.connect_async("mqtt3.inv.connio.net", 1883, 60)
+client.connect_async("mqtt.connio.cloud", 1883, 60)
+
+#Innova
+#client.connect_async("mqtt3.inv.connio.net", 1883, 60)
 
 # Blocking call that processes network traffic, dispatches callbacks and
 # handles reconnecting.

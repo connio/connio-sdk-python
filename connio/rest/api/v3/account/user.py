@@ -27,6 +27,31 @@ class UserList(ListResource):
         self._solution = {'account_id': account_id, }
         self._uri = '/accounts/{account_id}/users'.format(**self._solution)
 
+    def create(self, email, role, name=values.unset):
+        """
+        Create a new UserInstance
+
+        :param unicode email: 
+        :param unicode role: 
+        :param unicode name: 
+
+        :returns: Newly created UserInstance
+        :rtype: connio.rest.api.v3.account.user.UserInstance
+        """
+        data = values.of({
+            'name': name,
+            'email': email,
+            'role': role
+        })
+
+        token = self._version.create(
+            'POST',
+            self._uri,
+            data=data,
+        )
+
+        return token
+
     def stream(self, friendly_name=values.unset, short_code=values.unset,
                limit=None, page_size=None):
         """
@@ -244,22 +269,23 @@ class UserContext(InstanceContext):
             id=self._solution['id'],
         )
 
-    def update(self, name=values.unset):
+    def update(self, name=values.unset, password=values.unset):
         """
         Update the UserInstance
 
         :param unicode name: Given name of the entity
-        :param unicode friendly_name: A human readable description of this resource
+        :param unicode password:
 
         :returns: Updated UserInstance
         :rtype: connio.rest.api.v3.account.user.UserInstance
         """
         data = values.of({
             'name': name,
+            'password': password,
         })
 
         payload = self._version.update(
-            'POST',
+            'PUT',
             self._uri,
             data=data,
         )
@@ -275,8 +301,8 @@ class UserContext(InstanceContext):
     def apikey(self):
         """
         
-        :returns: connio.rest.api.v3.account.user.ApiKeyInstance
-        :rtype: connio.rest.api.v3.account.user.ApiKeyInstance
+        :returns: connio.rest.api.v3.account.apikey.ApiKeyInstance
+        :rtype: connio.rest.api.v3.account.apikey.ApiKeyInstance
         """
         if self._apikey is None:
             self._apikey = ApiKeyContext(
@@ -325,7 +351,7 @@ class UserInstance(InstanceResource):
         self._properties = {
             'account_id': payload['accountId'],
             'id': payload['id'],
-            'name': payload['name'],
+            'name': payload.get('name'),
             'email': payload['email'],
             'status': payload['status'],
             'role': payload['role'],
@@ -336,7 +362,7 @@ class UserInstance(InstanceResource):
             'prefs': payload.get('prefs'),
             'avatarUrl': payload.get('avatarUrl'),
             'date_created': deserialize.iso8601_datetime(payload['dateCreated']),
-            'date_updated': deserialize.iso8601_datetime(payload['dateModified']),
+            'date_updated': deserialize.iso8601_datetime(payload.get('dateModified')),
         }
 
         # Context
@@ -481,18 +507,19 @@ class UserInstance(InstanceResource):
         """
         return self._proxy.fetch()
 
-    def update(self, name=values.unset):
+    def update(self, name=values.unset, password=values.unset):
         """
         Update the UserInstance
 
         :param unicode name: Name of the resource
-        :param unicode friendly_name: A human readable description of this resource
+        :param unicode password:
 
         :returns: Updated UserInstance
         :rtype: connio.rest.api.v3.account.user.UserInstance
         """
         return self._proxy.update(
             name=name,
+            password=password
         )
 
     @property
@@ -500,8 +527,8 @@ class UserInstance(InstanceResource):
         """
         Access the ApiKey
 
-        :returns: connio.rest.api.v3.account.user.UserInstance.apikey.ApiKeyInstance
-        :rtype: connio.rest.api.v3.account.user.UserInstance.apikey.ApiKeyInstance
+        :returns: connio.rest.api.v3.account.apikey.ApiKeyInstance
+        :rtype: connio.rest.api.v3.account.apikey.ApiKeyInstance
         """
         return self._proxy.apikey
 

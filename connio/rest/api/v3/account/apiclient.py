@@ -24,7 +24,7 @@ class ApiClientList(ListResource):
         super(ApiClientList, self).__init__(version)
 
         # Path Solution
-        self._solution = {'account_id': account_id, }
+        self._solution = {'account_id': account_id}
         self._uri = '/accounts/{account_id}/apiclients'.format(**self._solution)
 
     def create(self, context, scope, name=values.unset, friendly_name=values.unset, 

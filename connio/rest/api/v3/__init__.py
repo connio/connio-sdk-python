@@ -2,6 +2,8 @@
 from connio.base.version import Version
 from connio.rest.api.v3.account import AccountContext
 from connio.rest.api.v3.account import AccountList
+from connio.rest.api.v3.sysuser import SysUserList
+from connio.rest.api.v3.helpers import HelperContext
 
 
 class V3(Version):
@@ -11,12 +13,15 @@ class V3(Version):
         Initialize the V3 version of Api
 
         :returns: V3 version of Api
-        :rtype: connio.rest.api.v3.V3.V3
+        :rtype: connio.rest.api.v3.V3
         """
         super(V3, self).__init__(domain)
-        self.version = 'v3'
+        self.sysAdminPath = domain.sys
+        self.version = 'v3' + (self.sysAdminPath or '')
         self._account = None
         self._accounts = None
+        self._sysusers = None
+        self._helpers = None
 
     @property
     def accounts(self):
@@ -36,6 +41,24 @@ class V3(Version):
         if self._account is None:
             self._account = AccountContext(self, '_this_')
         return self._account
+
+    @property
+    def system_users(self):
+        """
+        :rtype: connio.rest.api.v3.sysuser.SysUserList
+        """
+        if self._sysusers is None and self.sysAdminPath is not None:
+            self._sysusers = SysUserList(self)
+        return self._sysusers
+
+    @property
+    def helpers(self):
+        """
+        
+        """
+        if self.sysAdminPath is not None:
+            self._helpers = HelperContext(self)
+        return self._helpers
 
     # We don't want to override the primary account
     # @account.setter

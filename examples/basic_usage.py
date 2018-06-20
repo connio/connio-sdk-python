@@ -16,8 +16,8 @@ def example():
     Some example usage of different connio resources.
     """
 
-    client = Client(username="_key_381845811449612485", 
-                    password="3dc37bf89ad94f199adc11463099337d")
+    client = Client(username="_key_384829132696204034", 
+                    password="840b43d162b040e4a9c14e7899f0151c")
 
     # Get master account details
     master = client.accounts.get().fetch()    

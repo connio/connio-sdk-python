@@ -14,6 +14,7 @@ class Api(Domain):
         super(Api, self).__init__(client)
 
         self.base_url = client.host
+        self.sys = client.sys
 
         # Versions
         self._v3 = None
@@ -42,3 +43,18 @@ class Api(Domain):
         :rtype: connio.rest.api.v3.account.AccountList
         """
         return self.v3.accounts
+
+    @property
+    def users(self):
+        """
+        :rtype: connio.rest.api.v3.sysuser.SysUserList
+        """
+        return self.v3.system_users
+
+    @property
+    def helpers(self):
+        """
+        :rtype: connio.rest.api.v3
+        """
+        return self.v3.helpers
+
