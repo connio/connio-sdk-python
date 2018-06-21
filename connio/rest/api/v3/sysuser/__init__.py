@@ -324,7 +324,7 @@ class SysUserInstance(InstanceResource):
             'id': payload['id'],
             'account_id': payload['accountId'],
             'email': payload['email'],
-            'name': payload.get('name'),
+            'name': payload.get('name') or payload.get('fullName'),
             'status': payload['status'],
             'role': payload['role'],
             'locked': payload.get('locked'),
