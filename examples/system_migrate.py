@@ -20,9 +20,10 @@ def migrate_system(migration_path):
     Some example usage of different connio resources.
     """
 
-    #from_host = "https://api.connio.com"
+    # from_host = "https://api.connio.cloud"
+    from_host = "https://api.connio.com"
     # from_host = "https://api3.inv.connio.net"
-    from_host = "https://api.connio.cloud"
+    
     to_host = "http://localhost:8081"
     
     frmSys = Client(username="user", 
@@ -83,7 +84,7 @@ def migrate_account(migration_path, account_id, account_name, admin_user_email, 
 
     tblFromOldAccountIdToNewAccountId[account_id] = admin.account_id
 
-    time.sleep(2)
+    time.sleep(3)
 
     # Update admin api key and set password
     toCli = cloneUser(migration_path, admin, from_admin_key_id, from_admin_key_secret, to_host)
@@ -199,7 +200,7 @@ def migrate_account(migration_path, account_id, account_name, admin_user_email, 
 
     # Migrate all Devices
     no = 1
-    for dev in fromCli.account.devices.stream(limit=10):
+    for dev in fromCli.account.devices.stream():
         # Copy device id into migration folder
         text_file = open(migration_path + "device", "w")
         text_file.write(dev.id)
@@ -216,7 +217,7 @@ def migrate_account(migration_path, account_id, account_name, admin_user_email, 
         for i in dev.apps:
             apps.append(tblApps[i])
             
-        toCli.account.devices.create(name=dev.name,
+        newDev = toCli.account.devices.create(name=dev.name,
                                      profile=tblFromOldProfIdToNewProfId.get(dev.profile_id),
                                      apps=apps,
                                      friendly_name=dev.friendly_name,
@@ -229,6 +230,8 @@ def migrate_account(migration_path, account_id, account_name, admin_user_email, 
                                      annotate_with_location=dev.annotate_with_location,
                                      annotate_with_meta=dev.annotate_with_meta
                                     )
+        print('Device #{}. {}, {}, {}'.format(no, newDev.id, newDev.name, newDev.date_created))
+        no += 1
 
         os.remove(migration_path + "device")
         os.remove(migration_path + "apikey")
@@ -414,6 +417,15 @@ def main(argv):
             sys.exit()
         elif opt in ("-m", "--migration_path"):
             migration_path = arg
+
+    if os.path.isfile(migration_path + "user"):
+        os.remove(migration_path + "user")
+
+    if os.path.isfile(migration_path + "device"):
+        os.remove(migration_path + "device")
+
+    if os.path.isfile(migration_path + "apikey"):
+        os.remove(migration_path + "apikey")
 
     migrate_system(migration_path)
 
