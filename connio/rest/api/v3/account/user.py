@@ -297,6 +297,15 @@ class UserContext(InstanceContext):
             id=self._solution['id'],
         )
 
+    def delete(self):
+        """
+        Deletes the UserInstance
+
+        :returns: True if delete succeeds, False otherwise
+        :rtype: bool
+        """
+        return self._version.delete('delete', self._uri)   
+
     @property
     def apikey(self):
         """
@@ -521,6 +530,15 @@ class UserInstance(InstanceResource):
             name=name,
             password=password
         )
+
+    def delete(self):
+        """
+        Deletes the UserInstance
+
+        :returns: True if delete succeeds, False otherwise
+        :rtype: bool
+        """
+        return self._proxy.delete()
 
     @property
     def apikey(self):

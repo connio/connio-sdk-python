@@ -41,7 +41,7 @@ class AccountList(ListResource):
         self._solution = {}
         self._uri = '/accounts'.format(**self._solution)
 
-    def create(self, name, friendly_name=values.unset, userInfo=None):
+    def create(self, name, friendly_name=values.unset, owner=None, userInfo=None, tags=None, description=None):
         """
         Create a new AccountInstance
 
@@ -57,7 +57,10 @@ class AccountList(ListResource):
         data = values.of({
             'name': name, 
             'friendlyName': friendly_name, 
-            'user': adminInfo
+            'owner': owner,
+            'user': adminInfo,
+            'tags': tags,
+            'description': description
         })
 
         payload = self._version.create(
@@ -556,6 +559,9 @@ class AccountInstance(InstanceResource):
         :rtype: connio.rest.api.v3.account.AccountInstance
         """
         return self._proxy.update(friendly_name=friendly_name, status=status, )
+
+    def __getitem__(self, key):
+        return self._properties[key]
 
     def __repr__(self):
         """

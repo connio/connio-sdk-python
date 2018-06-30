@@ -453,6 +453,9 @@ class SysUserInstance(InstanceResource):
         """
         return self._proxy.update(name=name, status=status, )
 
+    def __getitem__(self, key):
+        return self._properties[key]
+
     def __repr__(self):
         """
         Provide a friendly representation

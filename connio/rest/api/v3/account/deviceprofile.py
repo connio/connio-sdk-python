@@ -35,13 +35,11 @@ class DeviceProfileList(ListResource):
         :param unicode friendly_name: A human readable description of the application
         :param unicode description: A description of this deviceprofile
         :param unicode tags: Tags associated with this deviceprofile
-
-        #TODO Doldur!
-
         
         :returns: Newly created DeviceProfileInstance
         :rtype: connio.rest.api.v3.account.deviceprofile.DeviceProfileInstance
         """
+        
         data = values.of({
             'name': name,
             'friendlyName': friendly_name,
