@@ -15,17 +15,19 @@ from connio.rest.api.v3.account import AccountInstance
 ACCOUNT_KEYID = os.environ.get('CONNIO_ACCOUNT_KEYID')
 ACCOUNT_KEYSECRET = os.environ.get('CONNIO_ACCOUNT_KEYSECRET')
 
+# from_host = "https://api.connio.cloud"
+# from_host = "https://api.connio.com"
+from_host = "https://api3.inv.connio.net"
+    
+to_host = "http://localhost:8081"
+
+#str(message.payload.decode("utf-8"))
+
 def migrate_system(migration_path):
     """
     Some example usage of different connio resources.
     """
 
-    # from_host = "https://api.connio.cloud"
-    from_host = "https://api.connio.com"
-    # from_host = "https://api3.inv.connio.net"
-    
-    to_host = "http://localhost:8081"
-    
     frmSys = Client(username="user", 
                     password="password",
                     sysadmin=True,
@@ -35,37 +37,51 @@ def migrate_system(migration_path):
     print('Discovering master accounts on the source....')
 
     masters = dict()
+    subs = dict()
+   
+    sortedAccountList = sorted(frmSys.accounts.list(), key = operator.itemgetter('date_created'))
+
     no = 1
-    for sysaccount in frmSys.accounts.stream():
+    for sysaccount in sortedAccountList:
         if sysaccount.owner_account_id == None:
             master = frmSys.accounts.get(sysaccount.id).fetch()
             print('No {}. Master account: {}, {}, {}'.format(no, master.id, master.name, master.date_created))
             masters[master.id] = master.name            
             no += 1
 
-    #List all system users
     no = 1
-    for sysusr in frmSys.users.stream():
-        if sysusr.status == 'confirmed' and sysusr.role == 'admin' and masters.get(sysusr.account_id) is not None:
-            print('Migrating account: {}'.format(masters[sysusr.account_id]))            
-            migrate_account(migration_path, sysusr.account_id, masters[sysusr.account_id], sysusr.email, sysusr.name, sysusr.apikey.id, sysusr.apikey.secret, from_host, to_host)
-            masters.pop(sysusr.account_id, None)
-        no += 1
+    for sysaccount in sortedAccountList:
+        if sysaccount.owner_account_id != None:
+            sub = frmSys.accounts.get(sysaccount.id).fetch()
+            print('No {}. Sub account: {}, {}, {}, Owner: {}'.format(no, sub.id, sub.name, sub.date_created, masters.get(sub.owner_account_id) or subs.get(sub.owner_account_id)))
+            subs[sub.id] = sub.name            
+            no += 1
 
-def migrate_account(migration_path, account_id, account_name, admin_user_email, admin_user_name, from_admin_key_id, from_admin_key_secret, from_host, to_host):    
+
+    # List all system users
+    sortedUserList = sorted(frmSys.users.list(), key = operator.itemgetter('date_created'))
+    no = 1
+    for sysusr in sortedUserList:
+        if sysusr.status == 'confirmed' and sysusr.role == 'admin' and masters.get(sysusr.account_id) is not None:
+            print('No {}. Migrating account: {}'.format(no, masters.get(sysusr.account_id) or subs.get(sysusr.account_id)))
+            migrate_account(migration_path, sysusr.account_id, masters[sysusr.account_id], None, sysusr.email, sysusr.name, sysusr.apikey.id, sysusr.apikey.secret, from_host, to_host)
+            masters.pop(sysusr.account_id, None)
+            no += 1
+
+def migrate_account(migration_path, account_id, account_name, owner_account, admin_user_email, admin_user_name, from_admin_key_id, from_admin_key_secret, from_host, to_host):    
     """
     Migrate an account from one system to another.
     """
     if not os.path.exists(migration_path):
         os.makedirs(migration_path)
 
-    # Build account map
-    tblFromOldAccountIdToNewAccountId = dict()    
-
     toSys = Client(username="user", 
                     password="password",
                     sysadmin=True,
                     host=to_host)
+
+     # Build account map
+    tblFromOldAccountIdToNewAccountId = dict()    
 
     # clean account if exists
     try:
@@ -79,10 +95,8 @@ def migrate_account(migration_path, account_id, account_name, admin_user_email, 
                     password=from_admin_key_secret,
                     host=from_host)
 
-    token = toSys.accounts.create(name=account_name, userInfo=UserInfo(email=admin_user_email, role='admin', name=admin_user_name))
+    token = toSys.accounts.create(name=account_name, owner=owner_account, tags=['migration'], userInfo=UserInfo(email=admin_user_email, role='admin', name=admin_user_name))
     admin = toSys.api.helpers.activate(token['token'])
-
-    tblFromOldAccountIdToNewAccountId[account_id] = admin.account_id
 
     time.sleep(3)
 
@@ -95,34 +109,43 @@ def migrate_account(migration_path, account_id, account_name, admin_user_email, 
     for app in toCli.account.apps.stream():
         app.delete()
 
+    # start cloning all elements
+    clone_account(migration_path, tblFromOldAccountIdToNewAccountId, toSys, fromCli, account_id, toCli, admin.account_id, admin_user_email)
+
+
+def clone_account(migration_path, tblFromOldAccountIdToNewAccountId, toSys, fromCli, account_id, toCli, admin_account_id, admin_user_email):
+
+    tblFromOldAccountIdToNewAccountId[account_id] = admin_account_id
+
     # Build default profile map
     tblFromOldProfIdToNewProfId = dict()
 
     sortedDPList = sorted(fromCli.account.deviceprofiles.list(), key = operator.itemgetter('date_created'))
 
+    no = 1
+    for dpf in sortedDPList:
+        print('Device profile {}. Device Profile: {}, {}, {}'.format(no, dpf.id, dpf.name, dpf.date_created))
+        tblFromOldProfIdToNewProfId[dpf.id] = dpf.name
+        no += 1
+
     # Migrate all Device Profiles
     no = 1
     for dpf in sortedDPList:
-        if dpf.name == 'ConnectedDevice' or dpf.name == 'Device' or dpf.name == 'Gateway':
-            print('Device profile {}. Device Profile: {}, {}, {}'.format(no, dpf.id, dpf.name, dpf.date_created))
-            tblFromOldProfIdToNewProfId[dpf.id] = dpf.name   
-        else:
-            print('Device profile {}. Device Profile: {}, {}, {}'.format(no, dpf.id, dpf.name, dpf.date_created))
-
+        if dpf.name != 'ConnectedDevice' and dpf.name != 'Device' and dpf.name != 'Gateway':
             base_profile = tblFromOldProfIdToNewProfId.get(dpf.base_profile_id)
             # # EXCEPTION:
             if dpf.name == 'WeatherStation':
                 base_profile = 'ConnectedDevice'
 
             newdp = toCli.account.deviceprofiles.create(name=dpf.name, 
-                                                 friendly_name=dpf.friendly_name,
-                                                 base_profile=base_profile,
-                                                 description=dpf.description,
-                                                 tags=dpf.tags,
-                                                 device_class=dpf.device_class,
-                                                 product_name=dpf.product_name,
-                                                 vendor_name=dpf.vendor_name,
-                                                 image_url=dpf.image_url
+                                                    friendly_name=dpf.friendly_name,
+                                                    base_profile=base_profile,
+                                                    description=dpf.description,
+                                                    tags=dpf.tags,
+                                                    device_class=dpf.device_class,
+                                                    product_name=dpf.product_name,
+                                                    vendor_name=dpf.vendor_name,
+                                                    image_url=dpf.image_url
                                                 )
             tblFromOldProfIdToNewProfId[dpf.id] = dpf.name
             
@@ -130,39 +153,40 @@ def migrate_account(migration_path, account_id, account_name, admin_user_email, 
             for prp in fromCli.account.properties(dpf.id).stream():
                 if prp.inherited == False:                   
                     newprp=toCli.account.properties(newdp.id).create(name=prp.name.replace('.', '_'),
-                                                              friendly_name=prp.friendly_name,
-                                                              description=prp.description,
-                                                              tags=prp.tags,
-                                                              data_type=prp.data_type, 
-                                                              access_type=prp.access_type, 
-                                                              publish_type=prp.publish_type,
-                                                              measurement=prp.measurement,
+                                                                friendly_name=prp.friendly_name,
+                                                                description=prp.description,
+                                                                tags=prp.tags,
+                                                                data_type=prp.data_type, 
+                                                                access_type=prp.access_type, 
+                                                                publish_type=prp.publish_type,
+                                                                measurement=prp.measurement,
                                                                 # retention=prp.retention
                                                             )
                     print('Prop #{}. Property of {}: {}, {}, {}, {}, {}'.format(pno, newdp.name, newprp.id, newprp.name, newprp.inherited, newprp.access_type, newprp.date_created))
                     pno += 1
-
-        no += 1
+            no += 1
 
     # Migrate all App Profiles
     sortedAPList = sorted(fromCli.account.appprofiles.list(), key = operator.itemgetter('date_created'))
     
     no = 1
     for apf in sortedAPList:
-        if apf.name == 'Sample':
-            tblFromOldProfIdToNewProfId[apf.id] = apf.name
-            print('App profile {}. App Profile: {}, {}, {}'.format(no, apf.id, apf.name, apf.date_created))    
-        else:
-            print('App profile {}. App Profile: {}, {}, {}'.format(no, apf.id, apf.name, apf.date_created))    
+        print('App profile {}. App Profile: {}, {}, {}'.format(no, apf.id, apf.name, apf.date_created))
+        tblFromOldProfIdToNewProfId[apf.id] = apf.name
+        no += 1
+    
+    no = 1
+    for apf in sortedAPList:        
+        if apf.name != 'Sample':
             newapf = toCli.account.appprofiles.create(name=apf.name, 
-                                                 friendly_name=apf.friendly_name,
-                                                 base_profile=tblFromOldProfIdToNewProfId.get(apf.base_profile_id),
-                                                 description=apf.description,
-                                                 tags=apf.tags,
-                                                 version=apf.version,
-                                                 product_name=apf.product_name,
-                                                 vendor_name=apf.vendor_name,
-                                                 image_url=apf.image_url
+                                                    friendly_name=apf.friendly_name,
+                                                    base_profile=tblFromOldProfIdToNewProfId.get(apf.base_profile_id),
+                                                    description=apf.description,
+                                                    tags=apf.tags,
+                                                    version=apf.version,
+                                                    product_name=apf.product_name,
+                                                    vendor_name=apf.vendor_name,
+                                                    image_url=apf.image_url
                                                 )
             tblFromOldProfIdToNewProfId[apf.id] = apf.name
             
@@ -170,19 +194,18 @@ def migrate_account(migration_path, account_id, account_name, admin_user_email, 
             for prp in fromCli.account.properties(apf.id).stream():
                 if prp.inherited == False:                   
                     newprp=toCli.account.properties(newapf.id).create(name=prp.name,
-                                                              friendly_name=prp.friendly_name,
-                                                              description=prp.description,
-                                                              tags=prp.tags,
-                                                              data_type=prp.data_type, 
-                                                              access_type=prp.access_type, 
-                                                              publish_type=prp.publish_type,
-                                                              measurement=prp.measurement,
+                                                                friendly_name=prp.friendly_name,
+                                                                description=prp.description,
+                                                                tags=prp.tags,
+                                                                data_type=prp.data_type, 
+                                                                access_type=prp.access_type, 
+                                                                publish_type=prp.publish_type,
+                                                                measurement=prp.measurement,
                                                                 # retention=prp.retention
                                                             )
                     print('Prop #{}. Property of {}: {}, {}, {}, {}, {}'.format(pno, newprp.name, newprp.id, newprp.name, newprp.inherited, newprp.access_type, newprp.date_created))
                     pno += 1
-
-        no += 1
+            no += 1
 
     # Migrate all Apps
     tblApps = dict()
@@ -200,7 +223,7 @@ def migrate_account(migration_path, account_id, account_name, admin_user_email, 
 
     # Migrate all Devices
     no = 1
-    for dev in fromCli.account.devices.stream():
+    for dev in fromCli.account.devices.stream(limit=10):
         # Copy device id into migration folder
         text_file = open(migration_path + "device", "w")
         text_file.write(dev.id)
@@ -240,11 +263,23 @@ def migrate_account(migration_path, account_id, account_name, admin_user_email, 
     no = 1
     for acc in fromCli.accounts.stream():
         if acc.status != AccountInstance.Status.CREATED and acc.status != AccountInstance.Status.CLOSED:
-            newSub = toCli.accounts.create(name=acc.name, 
-                                        friendly_name=acc.friendly_name)
-            print('New subaccount name: ('+ str(no) + ') ' + newSub.name + ', id: ' + newSub.id)
-            tblFromOldAccountIdToNewAccountId[acc.id] = newSub.id
-            no = no + 1
+            # newSub = toCli.accounts.create(name=acc.name, 
+            #                             friendly_name=acc.friendly_name)
+            # print('New subaccount name: ('+ str(no) + ') ' + newSub.name + ', id: ' + newSub.id)
+            # tblFromOldAccountIdToNewAccountId[acc.id] = newSub.id
+
+            # token = toSys.accounts.create(name=acc.name, owner=admin_account_id, tags=['migration'], userInfo=UserInfo(email="admin_{}@connio-migrator.com".format(acc.name), role='admin', name="connio-migrator"))
+            # admin = toSys.api.helpers.activate(token['token'])
+            # tblFromOldAccountIdToNewAccountId[acc.id] = admin.account_id
+
+            # to = Client(username=admin.apikey.id, password=admin.apikey.secret, host=to_host)
+            # fr = fromCli.accounts.get(acc.id)
+            for usr in fromCli.accounts.get(acc.id).users.stream():
+                print('Owner account id: {}={} Sub account user: {}, user account id: {}, role: {}, status: {}'.format(account_id, acc.owner_account_id, usr.email, usr.account_id, usr.role, usr.status))
+
+
+            # clone_account(migration_path, tblFromOldAccountIdToNewAccountId, toSys, fr, account_id, to, admin.account_id, admin.email)
+            no += 1
 
     # Migrate all API Clients
     no = 1
@@ -273,7 +308,6 @@ def migrate_account(migration_path, account_id, account_name, admin_user_email, 
                 accountIDs.append(tblFromOldAccountIdToNewAccountId[i])
             apicli.apikey.context['ids'] = accountIDs
 
-
         #Filter out deprecated scopes
         deprecated_scopes=["index:create", "index:delete", "index:modify", "index:read", "view:create", "view:delete", "view:modify", "view:read"]        
         filtered_scopes = [s for s in apicli.apikey.scope if s not in deprecated_scopes]
@@ -295,7 +329,7 @@ def migrate_account(migration_path, account_id, account_name, admin_user_email, 
     # Migrate all Users
     no = 1
     for fromusr in fromCli.account.users.stream():
-        if fromusr.email != admin.email:
+        if fromusr.email != admin_user_email:
             # Copy API client id into migration folder
             text_file = open(migration_path + "user", "w")
             text_file.write(fromusr.id)
@@ -336,7 +370,6 @@ def migrate_account(migration_path, account_id, account_name, admin_user_email, 
 
     # Remove migration directory
     os.removedirs(migration_path)
-
 
 def cleanup(toCli):
     # Cleanup existing profiles     
@@ -402,7 +435,6 @@ def cloneUser(migration_path, user, src_user_key_id, src_user_key_secret, to_hos
     return Client(username=apikey.id, 
                 password=apikey.secret,
                 host=to_host)
-
 
 def main(argv):
     migration_path = "/Users/emre/DevHome/Projects/Connio/v3.1/octopus/connio-solo/migration/"
