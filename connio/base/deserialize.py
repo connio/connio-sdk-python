@@ -2,6 +2,7 @@ import datetime
 from decimal import Decimal, BasicContext
 from email.utils import parsedate
 from connio.rest.api.v3.account.propertyy import PropertyInstance
+from connio.rest.api.v3.account.method import MethodInstance
 from connio.rest.api.v3.account.device import DeviceInstance
 import pytz
 
@@ -119,3 +120,19 @@ def location(loc):
         geoCoord = DeviceInstance.GeoCoord(geo['lat'], geo['lon'], geo.get('alt'))
 
     return DeviceInstance.Location(zone, geoCoord)
+
+def methodImplementation(methodImpl):
+    """
+    Parses a method implementation object give in JSON to method implementation type
+    :param body: method body
+    :param lang: script language
+    :return: MethodInstance.MethodImplementation
+    """
+
+    body = methodImpl.get('funcBody')
+    lang = methodImpl.get('script')
+
+    if body is None:
+        return None
+    return MethodInstance.MethodImplementation(body, lang)
+

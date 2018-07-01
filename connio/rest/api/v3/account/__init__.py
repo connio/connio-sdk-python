@@ -12,9 +12,10 @@ from connio.rest.api.v3.account.deviceprofile import DeviceProfileList
 from connio.rest.api.v3.account.device import DeviceList
 from connio.rest.api.v3.account.appprofile import AppProfileList
 from connio.rest.api.v3.account.app import AppList
+
 from connio.rest.api.v3.account.propertyy import PropertyList
-# from connio.rest.api.v3.account.method import MethodList
-# from connio.rest.api.v3.account.alert import AlertList
+from connio.rest.api.v3.account.method import MethodList
+from connio.rest.api.v3.account.alert import AlertList
 
 class UserInfo(object):
     def __init__(self, email, role, name=values.unset):
@@ -411,6 +412,26 @@ class AccountContext(InstanceContext):
         """
         self._properties = PropertyList(self._version, account_id=self._solution['id'], owner_id=owner_id, )
         return self._properties
+
+    def methods(self, owner_id):
+        """
+        Access the methods
+
+        :returns: connio.rest.api.v3.account.method.MethodList
+        :rtype: connio.rest.api.v3.account.method.MethodList
+        """
+        self._methods = MethodList(self._version, account_id=self._solution['id'], owner_id=owner_id, )
+        return self._methods
+
+    def alerts(self, owner_id):
+        """
+        Access the alerts
+
+        :returns: connio.rest.api.v3.account.alert.AlertList
+        :rtype: connio.rest.api.v3.account.alert.AlertList
+        """
+        self._alerts = AlertList(self._version, account_id=self._solution['id'], owner_id=owner_id, )
+        return self._alerts
     
     def __repr__(self):
         """

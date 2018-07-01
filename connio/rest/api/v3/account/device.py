@@ -64,7 +64,37 @@ class DeviceList(ListResource):
             data=data,
         )
 
-        return DeviceInstance(self._version, payload, account_id=self._solution['account_id'], )    
+        return DeviceInstance(self._version, payload, account_id=self._solution['account_id'], )
+
+    def create_batch(self, devices):
+        """
+        Create multiple devices
+
+        """
+        data = values.of(devices)
+
+        # {
+        #     'name': name,
+        #     'profile': profile,
+        #     'apps': apps,
+        #     'friendlyName': friendly_name,
+        #     'description': description,
+        #     'tags': tags,
+        #     'location': serialize.location(location),
+        #     'customIds': custom_ids,
+        #     'status': status,
+        #     'period': period,
+        #     'annotateWithLoc': annotate_with_location,
+        #     'annotateWithMeta': annotate_with_meta,
+        # }
+
+        payload = self._version.create(
+            'POST',
+            self._uri,
+            data=data,
+        )
+
+        return payload
 
     def stream(self, friendly_name=values.unset, short_code=values.unset,
                limit=None, page_size=None):
@@ -332,8 +362,8 @@ class DeviceContext(InstanceContext):
     def apikey(self):
         """
         
-        :returns: connio.rest.api.v3.account.device.ApiKeyInstance
-        :rtype: connio.rest.api.v3.account.device.ApiKeyInstance
+        :returns: connio.rest.api.v3.account.apikey.ApiKeyInstance
+        :rtype: connio.rest.api.v3.account.apikey.ApiKeyInstance
         """
         if self._apikey is None:
             self._apikey = ApiKeyContext(
@@ -619,8 +649,8 @@ class DeviceInstance(InstanceResource):
         """
         Access the ApiKey
 
-        :returns: connio.rest.api.v3.account.device.DeviceInstance.apikey.ApiKeyInstance
-        :rtype: connio.rest.api.v3.account.device.DeviceInstance.apikey.ApiKeyInstance
+        :returns: connio.rest.api.v3.account.apikey.ApiKeyInstance
+        :rtype: connio.rest.api.v3.account.apikey.ApiKeyInstance
         """
         return self._proxy.apikey
 

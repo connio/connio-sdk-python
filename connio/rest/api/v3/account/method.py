@@ -1,5 +1,6 @@
 
 from connio.base import deserialize
+from connio.base import serialize
 from connio.base import values
 from connio.base.instance_context import InstanceContext
 from connio.base.instance_resource import InstanceResource
@@ -26,14 +27,14 @@ class MethodList(ListResource):
         self._uri = '/accounts/{account_id}/methods?owner={owner_id}'.format(**self._solution)
 
 
-    def create(self, name, access_type, methodImpl=values.unset, friendly_name=values.unset, 
+    def create(self, name, access_type, method_impl=values.unset, friendly_name=values.unset, 
                 description=values.unset, tags=values.unset):
         """
         Create a new MethodInstance
 
         :param unicode name: A name uniquely identifying this method within account context
         :param unicode access_type: 
-        :param unicode methodImpl:
+        :param unicode method_impl:
         :param unicode description: A description of this method
         :param unicode tags: Tags associated with this method
         
@@ -47,6 +48,7 @@ class MethodList(ListResource):
             'description': description,
             'tags': tags,
             'access': access_type,
+            'methodImpl': serialize.methodImplementation(method_impl.body, method_impl.lang),
         })
 
         payload = self._version.create(
@@ -80,6 +82,7 @@ class MethodList(ListResource):
         page = self.page(friendly_name=friendly_name, page_size=limits['page_size'], )
 
         return self._version.stream(page, limits['limit'], limits['page_limit'])
+
 
     def list(self, friendly_name=values.unset, limit=None, page_size=None):
         """
@@ -283,7 +286,7 @@ class MethodContext(InstanceContext):
         data = values.of({
             'name': name,
             'friendlyName': friendly_name,
-            'methodImpl': method_impl,
+            'methodImpl': serialize.methodImplementation(method_impl.body, method_impl.lang),
         })
 
         payload = self._version.update(
@@ -313,6 +316,11 @@ class MethodContext(InstanceContext):
 class MethodInstance(InstanceResource):
     """  """
 
+    class MethodImplementation:
+        def __init__(self, body, lang='javascript'):
+            self.body = body
+            self.lang = lang
+
     def __init__(self, version, payload, account_id, id=None):
         """
         Initialize the MethodInstance
@@ -333,7 +341,7 @@ class MethodInstance(InstanceResource):
             'description': payload.get('description'),
             'tags': payload.get('tags'),
             'access_type': payload['access'],
-            'method_impl': payload['methodImpl'],
+            'method_impl': deserialize.methodImplementation(payload.get('methodImpl')),
             'inherited': payload['inherited'],
             'locked': payload['locked'],        
             'date_created': deserialize.iso8601_datetime(payload['dateCreated']),
@@ -442,6 +450,14 @@ class MethodInstance(InstanceResource):
         return self._properties['access_type']
 
     @property
+    def method_impl(self):
+        """
+        :returns:
+        :rtype: unicode
+        """
+        return self._properties['method_impl']    
+
+    @property
     def locked(self):
         """
         :returns:
@@ -487,7 +503,7 @@ class MethodInstance(InstanceResource):
         return self._proxy.update(            
             name=name,
             friendly_name=friendly_name,
-            method_impl=method_impl
+            method_impl=method_impl,
         )
 
     def __getitem__(self, key):

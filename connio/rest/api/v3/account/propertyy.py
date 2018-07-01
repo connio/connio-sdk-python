@@ -525,7 +525,7 @@ class PropertyInstance(InstanceResource):
         """
         return self._proxy.fetch()
 
-    def update(self, friendly_name=values.unset, name=values.unset):
+    def update(self, friendly_name=values.unset, name=values.unset, measurement=values.unset):
         """
         Update the PropertyInstance
 
@@ -538,6 +538,7 @@ class PropertyInstance(InstanceResource):
         return self._proxy.update(
             friendly_name=friendly_name,
             name=name,
+            measurement=measurement,
         )
 
     def __getitem__(self, key):

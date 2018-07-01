@@ -22,8 +22,8 @@ MIGRATION_PATH = "/Users/emre/DevHome/Projects/Connio/v3.1/octopus/connio-solo/m
 # from_host = "https://api.connio.com"
 from_host = "https://api3.inv.connio.net"
     
-# to_host = "http://localhost:8081"
-to_host = "https://api.connio.cloud"
+to_host = "http://localhost:8081"
+# to_host = "https://api.connio.cloud"
 
 frmSys = Client(username="user", 
                     password="password",
@@ -61,16 +61,6 @@ def migrate_system():
             print('No {}. Master account: {}, {}, {}'.format(no, master.id, master.name, master.date_created))
             masters[master.id] = master.name            
             no += 1
-
-    # subs = dict()
-    # no = 1
-    # for sysaccount in sortedAccountList:
-    #     if sysaccount.owner_account_id != None:
-    #         sub = frmSys.accounts.get(sysaccount.id).fetch()
-    #         print('No {}. Sub account: {}, {}, {}, Owner: {}'.format(no, sub.id, sub.name, sub.date_created, masters.get(sub.owner_account_id) or subs.get(sub.owner_account_id)))
-    #         subs[sub.id] = sub.name            
-    #         no += 1
-
 
     # List all system users
     sortedUserList = sorted(frmSys.users.list(), key = operator.itemgetter('date_created'))
@@ -118,12 +108,12 @@ def migrate_master(account_id, account_name, owner_account, admin_user_email, ad
     token = toSys.accounts.create(name=account_name, owner=owner_account, tags=['migration'], userInfo=UserInfo(email=admin_user_email, role='admin', name=admin_user_name))
     admin = toSys.api.helpers.activate(token['token'])
 
-    time.sleep(3)
+    time.sleep(8)
 
     # Update admin api key and set password
     toCli = clone_user(MIGRATION_PATH, admin, from_admin_key_id, from_admin_key_secret, to_host)
 
-    time.sleep(3)
+    time.sleep(8)
 
     tblFromOldAccountIdToNewAccountId[account_id] = admin.account_id
 
@@ -163,7 +153,7 @@ def clone_account(accountMap, toCli, to_account_id, fromCli, from_account_id, fr
 
             token = toSys.accounts.create(name=acc.name, owner=to_account_id, tags=['migration'], userInfo=UserInfo(email=temp_admin_email, role='admin', name="connio-migrator"))
             admin = toSys.api.helpers.activate(token['token'])
-            time.sleep(3)
+            time.sleep(8)
             tempToCli = Client(username=admin.apikey.id, password=admin.apikey.secret, host=to_host)
             accountMap[acc.id] = admin.account_id
 
@@ -261,7 +251,7 @@ def clone_users(fromCli, from_account, toCli, from_admin_email=None):
             token = toCli.account.users.create(email=fromusr.email, role=fromusr.role, name=fromusr.name)
             usr = toSys.api.helpers.activate(token['token'])
 
-            time.sleep(3)
+            time.sleep(8)
 
             usr.update(password='password')
 
@@ -376,6 +366,25 @@ def clone_apps(fromCli, from_account, toCli, profileMap, appMap):
                                     )
         no += 1
         appMap[app.id] = newapp.id
+
+        dno = 1
+        for connector in app.data_connectors.list():
+            print('App {}: {}. data connector id: {}, type: {}, server: {}, db name: {}, disabled: {}'.format(
+                app.name,
+                dno,
+                connector.id, 
+                connector.type, 
+                connector.config['server'],
+                connector.config['database_name'],
+                connector.disabled)
+            )
+            newapp.data_connectors.create(
+                id=connector.id,
+                type=connector.type,
+                disabled=connector.disabled,
+                config=connector.config
+            )
+            dno += 1
 
 def clone_appprofiles(fromCli, from_account, toCli, profileMap):
     # Migrate all App Profiles

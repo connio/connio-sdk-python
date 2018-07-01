@@ -27,11 +27,11 @@ def migrate(migration_path):
     #                 password="xxx",
     #                 host="https://api3.inv.connio.net")
 
-    fromCli = Client(username="_key_374126053362348519", 
-                    password="7e20ee79632e4ae4924f7771358c5147")
+    fromCli = Client(username="_key_381829034888117286", 
+                    password="d7df4bfd720a436eaa6482822f801bbd")
 
-    toCli = Client(username="_key_374126053362348519", 
-                    password="7e20ee79632e4ae4924f7771358c5147",
+    toCli = Client(username="_key_396373341639626860", 
+                    password="c37740e760084cb19ddc9e83f048493d",
                     host="http://localhost:8081")
 
     # Cleanup existing profiles     
@@ -92,6 +92,7 @@ def migrate(migration_path):
                                                  base_profile=base_profile,
                                                  description=dpf.description,
                                                  tags=dpf.tags,
+                                                 image_url=dpf.image_url,
                                                  device_class=dpf.device_class,
                                                  product_name=dpf.product_name,
                                                  vendor_name=dpf.vendor_name
@@ -113,6 +114,19 @@ def migrate(migration_path):
                                                             )
                     print('Prop #{}. Property of {}: {}, {}, {}, {}, {}'.format(pno, newdp.name, newprp.id, newprp.name, newprp.inherited, newprp.access_type, newprp.date_created))
                     pno += 1
+
+            mno = 1
+            for mtd in fromCli.account.methods(dpf.id).stream():
+                if mtd.inherited == False:                   
+                    newmtd=toCli.account.methods(newdp.id).create(name=mtd.name,
+                                                              friendly_name=mtd.friendly_name,
+                                                              description=mtd.description,
+                                                              tags=mtd.tags,
+                                                              access_type=mtd.access_type,
+                                                              method_impl=mtd.method_impl,
+                                                            )
+                    print('Method #{}. Method of {}: {}, {}, {}, {}, {}'.format(mno, newmtd.name, newmtd.id, newmtd.name, newmtd.inherited, newmtd.access_type, newmtd.date_created))
+                    mno += 1
 
         no += 1
 
@@ -152,6 +166,19 @@ def migrate(migration_path):
                                                             )
                     print('Prop #{}. Property of {}: {}, {}, {}, {}, {}'.format(pno, newprp.name, newprp.id, newprp.name, newprp.inherited, newprp.access_type, newprp.date_created))
                     pno += 1
+
+            mno = 1
+            for mtd in fromCli.account.methods(apf.id).stream():
+                if mtd.inherited == False:                   
+                    newmtd=toCli.account.methods(newapf.id).create(name=mtd.name,
+                                                              friendly_name=mtd.friendly_name,
+                                                              description=mtd.description,
+                                                              tags=mtd.tags,
+                                                              access_type=mtd.access_type,
+                                                              method_impl=mtd.method_impl,
+                                                            )
+                    print('Method #{}. Method of {}: {}, {}, {}, {}, {}'.format(mno, newmtd.name, newmtd.id, newmtd.name, newmtd.inherited, newmtd.access_type, newmtd.date_created))
+                    mno += 1
 
         no += 1
 

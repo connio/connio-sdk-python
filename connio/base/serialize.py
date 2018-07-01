@@ -84,6 +84,7 @@ def measurement(measurement):
         return None
     return { 'type': measurement.type, 'unit': { 'label': measurement.unit.label, 'symbol': measurement.unit.symbol } }
 
+
 def location(loc):
     """
     
@@ -96,3 +97,14 @@ def location(loc):
         return { 'zone': loc.zone, 'geo': None }
     else: 
         return { 'zone': loc.zone, 'geo': { 'lat': loc.geo.lat, 'lon': loc.geo.lon, 'alt': loc.geo.alt } }
+
+
+def methodImplementation(body, lang='javascript'):
+    """
+    Serialize a method implementation object to JSON
+    :param measurement: MethodInstance.MethodImplementation
+    :return: jsonified string represenation of obj 
+    """    
+    if body is None:
+        return None
+    return { 'funcBody': body, 'script': lang }

@@ -5,6 +5,7 @@ from connio.base.instance_context import InstanceContext
 from connio.base.instance_resource import InstanceResource
 from connio.base.list_resource import ListResource
 from connio.base.page import Page
+from connio.rest.api.v3.account.dataconnector import DataConnectorList
 
 
 class AppList(ListResource):
@@ -250,6 +251,7 @@ class AppContext(InstanceContext):
         # Path Solution
         self._solution = {'account_id': account_id, 'id': id, }
         self._uri = '/accounts/{account_id}/apps/{id}'.format(**self._solution)
+        self._data_connectors = None
 
     def fetch(self):
         """
@@ -312,7 +314,22 @@ class AppContext(InstanceContext):
         :returns: True if delete succeeds, False otherwise
         :rtype: bool
         """
-        return self._version.delete('delete', self._uri)   
+        return self._version.delete('delete', self._uri) 
+
+    @property
+    def data_connectors(self):
+        """
+        
+        :returns: connio.rest.api.v3.account.connector.ConnectorList
+        :rtype: connio.rest.api.v3.account.connector.ConnectorList
+        """
+        if self._data_connectors is None:
+            self._data_connectors = DataConnectorList(
+                self._version,
+                account_id=self._solution['account_id'],
+                owner_id=self._solution['id']
+            )
+        return self._data_connectors
 
     def __repr__(self):
         """
@@ -441,6 +458,16 @@ class AppInstance(InstanceResource):
         :rtype: unicode
         """
         return self._properties['status']
+
+    @property
+    def data_connectors(self):
+        """
+        Access the Data Connectors
+
+        :returns: connio.rest.api.v3.account.connector.ConnectorList
+        :rtype: connio.rest.api.v3.account.connector.ConnectorList
+        """
+        return self._proxy.data_connectors
     
     @property
     def date_created(self):
