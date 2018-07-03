@@ -22,8 +22,8 @@ MIGRATION_PATH = "/Users/emre/DevHome/Projects/Connio/v3.1/octopus/connio-solo/m
 # from_host = "https://api.connio.com"
 from_host = "https://api3.inv.connio.net"
     
-to_host = "http://localhost:8081"
-# to_host = "https://api.connio.cloud"
+# to_host = "http://localhost:8081"
+to_host = "https://api.connio.cloud"
 
 frmSys = Client(username="user", 
                     password="password",
@@ -426,6 +426,31 @@ def clone_appprofiles(fromCli, from_account, toCli, profileMap):
                                                             )
                     #print('Prop #{}. Property of {}: {}, {}, {}, {}, {}'.format(pno, newprp.name, newprp.id, newprp.name, newprp.inherited, newprp.access_type, newprp.date_created))
                     pno += 1
+
+            mno = 1
+            for mtd in fromCli.account.methods(apf.id).stream():
+                if mtd.inherited == False:                   
+                    newmtd=toCli.account.methods(newapf.id).create(name=mtd.name,
+                                                              friendly_name=mtd.friendly_name,
+                                                              description=mtd.description,
+                                                              tags=mtd.tags,
+                                                              access_type=mtd.access_type,
+                                                              method_impl=mtd.method_impl,
+                                                            )
+                    #print('Method #{}. Method of {}: {}, {}, {}, {}, {}'.format(mno, newmtd.name, newmtd.id, newmtd.name, newmtd.inherited, newmtd.access_type, newmtd.date_created))
+                    mno += 1
+
+            # ano = 1
+            # for alr in fromCli.account.alerts(apf.id).stream():
+            #     newalr=toCli.account.alerts(newapf.id).create(name=alr.name,
+            #                                                 friendly_name=alr.friendly_name,
+            #                                                 description=alr.description,
+            #                                                 tags=alr.tags,
+            #                                                 #......                                                          
+            #                                             )
+            #     #print('Alert #{}. Alert of {}: {}, {}, {}'.format(ano, newalr.name, newalr.id, newalr.name, newalr.date_created))
+            #     ano += 1
+            
             no += 1
 
 
@@ -475,6 +500,31 @@ def clone_deviceprofiles(fromCli, from_account, toCli, profileMap):
                                                             )
                     #print('Prop #{}. Property of {}: {}, {}, {}, {}, {}'.format(pno, newdp.name, newprp.id, newprp.name, newprp.inherited, newprp.access_type, newprp.date_created))
                     pno += 1
+
+            mno = 1
+            for mtd in fromCli.account.methods(dpf.id).stream():
+                if mtd.inherited == False:                   
+                    newmtd=toCli.account.methods(newdp.id).create(name=mtd.name,
+                                                              friendly_name=mtd.friendly_name,
+                                                              description=mtd.description,
+                                                              tags=mtd.tags,
+                                                              access_type=mtd.access_type,
+                                                              method_impl=mtd.method_impl,
+                                                            )
+                    #print('Method #{}. Method of {}: {}, {}, {}, {}, {}'.format(mno, newmtd.name, newmtd.id, newmtd.name, newmtd.inherited, newmtd.access_type, newmtd.date_created))
+                    mno += 1
+
+            # ano = 1
+            # for alr in fromCli.account.alerts(dpf.id).stream():
+            #     newalr=toCli.account.alerts(newdp.id).create(name=alr.name,
+            #                                                 friendly_name=alr.friendly_name,
+            #                                                 description=alr.description,
+            #                                                 tags=alr.tags,
+            #                                                 #......                                                          
+            #                                             )
+            #     #print('Alert #{}. Alert of {}: {}, {}, {}'.format(ano, newalr.name, newalr.id, newalr.name, newalr.date_created))
+            #     ano += 1
+
             no += 1
 
 def main(argv):
