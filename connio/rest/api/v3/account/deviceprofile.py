@@ -39,6 +39,9 @@ class DeviceProfileList(ListResource):
         :returns: Newly created DeviceProfileInstance
         :rtype: connio.rest.api.v3.account.deviceprofile.DeviceProfileInstance
         """
+
+        # if tags is not None:
+        #     tags = tags[:32]
         
         data = values.of({
             'name': name,
