@@ -22,8 +22,8 @@ MIGRATION_PATH = "/Users/emre/DevHome/Projects/Connio/v3.1/octopus/connio-solo/m
 # from_host = "https://api.connio.com"
 from_host = "https://api3.inv.connio.net"
     
-# to_host = "http://localhost:8081"
-to_host = "https://api.connio.cloud"
+to_host = "http://localhost:8081"
+# to_host = "https://api.connio.cloud"
 
 frmSys = Client(username="user", 
                     password="password",
@@ -108,19 +108,17 @@ def migrate_master(account_id, account_name, owner_account, admin_user_email, ad
     token = toSys.accounts.create(name=account_name, owner=owner_account, tags=['migration'], userInfo=UserInfo(email=admin_user_email, role='admin', name=admin_user_name))
     admin = toSys.api.helpers.activate(token['token'])
 
-    time.sleep(8)
-
     # Update admin api key and set password
     toCli = clone_user(MIGRATION_PATH, admin, from_admin_key_id, from_admin_key_secret, to_host)
 
-    time.sleep(8)
+    time.sleep(5)
 
     tblFromOldAccountIdToNewAccountId[account_id] = admin.account_id
 
     clone_account(tblFromOldAccountIdToNewAccountId, toCli, admin.account_id, fromCli, account_id, account_name, admin_user_email)
 
 def clone_account(accountMap, toCli, to_account_id, fromCli, from_account_id, from_account_name, from_admin_email = None, owner_account = None):
-    print('Migrating account id: {}, name: {}, owner: {}'.format(from_account_id, from_account_name, owner_account or 'None'))
+    print('Migrating account {} --> id: {}, owner: {}'.format(from_account_name, from_account_id, owner_account or 'None'))
 
     # Build profile map
     tblFromOldProfIdToNewProfId = dict()
@@ -153,7 +151,9 @@ def clone_account(accountMap, toCli, to_account_id, fromCli, from_account_id, fr
 
             token = toSys.accounts.create(name=acc.name, owner=to_account_id, tags=['migration'], userInfo=UserInfo(email=temp_admin_email, role='admin', name="connio-migrator"))
             admin = toSys.api.helpers.activate(token['token'])
-            time.sleep(8)
+
+            time.sleep(5)
+
             tempToCli = Client(username=admin.apikey.id, password=admin.apikey.secret, host=to_host)
             accountMap[acc.id] = admin.account_id
 
@@ -207,8 +207,15 @@ def clone_user(migration_path, user, src_user_key_id, src_user_key_secret, to_ho
     :returns: connio.rest.api.v3.account.user.UserList
     :rtype: connio.rest.api.v3.account.user.UserList
     """
-    # setup a client with current admin credentials 
-    toCli = Client(username=user.apikey.id, password=user.apikey.secret, host=to_host)
+
+    while(1):
+        try:
+            # setup a client with current admin credentials 
+            toCli = Client(username=user.apikey.id, password=user.apikey.secret, host=to_host)
+            break
+        except:
+            time.sleep(1)
+            continue
 
     # Set admin password to default 
     user.update(password="password")
@@ -251,7 +258,7 @@ def clone_users(fromCli, from_account, toCli, from_admin_email=None):
             token = toCli.account.users.create(email=fromusr.email, role=fromusr.role, name=fromusr.name)
             usr = toSys.api.helpers.activate(token['token'])
 
-            time.sleep(8)
+            time.sleep(5)
 
             usr.update(password='password')
 
@@ -312,41 +319,55 @@ def clone_devices(fromCli, from_account, toCli, profileMap, appMap):
     # Migrate all Devices
     no = 1
     for dev in fromCli.account.devices.stream():
-        # Copy device id into migration folder
-        text_file = open(MIGRATION_PATH + "device", "w")
-        text_file.write(dev.id)
-        text_file.close()
 
-        text_file = open(MIGRATION_PATH + "apikey", "w")
-        text_file.write(dev.apikey.id)
-        text_file.write('\n')
-        text_file.write(dev.apikey.secret)
-        text_file.close()
+        while(1):
+            try:
+                # Copy device id into migration folder
+                text_file = open(MIGRATION_PATH + "device", "w")
+                text_file.write(dev.id)
+                text_file.close()
+
+                text_file = open(MIGRATION_PATH + "apikey", "w")
+                text_file.write(dev.apikey.id)
+                text_file.write('\n')
+                text_file.write(dev.apikey.secret)
+                text_file.close()
+                break
+            except ConnioException as err:
+                # Probably too many request error occurred - cool it down 
+                print('***** ERROR: {}'.format(err))
+                time.sleep(15)
+                continue 
 
         #convert app ids
         apps = []
         for i in dev.apps:
             apps.append(appMap[i])
             
-        try:
-            newDev = toCli.account.devices.create(name=dev.name,
-                                        profile=profileMap.get(dev.profile_id),
-                                        apps=apps,
-                                        friendly_name=dev.friendly_name,
-                                        description=dev.description,
-                                        tags=dev.tags,
-                                        location=dev.location,
-                                        custom_ids=dev.custom_ids,
-                                        status=dev.status,
-                                        period=dev.period,
-                                        annotate_with_location=dev.annotate_with_location,
-                                        annotate_with_meta=dev.annotate_with_meta
-                                        )
-            if no % 150 == 0:
-                print('Device #{}. {}, {}, {}'.format(no, newDev.id, newDev.name, newDev.date_created))
-            no += 1
-        except ConnioException as err:
-            print('***** ERROR: {}'.format(err))
+        while(1):
+            try:
+                newDev = toCli.account.devices.create(name=dev.name,
+                                            profile=profileMap.get(dev.profile_id),
+                                            apps=apps,
+                                            friendly_name=dev.friendly_name,
+                                            description=dev.description,
+                                            tags=dev.tags,
+                                            location=dev.location,
+                                            custom_ids=dev.custom_ids,
+                                            status=dev.status,
+                                            period=dev.period,
+                                            annotate_with_location=dev.annotate_with_location,
+                                            annotate_with_meta=dev.annotate_with_meta
+                                            )
+                if no % 150 == 0:
+                    print('Device #{}. {}, {}, {}'.format(no, newDev.id, newDev.name, newDev.date_created))
+                no += 1
+                break
+            except ConnioException as err:
+                # Probably too many request error occurred - cool it down
+                print('***** ERROR: {}'.format(err))
+                time.sleep(15)
+                continue
 
 
         os.remove(MIGRATION_PATH + "device")
