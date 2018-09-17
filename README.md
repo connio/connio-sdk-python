@@ -1,2 +1,2 @@
-# connio3-sdk-python
-Connio v3 Python SDK
+# connio-sdk-python
+Connio Python SDK

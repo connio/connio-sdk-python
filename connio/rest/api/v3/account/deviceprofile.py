@@ -27,7 +27,8 @@ class DeviceProfileList(ListResource):
         self._uri = '/accounts/{account_id}/deviceprofiles'.format(**self._solution)
 
     def create(self, name, base_profile=values.unset, friendly_name=values.unset, description=values.unset,
-                tags=values.unset, device_class=values.unset, vendor_name=values.unset, product_name=values.unset, image_url=values.unset):
+                tags=values.unset, device_class=values.unset, vendor_name=values.unset, product_name=values.unset, image_url=values.unset, 
+                locked=values.unset):
         """
         Create a new DeviceProfileInstance
 
@@ -53,6 +54,7 @@ class DeviceProfileList(ListResource):
             'vendorName': vendor_name,
             'productName': product_name,  
             'imageUrl': image_url,
+            'locked': locked,
         })
 
         payload = self._version.create(

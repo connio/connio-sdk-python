@@ -27,7 +27,8 @@ class AppProfileList(ListResource):
         self._uri = '/accounts/{account_id}/appprofiles'.format(**self._solution)
 
     def create(self, name, base_profile=values.unset, friendly_name=values.unset, description=values.unset,
-                tags=values.unset, version=values.unset, vendor_name=values.unset, product_name=values.unset, system=values.unset, image_url=values.unset):
+                tags=values.unset, version=values.unset, vendor_name=values.unset, product_name=values.unset, system=values.unset, 
+                image_url=values.unset, locked=values.unset):
         """
         Create a new AppProfileInstance
 
@@ -53,6 +54,7 @@ class AppProfileList(ListResource):
             'productName': product_name,  
             'system': system,
             'imageUrl': image_url,
+            'locked': locked,
         })
 
         payload = self._version.create(

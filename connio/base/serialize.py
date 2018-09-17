@@ -80,7 +80,7 @@ def measurement(measurement):
     :param measurement: PropertyInstance.Measurement
     :return: jsonified string represenation of obj 
     """    
-    if measurement is None:
+    if measurement is values.unset or measurement is None:
         return None
     return { 'type': measurement.type, 'unit': { 'label': measurement.unit.label, 'symbol': measurement.unit.symbol } }
 
@@ -91,12 +91,12 @@ def location(loc):
     """    
     if loc is None:
         return None
-    if loc.zone is None: 
-        return { 'zone': None, 'geo': { 'lat': loc.geo.lat, 'lon': loc.geo.lon, 'alt': loc.geo.alt } }
-    elif loc.geo is None:
-        return { 'zone': loc.zone, 'geo': None }
+    if loc.get('zone') is None and loc.get('geo') is not None: 
+        return { 'zone': None, 'geo': loc['geo'] }
+    elif loc.get('geo') is None and loc.get('zone') is not None: 
+        return { 'zone': loc['zone'], 'geo': None }
     else: 
-        return { 'zone': loc.zone, 'geo': { 'lat': loc.geo.lat, 'lon': loc.geo.lon, 'alt': loc.geo.alt } }
+        return { 'zone': loc['zone'], 'geo': loc['geo'] }
 
 
 def methodImplementation(body, lang='javascript'):

@@ -28,7 +28,7 @@ class PropertyList(ListResource):
 
 
     def create(self, name, data_type, access_type, publish_type, friendly_name=values.unset, description=values.unset,
-                tags=values.unset, measurement=values.unset, retention=values.unset):
+                tags=values.unset, measurement=values.unset, retention=values.unset, locked=values.unset):
         """
         Create a new PropertyInstance
 
@@ -53,6 +53,7 @@ class PropertyList(ListResource):
             'publish': publish_type,
             'measurement': serialize.measurement(measurement),
             'retention': retention,
+            'locked': locked,
         })
 
         payload = self._version.create(

@@ -44,6 +44,9 @@ def on_subscribe(client, userdata, mid, granted_qos):
     print("Subscription is complete")
 
     payload = json.dumps({'mac': '16:b4:12:7d:5d:da'})
+    # payload = json.dumps({'imei': '8349583409850438095'})
+    # payload = json.dumps({'sn': '3498593'})
+    
 
     #innova
     #payload = json.dumps({'mac': '2c:4d:54:42:f1:a8'})

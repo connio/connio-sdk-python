@@ -94,7 +94,7 @@ def example():
                                         )
 
     # Create devices generated from this device profile
-    for i in range(1, 11):
+    for i in range(1, 10):
         device = client.account.devices.create(name='Device.{}'.format(i), 
                                                profile='compressor',
                                                )

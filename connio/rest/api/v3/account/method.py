@@ -28,7 +28,7 @@ class MethodList(ListResource):
 
 
     def create(self, name, access_type, method_impl=values.unset, friendly_name=values.unset, 
-                description=values.unset, tags=values.unset):
+                description=values.unset, tags=values.unset, locked=values.unset):
         """
         Create a new MethodInstance
 
@@ -48,6 +48,7 @@ class MethodList(ListResource):
             'description': description,
             'tags': tags,
             'access': access_type,
+            'locked': locked,
             'methodImpl': serialize.methodImplementation(method_impl.body, method_impl.lang),
         })
 
