@@ -1,76 +1,146 @@
 import paho.mqtt.client as mqtt
 from paho.mqtt.client import connack_string
 from paho.mqtt.client import MQTTv311
+
 import json
+import datetime
+import os
+import time
+import pytz
 
+deviceId = None
+deviceKeyId = None
+deviceKeySecret = None
+config = { 'frequency': 10, 'forever': True }
 
-MqttClientID="_???_11111111111"
-UserName="_key_382212017171338747"
-Password="162d97594bb04b4db4bc8195b91e2949"
+def provision(userName, password, cidType, cidVal):
+    MqttClientID = "_???_11111111111"
 
+    # The callback for when the client receives a CONNACK response from the server.
+    def on_connect(client, userdata, flags, rc):
+        print("Connection returned result: " + connack_string(rc))
+        print("    Session present: " + str(flags['session present']))
+        print("    Connection result: " + str(rc))
 
-# INNOVA
+        # Subscribing in on_connect() means that if we lose the connection and
+        # reconnect then subscriptions will be renewed.
+        client.subscribe("connio/provisions/{}".format(MqttClientID))
 
-# MqttClientID="_???_11111111111"
-# UserName="_key_300296630590587668"
-# Password="296582a04af241eb99fde15014423683"
+    def on_disconnect(client, userdata, rc):
+        print("Connection is lost: " + connack_string(rc))
+        client.loop_stop()
 
-# MqttClientID="_???_3bad22ba52ad482992"
-# UserName="_key_359151487716885388"
-# Password="6e9304012a024979b2a8db96e8043773"
+    # The callback for when a PUBLISH message is received from the server.
+    def on_message(client, userdata, msg):
+        print("Message received: \n@" + msg.topic + "\n" + str(msg.payload))
+        
+        response = json.loads(msg.payload.decode("utf8"))
 
-# MqttClientID="_bridge_2345345435345"
-# UserName="burrard"
-# Password="burrard"
+        global deviceId 
+        global deviceKeyId
+        global deviceKeySecret
+        global config
 
-# The callback for when the client receives a CONNACK response from the server.
-def on_connect(client, userdata, flags, rc):
-    print("Connection returned result: " + connack_string(rc))
+        deviceId = response.get('deviceId')
+        deviceKeyId = response.get('apiKeyId')
+        deviceKeySecret = response.get('apiSecret')
+        config = response.get('config')
 
-    # Subscribing in on_connect() means that if we lose the connection and
-    # reconnect then subscriptions will be renewed.
-    # client.subscribe("$SYS/#")
-    client.subscribe("connio/provisions/{}".format(MqttClientID))
+        client.disconnect()
 
-def on_disconnect(client, userdata, rc):
-    print("Connection is lost: " + connack_string(rc))
+    def on_subscribe(client, userdata, mid, granted_qos):
+        print("Subscription is complete")
 
-# The callback for when a PUBLISH message is received from the server.
-def on_message(client, userdata, msg):
-    print(msg.topic+" " + str(msg.payload))
-    client.disconnect()
+        payload = json.dumps({cidType: cidVal, 'configProperty': 'config'})   
+        client.publish("connio/provisions", payload)
 
-def on_subscribe(client, userdata, mid, granted_qos):
-    print("Subscription is complete")
+    def on_publish(client, userdata, mid):
+        print("Publish is complete")
 
-    payload = json.dumps({'mac': '16:b4:12:7d:5d:da'})
-    # payload = json.dumps({'imei': '8349583409850438095'})
-    # payload = json.dumps({'sn': '3498593'})
+    client = mqtt.Client(client_id=MqttClientID, clean_session=True, userdata=None, protocol=MQTTv311)
+
+    client.on_connect = on_connect
+    client.on_disconnect = on_disconnect
+    client.on_message = on_message
+    client.on_subscribe = on_subscribe
+    client.on_publish = on_publish
+
+    client.username_pw_set(username=userName, password=password)
+    client.connect_async("mqtt.connio.cloud", 1883, 60)
+
+    client.loop_forever()
+
+#
+#
+#
+
+def connect():    
+    print('Connecting as....... {} : {} : {}'.format(deviceId, deviceKeyId, deviceKeySecret))
+
+    # The callback for when the client receives a CONNACK response from the server.
+    def on_connect(client, deviceId, flags, rc):       
+        client.subscribe("connio/data/in/devices/{}/#".format(deviceId))
+
+    def on_disconnect(client, userdata, rc):
+        print("Connection is lost: " + connack_string(rc))
+
+    # The callback for when a PUBLISH message is received from the server.
+    def on_message(client, userdata, msg):
+        global config
+
+        data = json.loads(msg.payload)
+        print("Data received @ topic: ", str(msg.topic) + " <= ", str(data))
+
+        prop = str(msg.topic).split('/')[-1]
+        if (prop == 'config'):
+            config = data
+        elif (prop == 'message'):
+            print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+            print("~                                              ~")
+            print("~                                              ~")
+            print("~                                              ~")
+            print("\t{}".format(str(data)))
+            print("~                                              ~")
+            print("~                                              ~")
+            print("~                                              ~")
+            print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+
+    def on_subscribe(client, userdata, mid, granted_qos):
+        print("Subscription is complete")
+
+    def on_publish(client, userdata, mid):
+        print("Data successfully sent")
+
+    client = mqtt.Client(client_id=deviceId, clean_session=True, userdata=deviceId, protocol=MQTTv311)
+
+    client.on_connect = on_connect
+    client.on_disconnect = on_disconnect
+    client.on_message = on_message
+    client.on_subscribe = on_subscribe
+    client.on_publish = on_publish
+
+    client.username_pw_set(username=deviceKeyId, password=deviceKeySecret)
+    client.connect_async("mqtt.connio.cloud", 1883, 30)
+
+    client.loop_start()
+
+    global config
+
+    if config is None:
+        config = {}
+
+    while config.get('forever', True):
+        time.sleep(config.get('frequency', 5))
+
+    client.loop_stop()
+        
+if __name__ == '__main__':    
+    provisioningKeyId = os.environ.get("CONNIO_PROVISION_KEY_ID", "INVALID_KEY_ID")
+    provisioningKeySecret = os.environ.get("CONNIO_PROVISION_KEY_SECRET", "INVALID_SECRET")
     
+    cidType = os.environ.get("CONNIO_DEVICE_CID_TYPE", 'sn')
+    cid = os.environ.get("CONNIO_DEVICE_CID_VALUE", 'SN-1234')
 
-    #innova
-    #payload = json.dumps({'mac': '2c:4d:54:42:f1:a8'})
-    client.publish("connio/provisions", payload)
+    provision(provisioningKeyId, provisioningKeySecret, cidType, cid)
+    connect()
 
-def on_publish(client, userdata, mid):
-    print("Publish is complete")
-
-client = mqtt.Client(client_id=MqttClientID, clean_session=True, userdata=None, protocol=MQTTv311)
-
-client.on_connect = on_connect
-client.on_disconnect = on_disconnect
-client.on_message = on_message
-client.on_subscribe = on_subscribe
-client.on_publish = on_publish
-
-client.username_pw_set(username=UserName, password=Password)
-client.connect_async("mqtt.connio.cloud", 1883, 60)
-
-#Innova
-#client.connect_async("mqtt3.inv.connio.net", 1883, 60)
-
-# Blocking call that processes network traffic, dispatches callbacks and
-# handles reconnecting.
-# Other loop*() functions are available that give a threaded interface and a
-# manual interface.
-client.loop_forever()

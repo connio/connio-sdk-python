@@ -8,16 +8,21 @@ sys.path.insert(0,parentdir)
 
 from connio.rest import Client
 
-ACCOUNT_KEYID = os.environ.get('CONNIO_ACCOUNT_KEYID')
-ACCOUNT_KEYSECRET = os.environ.get('CONNIO_ACCOUNT_KEYSECRET')
+ACCOUNT_KEYID = os.environ.get('CONNIO_ACCOUNT_KEYID', 'INVALID_KEYID')
+ACCOUNT_KEYSECRET = os.environ.get('CONNIO_ACCOUNT_KEYSECRET', 'INVALID_SECRET')
 
 def example():
     """
     Some example usage of different connio resources.
+
+    Make sure to set env vars in the terminal before you run this example.
+
+    $ export ACCOUNT_KEYID=<your connio user key id>
+    $ export ACCOUNT_KEYSECRET=<your connio key's secret>
     """
 
-    client = Client(username="_key_384829132696204034", 
-                    password="840b43d162b040e4a9c14e7899f0151c")
+    client = Client(username=ACCOUNT_KEYID, 
+                    password=ACCOUNT_KEYSECRET)
 
     # Get master account details
     master = client.accounts.get().fetch()    
