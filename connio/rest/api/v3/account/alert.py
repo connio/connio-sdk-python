@@ -1,5 +1,6 @@
 
 from connio.base import deserialize
+from connio.base import serialize
 from connio.base import values
 from connio.base.instance_context import InstanceContext
 from connio.base.instance_resource import InstanceResource
@@ -26,8 +27,8 @@ class AlertList(ListResource):
         self._uri = '/accounts/{account_id}/alerts?owner={owner_id}'.format(**self._solution)
 
 
-    def create(self, name, friendly_name=values.unset, status=values.unset,  
-                description=values.unset, tags=values.unset):
+    def create(self, name, trigger, metric, friendly_name=values.unset, status='enabled',  
+                description=values.unset, tags=values.unset, conditions=values.unset, notifications=values.unset, locked=values.unset):
         """
         Create a new AlertInstance
 
@@ -47,6 +48,11 @@ class AlertList(ListResource):
             'description': description,
             'tags': tags,
             'status': status,
+            'trigger': trigger,
+            'metric': metric,
+            'conditions': serialize.conditions(conditions),
+            'notifications': serialize.notifications(notifications),
+            'locked': locked,
         })
 
         payload = self._version.create(
@@ -313,6 +319,31 @@ class AlertContext(InstanceContext):
 class AlertInstance(InstanceResource):
     """  """
 
+    class Condition(object):
+        class Expression(object):
+            def __init__(self, operation, value=None):
+                self.operation=operation
+                self.value=value
+        class Handler(object):
+            def __init__(self, key, notification):
+                self.key=key
+                self.notification=notification
+        def __init__(self, severity, expression, handlers):
+            self.severity = severity
+            self.expression = expression
+            self.handlers = handlers
+
+    class Notification(object):
+        def __init__(self, action, name, level=None, message=None, to=None, subject=None, method=None, parameter=None):
+            self.action = action
+            self.name = name
+            self.level = level
+            self.to = to
+            self.subject = subject
+            self.message = message
+            self.method = method
+            self.parameter = parameter
+
     def __init__(self, version, payload, account_id, id=None):
         """
         Initialize the AlertInstance
@@ -329,9 +360,13 @@ class AlertInstance(InstanceResource):
             'owner_id': payload['ownerId'],
             'name': payload['name'],
             'friendly_name': payload['friendlyName'],
-            'description': payload.setdefault('description', None),
-            'tags': payload.setdefault('tags', None),
-            'status': payload['status'],
+            'description': payload.get('description'),
+            'tags': payload.get('tags'),
+            'status': payload.setdefault('status', 'enabled'),
+            'metric': payload['metric'],
+            'trigger': payload.get('triggerPropId') or payload.get('triggerId'),
+            'conditions': deserialize.conditions(payload.get('conditions')),
+            'notifications': deserialize.notifications(payload.get('notifications')),
             'locked': payload['locked'],        
             'date_created': deserialize.iso8601_datetime(payload['dateCreated']),
             'date_updated': deserialize.iso8601_datetime(payload['dateModified']),
@@ -421,6 +456,38 @@ class AlertInstance(InstanceResource):
         :rtype: unicode
         """
         return self._alerts['status']
+
+    @property
+    def metric(self):
+        """
+        :returns:
+        :rtype: unicode
+        """
+        return self._alerts['metric']
+
+    @property
+    def trigger(self):
+        """
+        :returns:
+        :rtype: unicode
+        """
+        return self._alerts['trigger']
+
+    @property
+    def conditions(self):
+        """
+        :returns:
+        :rtype: 
+        """
+        return self._alerts['conditions']
+
+    @property
+    def notifications(self):
+        """
+        :returns:
+        :rtype: 
+        """
+        return self._alerts['notifications']
 
     @property
     def locked(self):

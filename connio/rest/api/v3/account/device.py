@@ -66,32 +66,15 @@ class DeviceList(ListResource):
 
         return DeviceInstance(self._version, payload, account_id=self._solution['account_id'], )
 
-    def create_batch(self, devices):
+    def create_bulk(self, devices):
         """
         Create multiple devices
 
-        """
-        data = values.of(devices)
-
-        # {
-        #     'name': name,
-        #     'profile': profile,
-        #     'apps': apps,
-        #     'friendlyName': friendly_name,
-        #     'description': description,
-        #     'tags': tags,
-        #     'location': serialize.location(location),
-        #     'customIds': custom_ids,
-        #     'status': status,
-        #     'period': period,
-        #     'annotateWithLoc': annotate_with_location,
-        #     'annotateWithMeta': annotate_with_meta,
-        # }
-
+        """        
         payload = self._version.create(
             'POST',
-            self._uri,
-            data=data,
+            self._uri + '/bulk',
+            data=devices,
         )
 
         return payload

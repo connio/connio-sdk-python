@@ -1,5 +1,6 @@
 
 from connio.base import deserialize
+from connio.base import serialize
 from connio.base import values
 from connio.base.instance_context import InstanceContext
 from connio.base.instance_resource import InstanceResource
@@ -18,11 +19,10 @@ from connio.rest.api.v3.account.method import MethodList
 from connio.rest.api.v3.account.alert import AlertList
 
 class UserInfo(object):
-    def __init__(self, email, role, name=values.unset):
+    def __init__(self, email, role, name=None):
         self.email = email
         self.role = role
         self.name = name
-
 
 class AccountList(ListResource):
     """  """
@@ -42,7 +42,7 @@ class AccountList(ListResource):
         self._solution = {}
         self._uri = '/accounts'.format(**self._solution)
 
-    def create(self, name, friendly_name=values.unset, owner=None, userInfo=None, tags=None, description=None):
+    def create(self, name, friendly_name=values.unset, owner=values.unset, userInfo=values.unset, tags=values.unset, description=values.unset, plan=values.unset):
         """
         Create a new AccountInstance
 
@@ -51,8 +51,8 @@ class AccountList(ListResource):
         :returns: Newly created AccountInstance
         :rtype: connio.rest.api.v3.account.AccountInstance
         """
-        adminInfo = None
-        if userInfo is not None:
+        adminInfo = values.unset
+        if userInfo is not values.unset:
             adminInfo = {'email': userInfo.email, 'role': userInfo.role, 'name': userInfo.name}
 
         data = values.of({
@@ -61,7 +61,8 @@ class AccountList(ListResource):
             'owner': owner,
             'user': adminInfo,
             'tags': tags,
-            'description': description
+            'description': description,
+            'plan': serialize.plan(plan)
         })
 
         payload = self._version.create(
@@ -447,15 +448,22 @@ class AccountContext(InstanceContext):
 class AccountInstance(InstanceResource):
     """  """
 
-    class Status(object):
+    class Status:
         CREATED = "created"
         OPEN = "open"
         SUSPENDED = "suspended"        
         CLOSED = "closed"
 
-    class PlanType(object):
-        TRIAL = "Trial"
-        PAID = "Paid"
+    class PlanType:
+        TRIAL = "trial"
+        PAID_PLAN_A = "paidPlanA"
+        PAID_PLAN_B = "paidPlanB"
+        PAID_PLAN_C = "paidPlanC"
+
+    class Plan(object):
+        def __init__(self, type, expires_at=None):
+            self.type = type
+            self.expires_at = expires_at
 
     def __init__(self, version, payload, id=None):
         """
@@ -472,6 +480,7 @@ class AccountInstance(InstanceResource):
             'name': payload['name'],
             'friendly_name': payload.get('friendlyName'),
             'status': payload['status'],
+            'plan': deserialize.plan(payload['plan']),
             'owner_account_id': payload.get('ownerId'),
             'locked': payload['locked'],
             'date_created': deserialize.iso8601_datetime(payload['dateCreated']),
@@ -550,6 +559,14 @@ class AccountInstance(InstanceResource):
         :rtype: AccountInstance.Status
         """
         return self._properties['status']
+
+    @property
+    def plan(self):
+        """
+        :returns: The plan of this account
+        :rtype: AccountInstance.Plan
+        """
+        return self._properties['plan']
 
     def delete(self, remove=False):
         """

@@ -13,8 +13,12 @@ deviceKeyId = None
 deviceKeySecret = None
 config = { 'frequency': 10, 'forever': True }
 
+BROKER_ADDR = "mqtt.connio.cloud"
+# BROKER_ADDR = "localhost"
+BROKER_PORT = 1883
+
 def provision(userName, password, cidType, cidVal):
-    MqttClientID = "_???_11111111111"
+    MqttClientID = "_???_SAA345678987654321"
 
     # The callback for when the client receives a CONNACK response from the server.
     def on_connect(client, userdata, flags, rc):
@@ -51,7 +55,8 @@ def provision(userName, password, cidType, cidVal):
     def on_subscribe(client, userdata, mid, granted_qos):
         print("Subscription is complete")
 
-        payload = json.dumps({cidType: cidVal, 'configProperty': 'config'})   
+        # payload = json.dumps({cidType: cidVal, 'configProperty': 'config'})
+        payload = json.dumps({cidType: cidVal})   
         client.publish("connio/provisions", payload)
 
     def on_publish(client, userdata, mid):
@@ -66,7 +71,7 @@ def provision(userName, password, cidType, cidVal):
     client.on_publish = on_publish
 
     client.username_pw_set(username=userName, password=password)
-    client.connect_async("mqtt.connio.cloud", 1883, 60)
+    client.connect_async(BROKER_ADDR, BROKER_PORT, 60)
 
     client.loop_forever()
 
@@ -94,7 +99,7 @@ def connect():
         prop = str(msg.topic).split('/')[-1]
         if (prop == 'config'):
             config = data
-        elif (prop == 'message'):
+        elif (prop == 'message' or prop == 'cmd'):
             print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
             print("~                                              ~")
             print("~                                              ~")
@@ -106,7 +111,7 @@ def connect():
             print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
     def on_subscribe(client, userdata, mid, granted_qos):
-        print("Subscription is complete")
+        print("Subscription is complete with QoS level {}".format(granted_qos))
 
     def on_publish(client, userdata, mid):
         print("Data successfully sent")
@@ -120,14 +125,14 @@ def connect():
     client.on_publish = on_publish
 
     client.username_pw_set(username=deviceKeyId, password=deviceKeySecret)
-    client.connect_async("mqtt.connio.cloud", 1883, 30)
+    client.connect_async(BROKER_ADDR, BROKER_PORT, 30)
 
     client.loop_start()
 
     global config
 
     if config is None:
-        config = {}
+        config = { 'forever': True, 'frequency': 10 }
 
     while config.get('forever', True):
         time.sleep(config.get('frequency', 5))
@@ -135,11 +140,11 @@ def connect():
     client.loop_stop()
         
 if __name__ == '__main__':    
-    provisioningKeyId = os.environ.get("CONNIO_PROVISION_KEY_ID", "INVALID_KEY_ID")
-    provisioningKeySecret = os.environ.get("CONNIO_PROVISION_KEY_SECRET", "INVALID_SECRET")
+    provisioningKeyId = os.environ.get("CONNIO_PROVISION_KEY_ID", "_key_499569128223998049")
+    provisioningKeySecret = os.environ.get("CONNIO_PROVISION_KEY_SECRET", "0af19086c6a1485e890b996776bb58f0")
     
-    cidType = os.environ.get("CONNIO_DEVICE_CID_TYPE", 'sn')
-    cid = os.environ.get("CONNIO_DEVICE_CID_VALUE", 'SN-1234')
+    cidType = os.environ.get("CONNIO_DEVICE_CID_TYPE", 'mac')
+    cid = os.environ.get("CONNIO_DEVICE_CID_VALUE", '00:1e:c0:91:6e:0c')
 
     provision(provisioningKeyId, provisioningKeySecret, cidType, cid)
     connect()

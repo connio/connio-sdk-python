@@ -49,7 +49,7 @@ class MethodList(ListResource):
             'tags': tags,
             'access': access_type,
             'locked': locked,
-            'methodImpl': serialize.methodImplementation(method_impl.body, method_impl.lang),
+            'methodImpl': serialize.methodImplementation(method_impl),
         })
 
         payload = self._version.create(

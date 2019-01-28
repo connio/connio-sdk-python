@@ -45,7 +45,7 @@ class SysUserList(ListResource):
 
         return SysUserInstance(self._version, payload, )
 
-    def stream(self, name=values.unset, status=values.unset, limit=None,
+    def stream(self, account=values.unset, name=values.unset, status=values.unset, limit=None,
                page_size=None):
         """
         Streams SysUserInstance records from the API as a generator stream.
@@ -67,17 +67,18 @@ class SysUserList(ListResource):
         """
         limits = self._version.read_limits(limit, page_size)
 
-        page = self.page(name=name, status=status, page_size=limits['page_size'], )
+        page = self.page(account=account, name=name, status=status, page_size=limits['page_size'], )
 
         return self._version.stream(page, limits['limit'], limits['page_limit'])
 
-    def list(self, name=values.unset, status=values.unset, limit=None,
+    def list(self, account=values.unset, name=values.unset, status=values.unset, limit=None,
              page_size=None):
         """
         Lists SysUserInstance records from the API as a list.
         Unlike stream(), this operation is eager and will load `limit` records into
         memory before returning.
 
+        :param unicode account: User account to filter on
         :param unicode name: User name to filter on
         :param SysUserInstance.Status status: Status to filter on
         :param int limit: Upper limit for the number of records to return. list() guarantees
@@ -91,18 +92,20 @@ class SysUserList(ListResource):
         :rtype: list[connio.rest.api.v3.sysuser.SysUserInstance]
         """
         return list(self.stream(
+            account=account,
             name=name,
             status=status,
             limit=limit,
             page_size=page_size,
         ))
 
-    def page(self, name=values.unset, status=values.unset,
+    def page(self, account=values.unset, name=values.unset, status=values.unset,
              page_number=values.unset, page_size=values.unset):
         """
         Retrieve a single page of SysUserInstance records from the API.
         Request is executed immediately
 
+        :param unicode account: User account to filter on
         :param unicode name: User name to filter on
         :param SysUserInstance.Status status: Status to filter on
         :param int page_number: Page Number, this value is simply for client state
@@ -112,6 +115,7 @@ class SysUserList(ListResource):
         :rtype: connio.rest.api.v3.sysuser.SysUserPage
         """
         params = values.of({
+            'account': account,
             'name': name,
             'status': status,
             'pageNo': page_number,

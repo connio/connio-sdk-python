@@ -28,7 +28,7 @@ class PropertyList(ListResource):
 
 
     def create(self, name, data_type, access_type, publish_type, friendly_name=values.unset, description=values.unset,
-                tags=values.unset, measurement=values.unset, retention=values.unset, locked=values.unset):
+                tags=values.unset, measurement=values.unset, retention=values.unset, boundaries=values.unset, locked=values.unset):
         """
         Create a new PropertyInstance
 
@@ -52,7 +52,8 @@ class PropertyList(ListResource):
             'access': access_type,
             'publish': publish_type,
             'measurement': serialize.measurement(measurement),
-            'retention': retention,
+            'boundaries': serialize.boundaries(boundaries),        
+            'retention': serialize.retention(retention),
             'locked': locked,
         })
 
@@ -320,15 +321,61 @@ class PropertyContext(InstanceContext):
 class PropertyInstance(InstanceResource):
     """  """
 
-    class MeasurementUnit:
+    class MeasurementUnit(object):
         def __init__(self, label, symbol):
             self.label = label
             self.symbol = symbol
         
-    class Measurement:
+    class Measurement(object):
         def __init__(self, type, unit):
             self.type = type
             self.unit = unit
+
+    class Boundaries(object):
+        class Geofence:
+            def __init__(self, lat=None, lon=None, radius=None, inside=None):
+                self.lat = lat
+                self.lon = lon
+                self.radius = radius
+                self.inside = inside
+
+        def __init__(self, size=None, min=None, max=None, set=None, geofence=None):
+            self.size = size
+            self.min = min
+            self.max = max
+            self.set = set
+            if geofence is not None:
+                self.lat = geofence.lat
+                self.lon = geofence.lon
+                self.radius = geofence.radius
+                self.inside = geofence.inside
+            else:
+                self.lat = None
+                self.lon = None
+                self.radius = None
+                self.inside = None
+
+
+    class Context(object):
+        def __init__(self, type=None):
+            self.type = type
+
+    class Condition(object):
+        def __init__(self, when=None, value=None):
+            self.when = when
+            self.value = value
+
+    class Retention(object):
+        class RetentionType:
+            MOSTRECENT = "mostrecent"
+            HISTORICAL = "historical"
+
+        def __init__(self, type=RetentionType.HISTORICAL, context=None, lifetime=None, capacity=None, condition=None):
+            self.type = type
+            self.context = context
+            self.lifetime = lifetime
+            self.capacity = capacity
+            self.condition = condition
 
     def __init__(self, version, payload, account_id, id=None):
         """
@@ -352,8 +399,9 @@ class PropertyInstance(InstanceResource):
             'data_type': payload['type'],
             'access_type': payload['access'],
             'publish_type': payload['publish'],
-            'retention': payload.get('retention'),
+            'retention': deserialize.retention(payload.get('retention')),
             'measurement': deserialize.measurement(payload.get('measurement')),
+            'boundaries': deserialize.boundaries(payload.get('boundaries')),
             'inherited': payload['inherited'],
             'locked': payload['locked'],        
             'date_created': deserialize.iso8601_datetime(payload['dateCreated']),
@@ -484,6 +532,14 @@ class PropertyInstance(InstanceResource):
         :rtype: unicode
         """
         return self._properties['retention']
+
+    @property
+    def boundaries(self):
+        """
+        :returns:
+        :rtype: unicode
+        """
+        return self._properties['boundaries']
 
     @property
     def measurement(self):
