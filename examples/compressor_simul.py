@@ -14,9 +14,11 @@ import json
 import datetime
 import os
 import time
+import random
 
-config = { 'frequency': 20, 'forever': True  }
+writeSettings = { 'frequency': 20, 'forever': True  }
 deviceId = None
+config = ''
 
 def _teal(words):
     return u("\033[36m\033[49m%s\033[0m") % words
@@ -34,29 +36,32 @@ def onConfigUpdated(data):
     config = data
 
 def readAndWrite(connection):
-    while config['forever']:
+    while writeSettings.get('forever', True):
         # now = datetime.datetime.utcnow().replace(microsecond=0).replace(tzinfo=datetime.timezone.utc).isoformat()
 
         data = json.dumps({'dps': [ 
-            { 'method': 'setScrewTemperature', 'value': 620 },
-            { 'method': 'setWorkingPressure', 'value': 78.3 },
-            { 'method': 'setAuxiliaryPressure', 'value': 68.1 },
-            { 'method': 'setAlarms', 'value': [0,0,0,0] },
-            { 'method': 'setNonAckAlarms', 'value': [0,0,0,0] },
-            { 'method': 'setLoadHours', 'value': [15,34] },
-            { 'method': 'setTotalHours', 'value': [34,56] },
-            { 'method': 'setCompressorState', 'value': 11 },
-            { 'method': 'setControllerState', 'value': 5 },
+            { 'method': 'setSerialNumber', 'value': [ 68, 69, 78, 69, 77, 69, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ] },
+            { 'method': 'setLogikaModel', 'value': [ 2, 161 ] },
+            { 'method': 'setLogikaFwVersion', 'value': [ 3, 1 ] },
+            { 'method': 'setAlarms', 'value': [0,0,0,2,0,0,0,0] },
+            { 'method': 'setNonAckAlarms', 'value': [0,0,0,2,0,0,0,0] },
+            { 'method': 'setScrewTemperature', 'value': [1, 4] },
+            { 'method': 'setWorkingPressure', 'value': [ 0, 21 ] },
+            # { 'method': 'setAuxiliaryPressure', 'value': 68.1 },            
+            #{ 'method': 'setLoadHours', 'value': [15,34] },
+            #{ 'method': 'setTotalHours', 'value': [34,56] },
+            { 'method': 'setCompressorState', 'value': [ 0, 13 ] },
+            { 'method': 'setControllerState', 'value': [ 0, 5 ] },
         ]})
         connection.publish("connio/data/out/devices/{}/methods/json".format(deviceId), data)
                
         # payload = json.dumps(reading)        
         # connection.publish("connio/data/out/devices/{}/methods/parseReading".format(deviceId), payload)
 
-        connection.publish("connio/data/out/devices/{}/properties/cfgReleaseNo".format(deviceId), "23.233")
+        #connection.publish("connio/data/out/devices/{}/properties/cfgReleaseNo".format(deviceId), "23.233")
 
         print(_blue("•"))
-        time.sleep(config['frequency'])
+        time.sleep(writeSettings.get('frequency', 5))
         
 
 if __name__ == '__main__':
@@ -69,13 +74,13 @@ if __name__ == '__main__':
     password = os.environ.get("CONNIO_PROVISION_KEY_SECRET", "0af19086c6a1485e890b996776bb58f0")
 
     # Account wide unique device id, could be sn, mac, imei, esn, or cid
-    cid = os.environ.get("CONNIO_DEVICE_CID", "16:b4:12:7d:5d:da")    
+    cid = os.environ.get("CONNIO_DEVICE_MAC", "16:b4:12:7d:5d:da")
     cidMap = CidMap("mac", cid)
 
     session = Session()
 
     # Provision the device
-    deviceIdentity = session.provision(MqttConnInfo(BROKER_ADDR, "_???_11111", username, password), cidMap)
+    deviceIdentity = session.provision(MqttConnInfo(BROKER_ADDR, "_???_" + str(random.randint(11111111,99999999)), username, password), cidMap, "modbus_settings")
 
     # Connect with device credentials
     mqttConnInfo = MqttConnInfo(BROKER_ADDR, deviceIdentity.id, deviceIdentity.keyId, deviceIdentity.keySecret)

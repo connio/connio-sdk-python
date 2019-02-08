@@ -97,14 +97,14 @@ def boundaries(boundaries):
         return None
         
     return { 
-        'size': boundaries.size,
-        'min': boundaries.min,
-        'max': boundaries.max,
-        'set': boundaries.set,
-        'lat': boundaries.lat,
-        'lon': boundaries.lon,
-        'radius': boundaries.radius,
-        'inside': boundaries.inside,
+        'size': boundaries.get('size', None),
+        'min': boundaries.get('min', None),
+        'max': boundaries.get('max', None),
+        'set': boundaries.get('set', None),
+        'lat': boundaries.get('lat', None),
+        'lon': boundaries.get('lon', None),
+        'radius': boundaries.get('radius', None),
+        'inside': boundaries.get('inside', None),
     }
     
 def retention(retention):
