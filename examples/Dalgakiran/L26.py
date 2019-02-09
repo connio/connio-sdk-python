@@ -133,7 +133,7 @@ const requests = {
     WP:  { rprop: "cfgWPx", rcmd: "r,meth:setWPx,-,12,-,1,0x509", min: 1, max: 6, offset: "0x509" },
     WT:  { rprop: "cfgWTx", rcmd: "r,meth:setWTx,-,16,-,1,0x50F", min: 0, max: 7, offset: "0x50F", multiplier: 1 },
     Wt:  { rprop: "cfgWtx_", rcmd: "r,meth:setWtx_,-,14,-,1,0x517", min: 1, max: 7, offset: "0x517", multiplier: 1 },
-    C07_:{ rprop: "cfgC07_x", rcmd: "r,meth:setC07_x,-,4,-,1,0x51E", min: 1, max: 2, offset: "0x51E", multiplier: 1 },
+    C07: { rprop: "cfgC07_x", rcmd: "r,meth:setC07_x,-,4,-,1,0x51E", min: 1, max: 2, offset: "0x51E", multiplier: 1 },
     C10: { rprop: "cfgNominalAirFlow", rcmd: "r,meth:setNominalAirFlow,-,2,-,1,0x528", min: 1, max: 1, offset: "0x528", multiplier: 0.1 },
     AP:  { rprop: "cfgAPx", rcmd: "r,meth:setAPx,-,10,-,1,0x529", min: 1, max: 3, offset: "0x529" },
     AP4: { rprop: "cfgAPx", rcmd: "r,meth:setAPx,-,10,-,1,0x529", min: 4, max: 4, offset: "0x52D" },
@@ -144,8 +144,8 @@ const requests = {
     PT:  { rprop: "cfgPTx", rcmd: "r,meth:setPTx,-,6,-,1,0x538", min: 1, max: 3, offset: "0x538" },
     PM1: { rprop: "cfgPM1", rcmd: "r,meth:setPM1,-,2,-,1,0x53B", min: 1, max: 1, offset: "0x53B", multiplier: .01  },
     AO:  { rprop: "cfgAOx", rcmd: "r,meth:setAOx,-,8,-,1,0x53C", min: 1, max: 4, offset: "0x53C" },
-    C20_:{ rprop:"cfgC20_x", rcmd: "r,meth:setC20_x,-,4,-,1,0x540", min: 1, max: 2, offset: "0x540", multiplier: 1 },
-    C2:  { rprop: "cfgC2x", rcmd: "r,meth:setC2x,-,4,-,1,0x542", min: 2, max: 3, offset: "0x542", multiplier: 1 },
+    C20: { rprop:"cfgC20_x", rcmd: "r,meth:setC20_x,-,4,-,1,0x540", min: 1, max: 2, offset: "0x540", multiplier: 1 },
+    C22: { rprop: "cfgC2x", rcmd: "r,meth:setC2x,-,4,-,1,0x542", min: 2, max: 3, offset: "0x542", multiplier: 1 },
     DR:  { rprop: "cfgDRx", rcmd: "r,meth:setDriveProtocol,-,14,-,1,0x544", min: 0, max: 6, offset: "0x544", multiplier: 1 },
 };
 return requests[value];
@@ -610,176 +610,50 @@ Device.writeAndReadTag(req);
 
 def setC07x_body():
     return """/**
+C07_1	R		hours
+C07_2	R		minutes
 */
-done(null, null);
+
+const itemCount = 2;
+
+let C07_x = {};
+for (var x = 0; x < itemCount; x++) {
+    C07_x['C07_' + (x+1).toString()] = '-';
+}
+
+Device.api.log("debug", "C07_x: " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+        if (i == 0) C07_x['C07_' + ((i/2)+1).toString()] = itemValue.toString() + ' hours';
+        if (i == 2) C07_x['C07_' + ((i/2)+1).toString()] = itemValue.toString() + ' minutes';
+    }
+    
+    Device.api.setProperty("C07_x", {
+      value: C07_x,
+      time: new Date().toISOString()
+      }).
+    then(property => {
+        done(null, property.value);
+    });
+ });
+
 """
 
 def writeC07x_body():
      return """/**
 */
-done(null, "<NOT IMPLEMENTED>");
-"""
+let args = {
+  tagKey: "C07",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
 
-#####################
-#
-#  APx
-#
-#####################
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
 
-def setAPx_body():
-    return """/**
-*/
-done(null, null);
-"""
-
-def writeAPx_body():
-     return """/**
-*/
-done(null, "<NOT IMPLEMENTED>");
-"""
-
-#####################
-#
-#  C19x
-#
-#####################
-
-def setC19x_body():
-    return """/**
-*/
-done(null, null);
-"""
-
-def writeC19x_body():
-     return """/**
-*/
-done(null, "<NOT IMPLEMENTED>");
-"""
-
-#####################
-#
-#  PIx
-#
-#####################
-
-def setPIx_body():
-    return """/**
-*/
-done(null, null);
-"""
-
-def writePIx_body():
-     return """/**
-*/
-done(null, "<NOT IMPLEMENTED>");
-"""
-
-#####################
-#
-#  FRx
-#
-#####################
-
-def setFRx_body():
-    return """/**
-*/
-done(null, null);
-"""
-
-def writeFRx_body():
-     return """/**
-*/
-done(null, "<NOT IMPLEMENTED>");
-"""
-
-#####################
-#
-#  PTx
-#
-#####################
-
-def setPTx_body():
-    return """/**
-*/
-done(null, null);
-"""
-
-def writePTx_body():
-     return """/**
-*/
-done(null, "<NOT IMPLEMENTED>");
-"""
-
-#####################
-#
-#  AOx
-#
-#####################
-
-def setAOx_body():
-    return """/**
-*/
-done(null, null);
-"""
-
-def writeAOx_body():
-     return """/**
-*/
-done(null, "<NOT IMPLEMENTED>");
-"""
-
-#####################
-#
-#  C20x
-#
-#####################
-
-def setC20x_body():
-    return """/**
-*/
-done(null, null);
-"""
-
-def writeC20x_body():
-     return """/**
-*/
-done(null, "<NOT IMPLEMENTED>");
-"""
-
-#####################
-#
-#  DRx
-#
-#####################
-
-def setDRx_body():
-    return """/**
-*/
-done(null, null);
-"""
-
-def writeDRx_body():
-     return """/**
-*/
-done(null, "<NOT IMPLEMENTED>");
-"""
-
-#####################
-#
-#  C22/3
-#
-#####################
-
-def setC22_body():
-    return """/**
-*/
-done(null, null);
-"""
-
-def writeC22_body():
-     return """/**
-*/
-done(null, "<NOT IMPLEMENTED>");
+Device.writeAndReadTag(req);
 """
 
 #####################
@@ -797,7 +671,7 @@ done(null, null);
 def writeC02_body():
      return """/**
 */
-done(null, "<NOT IMPLEMENTED>");
+done(null, "NOT IMPLEMENTED");
 """
 
 #####################
@@ -808,14 +682,359 @@ done(null, "<NOT IMPLEMENTED>");
 
 def setC10_body():
     return """/**
+NominalAirFlow	R	Capacity (Nominal Air Flow) L/min *0.1 (C10)	Lt/min
 */
-done(null, null);
+Device.api.setProperty("C10", {
+    value: Device.convertToDec({ values: value, default: 0}) * 10.0,
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
 """
 
 def writeC10_body():
      return """/**
 */
-done(null, "<NOT IMPLEMENTED>");
+let args = {
+  tagKey: "C10",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  APx (1-3)
+#
+#####################
+
+def setAPx_body():
+    return """/**
+AP1	R	bar * 10 (must be divided by 10)	bar
+AP2	R	bar * 10 (must be divided by 10)	bar
+AP3	R	bar * 10 (must be divided by 10)	bar
+---skip this element--
+AP4	R	bar * 10 (must be divided by 10)	bar
+*/
+
+const itemCount = 5;
+
+let APx = {};
+let idx = 1;
+for (var x = 0; x < itemCount; x++) {
+    if (x != 3) {
+      APx['AP' + idx.toString()] = '-';
+      idx += 1;
+    }
+}
+
+Device.api.log("debug", "APx: " + value.toString())
+ .then(p => {
+    let idx = 1;
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        // Skip element no 4
+        if (i != 6) {
+          let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1) / 10;
+          APx['AP' + idx.toString()] = itemValue.toString() + ' bar';
+          idx += 1;
+        }
+    }
+    
+    Device.api.setProperty("APx", {
+      value: APx,
+      time: new Date().toISOString()
+      }).
+    then(property => {
+        done(null, property.value);
+    });
+ });
+"""
+
+def writeAPx_body():
+     return """/**
+*/
+let args = {
+  tagKey: "AP",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  AP4
+#
+#####################
+
+def writeAP4_body():
+     return """/**
+*/
+let args = {
+  tagKey: "AP4",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  C19x
+#
+#####################
+
+def setC19x_body():
+    return """/**
+C19_1	R		second
+---skip these 2 bytes--
+C19_2	R		Range analog input
+*/
+
+const itemCount = 3;
+
+let C19_x = {};
+let y = 1;
+for (var x = 0; x < itemCount; x+=2) {
+    C19_x['C19_' + y.toString()] = '-';
+    y += 1;
+}
+
+Device.api.log("debug", "C19_x: " + value.toString())
+ .then(p => {
+    let y = 1;
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        if (i != 2) {
+            let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+            C19_x['C19_' + y.toString()] = itemValue.toString();
+            y+=1;
+        }
+    }
+    
+    Device.api.setProperty("C19_x", {
+      value: C19_x,
+      time: new Date().toISOString()
+      }).
+    then(property => {
+        done(null, property.value);
+    });
+ });
+
+"""
+
+#####################
+#
+#  C19_1
+#
+#####################
+
+def writeC19_1_body():
+     return """/**
+*/
+let args = {
+  tagKey: "C19_1",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  C19_2
+#
+#####################
+
+def writeC19_2_body():
+     return """/**
+*/
+let args = {
+  tagKey: "C19_2",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  PIx
+#
+#####################
+
+def setPIx_body():
+    return """/**
+*/
+const itemCount = 7;
+
+let PIx = {};
+for (var x = 0; x < itemCount; x++) {
+    PIx['PI' + (x+1).toString()] = '-';
+}
+
+Device.api.log("debug", "PIx: " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = (Device.convertToDec({ values: value.slice(i,i+2) }, -1) * 100.00).toFixed(2);
+        PIx['PI' + ((i/2)+1).toString()] = itemValue.toString();
+    }
+    
+    Device.api.setProperty("PIx", {
+      value: PIx,
+      time: new Date().toISOString()
+      }).
+    then(property => {
+        done(null, property.value);
+    });
+ });
+
+"""
+
+def writePIx_body():
+     return """/**
+*/
+let args = {
+  tagKey: "PI",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  FRx
+#
+#####################
+
+def setFRx_body():
+    return """/**
+FR1	Hz
+FR2 Hz
+*/
+const itemCount = 2;
+
+let FRx = {};
+for (var x = 0; x < itemCount; x++) {
+    FRx['FR' + (x+1).toString()] = '-';
+}
+
+Device.api.log("debug", "FRx: " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+        FRx['FR' + ((i/2)+1).toString()] = itemValue.toString() + ' Hz';
+    }
+    
+    Device.api.setProperty("FRx", {
+      value: FRx,
+      time: new Date().toISOString()
+      }).
+    then(property => {
+        done(null, property.value);
+    });
+ });
+
+"""
+
+def writeFRx_body():
+     return """/**
+*/
+let args = {
+  tagKey: "FR",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  PTx
+#
+#####################
+
+def setPTx_body():
+    return """/**
+PT1	R	seconds * 10 (must be divided by 10)	second
+PT2	R	seconds * 10 (must be divided by 10)	second
+PT3	R	seconds * 10 (must be divided by 10)	second
+*/
+const itemCount = 3;
+
+let PTx = {};
+for (var x = 0; x < itemCount; x++) {
+    PTx['PT' + (x+1).toString()] = '-';
+}
+
+Device.api.log("info", "PTx: " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1) / 10;
+        PTx['PT' + ((i/2)+1).toString()] = itemValue.toString() + ' seconds';
+    }
+    
+    Device.api.setProperty("PTx", {
+      value: PTx,
+      time: new Date().toISOString()
+      }).
+    then(property => {
+        done(null, property.value);
+    });
+ });
+"""
+
+def writePTx_body():
+     return """/**
+*/
+let args = {
+  tagKey: "PT",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
 """
 
 #####################
@@ -833,5 +1052,242 @@ done(null, null);
 def writePM1_body():
      return """/**
 */
-done(null, "<NOT IMPLEMENTED>");
+let args = {
+  tagKey: "PM1",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  AOx
+#
+#####################
+
+def setAOx_body():
+    return """/**
+AO1	R	bar * 10 (must be divided by 10)	bar
+AO2	R	bar * 10 (must be divided by 10)	bar
+AO3	R	A *10	N/A
+AO4	R	A *10	N/A
+*/
+const itemCount = 4;
+
+let AOx = {};
+for (var x = 0; x < itemCount; x++) {
+    AOx['AO' + (x+1).toString()] = '-';
+}
+
+Device.api.log("debug", "AOx: " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1) / 10;
+        
+        let unit = ' bar'
+        if (i >= 4) unit = ' A';
+        AOx['AO' + ((i/2)+1).toString()] = itemValue.toString() + unit;
+    }
+    
+    Device.api.setProperty("AOx", {
+      value: AOx,
+      time: new Date().toISOString()
+      }).
+    then(property => {
+        done(null, property.value);
+    });
+ });
+
+"""
+
+def writeAOx_body():
+     return """/**
+*/
+let args = {
+  tagKey: "AO",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  C20x
+#
+#####################
+
+def setC20x_body():
+    return """/**
+C20_1	R		second
+C20_2	R		second
+*/
+
+const itemCount = 2;
+
+let C20_x = {};
+for (var x = 0; x < itemCount; x++) {
+    C20_x['C20_' + (x+1).toString()] = '-';
+}
+
+Device.api.log("debug", "C20_x: " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+        C20_x['C20_' + ((i/2)+1).toString()] = itemValue.toString() + ' seconds';
+    }
+    
+    Device.api.setProperty("C20_x", {
+      value: C20_x,
+      time: new Date().toISOString()
+      }).
+    then(property => {
+        done(null, property.value);
+    });
+ });
+"""
+
+def writeC20x_body():
+     return """/**
+*/
+let args = {
+  tagKey: "C20",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  C22/3
+#
+#####################
+
+def setC22_body():
+    return """/**
+C22	    R		seconds
+C23 	R		minutes
+*/
+
+const itemCount = 2;
+
+let C2x = {};
+for (var x = 0; x < itemCount; x++) {
+    C2x['C2' + (x+2).toString()] = '-';
+}
+
+Device.api.log("debug", "C22: " + value.toString())
+ .then(p => {
+    let unit = ' seconds';
+    let multiplier = 1;
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+        if (i > 0) unit = ' minutes';
+        //if (i > 0) multiplier = 10;
+        //C2x['C2' + ((i/2)+2).toString()] = (itemValue * multiplier).toString() + unit;
+        C2x['C2' + ((i/2)+2).toString()] = itemValue.toString() + unit;
+    }
+    
+    Device.api.setProperty("C22", {
+      value: C2x,
+      time: new Date().toISOString()
+      }).
+    then(property => {
+        done(null, property.value);
+    });
+ });
+"""
+
+def writeC22_body():
+     return """/**
+*/
+let args = {
+  tagKey: "C22",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  DRx
+#
+#####################
+
+def setDRx_body():
+    return """/**
+DR0	R	"Drive protocol:0: NO INVERTER CONNECTED ON SECOND RS485 1: DANFOSS FC"
+DR1	R	
+DR2	R	
+DR3	R	0.1 sec
+DR4	R	0.1 sec
+DR5	R	0.01
+DR6	R	0.01
+*/
+
+const itemCount = 7;
+
+let DR = {};
+for (var x = 0; x < itemCount; x++) {
+    DR['DR' + x.toString()] = '-';
+}
+
+Device.api.log("debug", "DRx: " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+        if (i == 0 && itemValue == 0) itemValue = 'NO INVERTER CONNECTED ON SECOND RS485';
+        if (i == 0 && itemValue == 1) itemValue = 'DANFOSS FC';
+        
+        DR['DR' + (i/2).toString()] = itemValue.toString();
+    }
+    
+    Device.api.setProperty("DRx", {
+      value: DR,
+      time: new Date().toISOString()
+      }).
+    then(property => {
+        done(null, property.value);
+    });
+ });
+
+"""
+
+def writeDRx_body():
+     return """/**
+*/
+let args = {
+  tagKey: "DR",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
 """
