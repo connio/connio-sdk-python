@@ -96,7 +96,28 @@ const requests = {
   nbrOfStartsInLastHour:{ request: "r,meth:setNbrOfStartsInLastHour,-,2,-,1,0x611" },
   controllerTime:       { request: "r,meth:setControllerTime,-,8,-,1,0x800" },
   // Controller specific
+  auxPressure:          { request: "r,meth:setAuxPressure,3,2,0,1,0x407" },
+  ptcInput:             { request: "r,meth:setPTCInput,60,2,1,1,0x408" },
+  analogueOut:          { request: "r,meth:setAnalogOutFreq,60,2,1,1,0x40B" },
+  configSwitches:       { request: "r,meth:setConfigSwitches,-,2,-,1,0x500" },
+  configSelections:     { request: "r,meth:setConfigSelections,-,4,-,1,0x501" },
+  //
   WP:                   { request: "r,meth:setWPx,-,12,-,1,0x509" },
+  WT:                   { request: "r,meth:setWTx,-,16,-,1,0x50F" },
+  Wt:                   { request: "r,meth:setWtx_,-,14,-,1,0x517" },
+  C07:                  { request: "r,meth:setC07_x,-,4,-,1,0x51E" },
+  C02:                  { request: "r,meth:setC02,-,2,-,1,0x527" },
+  C10:                  { request: "r,meth:setC10,-,2,-,1,0x528" },
+  AP:                   { request: "r,meth:setAPx,-,10,-,1,0x529" },
+  C19:                  { request: "r,meth:setC19_x,-,6,-,1,0x52C" },
+  PI:                   { request: "r,meth:setPIx,-,14,-,1,0x52F" },
+  FR:                   { request: "r,meth:setFRx,-,4,-,1,0x536" },
+  PT:                   { request: "r,meth:setPTx,-,6,-,1,0x538" },
+  PM1:                  { request: "r,meth:setPM1,-,2,-,1,0x53B" },
+  AO:                   { request: "r,meth:setAOx,-,8,-,1,0x53C" },
+  C20:                  { request: "r,meth:setC20_x,-,4,-,1,0x540" },
+  C22:                  { request: "r,meth:setC22,-,4,-,1,0x542" },
+  DR:                   { request: "r,meth:setDRx,-,14,-,1,0x544" },
 };
 return requests[value].request;
 """
@@ -113,7 +134,7 @@ const requests = {
     WT:  { rprop: "cfgWTx", rcmd: "r,meth:setWTx,-,16,-,1,0x50F", min: 0, max: 7, offset: "0x50F", multiplier: 1 },
     Wt:  { rprop: "cfgWtx_", rcmd: "r,meth:setWtx_,-,14,-,1,0x517", min: 1, max: 7, offset: "0x517", multiplier: 1 },
     C07_:{ rprop: "cfgC07_x", rcmd: "r,meth:setC07_x,-,4,-,1,0x51E", min: 1, max: 2, offset: "0x51E", multiplier: 1 },
-    NAF: { rprop: "cfgNominalAirFlow", rcmd: "r,meth:setNominalAirFlow,-,2,-,1,0x528", min: 1, max: 1, offset: "0x528", multiplier: 0.1 },
+    C10: { rprop: "cfgNominalAirFlow", rcmd: "r,meth:setNominalAirFlow,-,2,-,1,0x528", min: 1, max: 1, offset: "0x528", multiplier: 0.1 },
     AP:  { rprop: "cfgAPx", rcmd: "r,meth:setAPx,-,10,-,1,0x529", min: 1, max: 3, offset: "0x529" },
     AP4: { rprop: "cfgAPx", rcmd: "r,meth:setAPx,-,10,-,1,0x529", min: 4, max: 4, offset: "0x52D" },
     C19_1:{ rprop:"cfgC19_x", rcmd: "r,meth:setC19_x,-,6,-,1,0x52C", min: 1, max: 1, offset: "0x52C", multiplier: 1 },
@@ -146,10 +167,10 @@ return "/dev/ttyS1:9600:8:N:1|"+
 "r,meth:setBlockingAlarm,5,2,1,1,0x402|"+
 "r,meth:setScrewTemperature,3,2,0,1,0x405|"+
 "r,meth:setWorkingPressure,3,2,0,1,0x406|"+
-//"r,meth:setAuxiliaryPressure,3,2,0,1,0x407|"+
-//"r,meth:setPTCInput,60,2,1,1,0x408|"+
+"r,meth:setAuxPressure,3,2,0,1,0x407|"+
+"r,meth:setPTCInput,60,2,1,1,0x408|"+
 "r,meth:setControllerSupplyVoltage,60,2,1,1,0x409|"+
-//"r,meth:setAnalogOutFreqSet,60,2,1,1,0x40B|"+
+"r,meth:setAnalogueOutFreq,60,2,1,1,0x40B|"+
 "r,meth:setTotalHours,3600,4,1,1,0x600|"+
 "r,meth:setTotalLoadHours,3600,4,1,1,0x602|"+
 "r,meth:setMaintCounters,3600,24,1,1,0x604"
@@ -273,6 +294,113 @@ catch(e) {
     done(e);
 }"""
 
+#
+#
+#
+def setAuxPressure_body():
+    return """/**
+*/
+Device.api.setProperty("auxPressure", {
+    value: Device.convertToDec({ values: value, default: 0}) / 10.0,
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
+#
+#
+#
+def setPTCInput_body():
+    return """/**
+*/
+Device.api.setProperty("ptcInput", {
+    value: Device.convertToDec({ values: value, default: 0}),
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
+#
+#
+#
+def setAnalogueOutFreq_body():
+    return """/**
+*/
+Device.api.setProperty("analogOutFreq", {
+    value: Device.convertToDec({ values: value, default: 0}),
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
+#
+#
+#
+def setConfigSwitches_body():
+    return """/**
+0x0001: C01 – Automatic Restart
+0x0002: C03 – Fixed Timer Wt4
+0x0004: C04 – Phase Check Active
+0x0008: C05 – Security Active
+0x0010: C06 – Low supply voltage check active
+0x0020: C11 – PTC input enabled
+0x0040: Temperature in Fahrenheit (menu M1-3)
+0x0080: Pressure in PSI (menu M1-3)
+0x0100: DST automatic adjust (menu M1-3)
+0x0200: T01 - Start/stop by weekly timer enabled
+0x0400: C17 – Block compressor on expiring of C–H maintenance
+0x0800: C07.3 – Maintenance mode when working under multiunit
+0x1000: C07.4 – Both inverter varying speed when master/slave new is active
+*/
+
+let outputMap = Device.convertToDec({ values: value, default: 0});
+
+let result = [];
+if (outputMap & 1) result.push("C01 – Automatic Restart");
+if (outputMap & 2) result.push("C03 – Fixed Timer Wt4");
+if (outputMap & 4) result.push("C04 – Phase Check Active");
+if (outputMap & 8) result.push("C05 – Security Active");
+if (outputMap & 16) result.push("C06 – Low supply voltage check active");
+if (outputMap & 32) result.push("C11 – PTC input enabled");
+if (outputMap & 64) result.push("Temperature in Fahrenheit (menu M1-3)");
+if (outputMap & 128) result.push("Pressure in PSI (menu M1-3)");
+if (outputMap & 256) result.push("DST automatic adjust (menu M1-3)");
+if (outputMap & 512) result.push("T01 - Start/stop by weekly timer enabled");
+if (outputMap & 1024) result.push("C17 – Block compressor on expiring of C–H maintenance");
+if (outputMap & 2048) result.push("C07.3 – Maintenance mode when working under multiunit");
+if (outputMap & 4096) result.push("C07.4 – Both inverter varying speed when master/slave new is active");
+
+Device.api.setProperty("configSwitches", {
+    value: { switches: result },
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
+#
+#
+#
+def setConfigSelections_body():
+    return """/**
+*/
+// TODO: Implement this
+Device.api.setProperty("configSelections", {
+    value: { selections: "Not Implemented" },
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
 #####################
 #
 #  WPx
@@ -317,14 +445,14 @@ Device.api.log("debug", tagPropName + ": " + value.toString())
 
 def writeWPx_body():
     return """/**
-    Writes given value into WPx tag.
-    @value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
+Writes given value into WPx tag.
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
 
-    To write 8.7 into WP2:
+To write 8.7 into WP2:
 
-        {
-            "value": { "x": 2, "setValue": 8.7 }
-        }
+    {
+      "value": { "x": 2, "setValue": 8.7 }
+    }
 */
 let args = {
   tagKey: "WP",
@@ -347,14 +475,65 @@ Device.writeAndReadTag(req);
 
 def setWTx_body():
     return """/**
+WT0	R	    0: Disable, 1: KTY, 2: NTC	N/A
+WT1	R		°C
+WT2	R		°C
+WT3	R		°C
+WT4	R		°C
+WT5	R		°C
+WT6	R		°C
+WT7	R		°C
 */
-done(null, null);
+
+const itemCount = 8;
+
+let WTx = {};
+for (var x = 0; x < itemCount; x++) {
+    WTx['WT' + x.toString()] = '-';
+}
+
+Device.api.log("info", "WTx: " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+        if (i == 0 && itemValue == 0) {
+            WTx['WT0'] = 'Disable';
+        }
+        else if (i == 0 && itemValue == 1) { 
+            WTx['WT0'] = 'KTY';
+        }
+        else if (i == 0 && itemValue == 2) { 
+            WTx['WT0'] = 'NTC';
+        }
+        else {
+            WTx['WT' + (i/2).toString()] = itemValue.toString() + '°C';    
+        }
+    }
+    
+    Device.api.setProperty("WTx", {
+      value: WTx,
+      time: new Date().toISOString()
+      }).
+    then(property => {
+        done(null, property.value);
+    });
+ });
 """
 
 def writeWTx_body():
      return """/**
 */
-done(null, "<NOT IMPLEMENTED>");
+let args = {
+  tagKey: "WT",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
 """
 
 #####################
@@ -365,14 +544,62 @@ done(null, "<NOT IMPLEMENTED>");
 
 def setWtx_body():
     return """/**
+Wt1	R		second
+Wt2	R		millisecond
+Wt3	R		second
+Wt4	R		minutes
+Wt5	R		second
+Wt6	R		second
+Wt7	R		minutes
 */
-done(null, null);
+
+const itemCount = 7;
+
+let Wtx = {};
+for (var x = 0; x < itemCount; x++) {
+    Wtx['Wt' + (x+1).toString()] = '-';
+}
+
+Device.api.log("debug", "Wtx: " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+        
+        let unit = ' seconds';
+        if (i == 2) {
+            unit = ' milliseconds';
+        }
+        else if (i == 6 || i == 12) {
+            unit = ' minutes';
+        }
+        
+        Wtx['Wt' + ((i/2) + 1).toString()] = itemValue.toString() + unit;
+    }
+    
+    Device.api.setProperty("Wtx_", {
+      value: Wtx,
+      time: new Date().toISOString()
+      }).
+    then(property => {
+        done(null, property.value);
+    });
+ });
 """
 
 def writeWtx_body():
      return """/**
 */
-done(null, "<NOT IMPLEMENTED>");
+let args = {
+  tagKey: "Wt",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
 """
 
 #####################
@@ -393,31 +620,218 @@ def writeC07x_body():
 done(null, "<NOT IMPLEMENTED>");
 """
 
-
-
-
-
-
-
-
-
-
 #####################
 #
-#  
+#  APx
 #
 #####################
 
-# NominalAirFlow
-# AP1-3
-# AP4
-# C19_1
-# C19_2
-# PI1-7
-# FR1-2
-# PT1-3
-# -PM1
-# AO1-4
-# C20_1, C20_2
-# C22, C23
-# DR0-6
+def setAPx_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeAPx_body():
+     return """/**
+*/
+done(null, "<NOT IMPLEMENTED>");
+"""
+
+#####################
+#
+#  C19x
+#
+#####################
+
+def setC19x_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeC19x_body():
+     return """/**
+*/
+done(null, "<NOT IMPLEMENTED>");
+"""
+
+#####################
+#
+#  PIx
+#
+#####################
+
+def setPIx_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writePIx_body():
+     return """/**
+*/
+done(null, "<NOT IMPLEMENTED>");
+"""
+
+#####################
+#
+#  FRx
+#
+#####################
+
+def setFRx_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeFRx_body():
+     return """/**
+*/
+done(null, "<NOT IMPLEMENTED>");
+"""
+
+#####################
+#
+#  PTx
+#
+#####################
+
+def setPTx_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writePTx_body():
+     return """/**
+*/
+done(null, "<NOT IMPLEMENTED>");
+"""
+
+#####################
+#
+#  AOx
+#
+#####################
+
+def setAOx_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeAOx_body():
+     return """/**
+*/
+done(null, "<NOT IMPLEMENTED>");
+"""
+
+#####################
+#
+#  C20x
+#
+#####################
+
+def setC20x_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeC20x_body():
+     return """/**
+*/
+done(null, "<NOT IMPLEMENTED>");
+"""
+
+#####################
+#
+#  DRx
+#
+#####################
+
+def setDRx_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeDRx_body():
+     return """/**
+*/
+done(null, "<NOT IMPLEMENTED>");
+"""
+
+#####################
+#
+#  C22/3
+#
+#####################
+
+def setC22_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeC22_body():
+     return """/**
+*/
+done(null, "<NOT IMPLEMENTED>");
+"""
+
+#####################
+#
+#  C02
+#
+#####################
+
+def setC02_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeC02_body():
+     return """/**
+*/
+done(null, "<NOT IMPLEMENTED>");
+"""
+
+#####################
+#
+#  C10
+#
+#####################
+
+def setC10_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeC10_body():
+     return """/**
+*/
+done(null, "<NOT IMPLEMENTED>");
+"""
+
+#####################
+#
+#  PM1
+#
+#####################
+
+def setPM1_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writePM1_body():
+     return """/**
+*/
+done(null, "<NOT IMPLEMENTED>");
+"""

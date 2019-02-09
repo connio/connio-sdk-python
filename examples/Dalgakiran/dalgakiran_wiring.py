@@ -200,6 +200,8 @@ Maintenance price list as:
     L33c.wire(client)
 
 if __name__ == '__main__':
+    #Mac 16:b4:12:7d:5d:da
+
     #Device IMEI: 861359035276375
     #Device name: DK.Test.Cihaz.1
     #Device friendly name: DK Test 1 [GSM]
