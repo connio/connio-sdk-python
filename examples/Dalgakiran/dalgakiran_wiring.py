@@ -13,7 +13,7 @@ from connio.rest.api.v3.account.method import MethodInstance
 from utility_methods import *
 from set_methods import *
 from readwrite_methods import *
-from stats import *
+from query_methods import *
 
 import L9_wiring as L9c
 import L26_wiring as L26c
@@ -131,18 +131,29 @@ Maintenance price list as:
     client.account.methods(compressor.id).create(name='init', method_impl= MethodInstance.MethodImplementation(getInit_body()), access_type='public', description="e.g. { 'value': 0, 'unit': '$' }")
     client.account.methods(compressor.id).create(name='getDashboardParallel', method_impl= MethodInstance.MethodImplementation(getDashboardParallel_body()), access_type='public')
     client.account.methods(compressor.id).create(name='getLatestValues', method_impl= MethodInstance.MethodImplementation(getLatestValues_body()), access_type='public')
+    client.account.methods(compressor.id).create(name='preaggregate', method_impl= MethodInstance.MethodImplementation(preaggregate_body()), access_type='public')
 
     accessLevel1 = 'protected'
     accessLevel1_1 = 'private'
 
     client.account.methods(compressor.id).create(name='getEmptyState', method_impl= MethodInstance.MethodImplementation(getEmptyState_body()), access_type=accessLevel1, description="e.g. { 'value': 0, 'unit': '$' }")
     client.account.methods(compressor.id).create(name='getCompressorInfo', method_impl= MethodInstance.MethodImplementation(getCompressorInfo_body()), access_type=accessLevel1)
-
+    
     # dashboarding
-    client.account.methods(compressor.id).create(name='buildAggregateQueries', method_impl= MethodInstance.MethodImplementation(buildAggregateQueries_body()), access_type=accessLevel1_1)  
-    client.account.methods(compressor.id).create(name='queryAggregates', method_impl= MethodInstance.MethodImplementation(queryAggregates_body()), access_type=accessLevel1_1)  
-    client.account.methods(compressor.id).create(name='queryPropertySummary', method_impl= MethodInstance.MethodImplementation(queryPropertySummary_body()), access_type=accessLevel1)  
-    client.account.methods(compressor.id).create(name='queryWarningAlarmSummary', method_impl= MethodInstance.MethodImplementation(queryWarningAlarmSummary_body()), access_type=accessLevel1)  
+    client.account.methods(compressor.id).create(name='buildAggregateQueries', method_impl= MethodInstance.MethodImplementation(buildAggregateQueries_body()), access_type=accessLevel1_1)
+    client.account.methods(compressor.id).create(name='queryAggregates', method_impl= MethodInstance.MethodImplementation(queryAggregates_body()), access_type=accessLevel1_1)
+    client.account.methods(compressor.id).create(name='queryPropertySummary', method_impl= MethodInstance.MethodImplementation(queryPropertySummary_body()), access_type=accessLevel1)
+    client.account.methods(compressor.id).create(name='queryWarningAlarmSummary', method_impl= MethodInstance.MethodImplementation(queryWarningAlarmSummary_body()), access_type=accessLevel1)
+    client.account.methods(compressor.id).create(name='queryTimeToMaintenance', method_impl= MethodInstance.MethodImplementation(queryTimeToMaintenance_body()), access_type=accessLevel1_1)
+    client.account.methods(compressor.id).create(name='queryUsageHours', method_impl= MethodInstance.MethodImplementation(queryUsageHours_body()), access_type=accessLevel1_1)
+    client.account.methods(compressor.id).create(name='queryEstimEnergyConsumption', method_impl= MethodInstance.MethodImplementation(queryEstimEnergyConsumption_body()), access_type=accessLevel1_1)
+    client.account.methods(compressor.id).create(name='queryEstimPowerConsumption', method_impl= MethodInstance.MethodImplementation(queryEstimPowerConsumption_body()), access_type=accessLevel1_1)
+    client.account.methods(compressor.id).create(name='queryLoadRatio', method_impl= MethodInstance.MethodImplementation(queryLoadRatio_body()), access_type=accessLevel1_1)
+    client.account.methods(compressor.id).create(name='queryStoppages', method_impl= MethodInstance.MethodImplementation(queryStoppages_body()), access_type=accessLevel1_1)  
+    client.account.methods(compressor.id).create(name='queryEstimCostOfRunning', method_impl= MethodInstance.MethodImplementation(queryEstimCostOfRunning_body()), access_type=accessLevel1_1)
+    client.account.methods(compressor.id).create(name='queryOEE', method_impl= MethodInstance.MethodImplementation(queryOEE_body()), access_type=accessLevel1_1)
+    client.account.methods(compressor.id).create(name='queryMtbf', method_impl= MethodInstance.MethodImplementation(queryMtbf_body()), access_type=accessLevel1_1)
+    client.account.methods(compressor.id).create(name='queryMttr', method_impl= MethodInstance.MethodImplementation(queryMttr_body()), access_type=accessLevel1_1)  
 
     client.account.methods(compressor.id).create(name='convertToHours', method_impl= MethodInstance.MethodImplementation(convertToHours_body()), access_type=accessLevel1_1)
     client.account.methods(compressor.id).create(name='convertToDec', method_impl= MethodInstance.MethodImplementation(convertToDec_body()), access_type=accessLevel1_1)

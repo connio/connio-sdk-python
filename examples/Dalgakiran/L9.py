@@ -173,6 +173,17 @@ return { IDLE_RUNNING: [ 6 ],
 #
 #
 #
+def hasInverter_body():
+    return"""/**
+@param value is the context
+*/
+// Do Nothing
+done(null, null);
+"""
+
+#
+#
+#
 def sendCommand_body():
     return """/*
     Send compressor command to the gateway

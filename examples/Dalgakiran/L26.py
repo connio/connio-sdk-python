@@ -243,6 +243,31 @@ return { IDLE_RUNNING: [ 10 ],
 #
 #
 #
+def hasInverter_body():
+    return"""/**
+@param value is the context
+*/
+const INVERTER = 'DANFOSS FC'
+const CFG_DRIVE_PROTOCOL = 'C10';
+
+async function fn() {
+    const context = value;
+
+    const { value: propValue = {} } = await Device.api.getProperty(CFG_DRIVE_PROTOCOL);
+    const hasInverter = propValue
+        ? propValue.DR0 === INVERTER
+        : false;
+
+    return Object.assign(context, {
+        hasInverter,
+    });
+}
+return Promise.resolve(fn())
+"""
+
+#
+#
+#
 def sendCommand_body():
     return """/*
     Send compressor command to the gateway

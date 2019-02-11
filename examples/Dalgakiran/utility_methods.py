@@ -256,11 +256,17 @@ return Promise.resolve(f());
 #
 def getDashboardParallel_body():
     return """/**
-
+*
+*
 */
+/** @desc Logika-Base */
 const PRESSURE_PROPERTY = 'workingPressure';
+/** @desc Logika-Base */
 const TEMPERATURE_PROPERTY = 'screwTemperature';
+/** @desc Logika-Base */
 const STATE_PROPERTY = 'state';
+
+const OFFLINE = 'offline';
 
 async function main(context) {
     Object.assign(context, {
@@ -298,18 +304,30 @@ async function main(context) {
     let results = await Promise.all([
         Device.getCompressorInfo(),
         Device.queryWarningAlarmSummary(context),
-    //     Device.getTimeToMaintenance(context),
-    //     Device.hasInverter(context),
+        Device.queryTimeToMaintenance(context),
+        Device.hasInverter(context),
     ]);
     
     // Merge results into context
     results.forEach(result => Object.assign(context, result));
-
-    return context;
+    
+    return {
+        ...context,
+        
+        /** @desc Reset current values for offline compressor */
+        pressure: {
+            ...context.pressure,
+            value: context.connectivity === OFFLINE ? 0 : context.pressure.value,
+        },
+        temperature: {
+            ...context.temperature,
+            value: context.connectivity === OFFLINE ? 0 : context.temperature.value,
+        },
+    };
 };
 
 Device.api.getProperty(STATE_PROPERTY)
- .then(property => property.value || Device.getEmptyState())
+ .then(property => property.value || Device.getEmptyView())
  .then(main)
  .then(context => Device.api.setProperty(STATE_PROPERTY, { value: context, time: new Date().toISOString() }))
  .then(property => done(null, property.value));
