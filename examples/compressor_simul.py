@@ -74,7 +74,7 @@ if __name__ == '__main__':
     password = os.environ.get("CONNIO_PROVISION_KEY_SECRET", "0af19086c6a1485e890b996776bb58f0")
 
     # Account wide unique device id, could be sn, mac, imei, esn, or cid
-    cid = os.environ.get("CONNIO_DEVICE_MAC", "16:b4:12:7d:5d:da")
+    cid = os.environ.get("CONNIO_DEVICE_MAC", "00:1e:c0:91:8c:8f")
     cidMap = CidMap("mac", cid)
 
     session = Session()
@@ -93,3 +93,6 @@ if __name__ == '__main__':
 
     # Start your data read & write loop
     connection.start_loop(readAndWrite)
+
+    #40.36666 49.83518
+    #869867035753377

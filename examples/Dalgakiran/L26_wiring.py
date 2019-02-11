@@ -33,7 +33,6 @@ def wire(client):
     client.account.properties(compressor.id).create(name='configSelections', data_type='object', access_type='protected', publish_type='never')
 
     client.account.properties(compressor.id).create(name='WPx', data_type='object', access_type='protected', publish_type='never')
-    client.account.properties(compressor.id).create(name='WPx', data_type='object', access_type='protected', publish_type='never')
     client.account.properties(compressor.id).create(name='WTx', data_type='object', access_type='protected', publish_type='never')
     client.account.properties(compressor.id).create(name='Wtx_', data_type='object', access_type='protected', publish_type='never')
     client.account.properties(compressor.id).create(name='C07_x', data_type='object', access_type='protected', publish_type='never')
