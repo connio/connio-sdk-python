@@ -1,8 +1,10 @@
 MANIFEST.in
 README.md
+setup.cfg
 setup.py
 connio/__init__.py
 connio/compat.py
+connio/mqtt.py
 connio/request_validator.py
 connio.egg-info/PKG-INFO
 connio.egg-info/SOURCES.txt

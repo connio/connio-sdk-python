@@ -79,8 +79,12 @@ if __name__ == '__main__':
 
     session = Session()
 
+    # broker_port = 30001
+    broker_port = 1883
+
     # Provision the device
-    deviceIdentity = session.provision(MqttConnInfo(BROKER_ADDR, "_???_" + str(random.randint(11111111,99999999)), username, password), cidMap, "modbus_settings")
+    # deviceIdentity = session.provision(MqttConnInfo(BROKER_ADDR, "_???_" + str(random.randint(11111111,99999999)), username, password, broker_port), cidMap, "modbus_settings")
+    deviceIdentity = session.provision(MqttConnInfo(BROKER_ADDR, "_???_861359035276375", username, password, broker_port), cidMap, "modbus_settings")
 
     # Connect with device credentials
     mqttConnInfo = MqttConnInfo(BROKER_ADDR, deviceIdentity.id, deviceIdentity.keyId, deviceIdentity.keySecret)

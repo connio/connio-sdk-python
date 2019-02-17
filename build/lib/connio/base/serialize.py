@@ -3,7 +3,6 @@ import json
 
 from connio.base import values
 
-
 def iso8601_date(d):
     """
     Return a string representation of a date that the Connio API understands
@@ -82,29 +81,123 @@ def measurement(measurement):
     """    
     if measurement is values.unset or measurement is None:
         return None
-    return { 'type': measurement.type, 'unit': { 'label': measurement.unit.label, 'symbol': measurement.unit.symbol } }
+        
+    return { 
+        'type': measurement.type, 
+        'unit': { 'label': measurement.unit.label, 'symbol': measurement.unit.symbol } 
+    }
 
+def boundaries(boundaries):
+    """
+    Serialize a boundaries object to boundaries JSON
+    :param boundaries: PropertyInstance.Boundaries
+    :return: jsonified string represenation of obj 
+    """    
+    if boundaries is values.unset or boundaries is None:
+        return None
+        
+    return { 
+        'size': boundaries.get('size', None),
+        'min': boundaries.get('min', None),
+        'max': boundaries.get('max', None),
+        'set': boundaries.get('set', None),
+        'lat': boundaries.get('lat', None),
+        'lon': boundaries.get('lon', None),
+        'radius': boundaries.get('radius', None),
+        'inside': boundaries.get('inside', None),
+    }
+    
+def retention(retention):
+    """
+    Serialize a retention object to retention JSON
+    :param retention: PropertyInstance.Retention
+    :return: jsonified string represenation of obj 
+    """    
+    from connio.rest.api.v3.account.propertyy import PropertyInstance
+
+    if retention is values.unset or retention is None:
+        return None
+
+    retentionType = 'historical'
+    if retention.type == PropertyInstance.Retention.RetentionType.MOSTRECENT:
+        retentionType = 'mostrecent'
+
+    return { 
+        'type': retentionType,
+        'context': { 'type': retention.context.type },
+        'lifetime': retention.lifetime,
+        'capacity': retention.capacity,
+        'condition': { 'when': retention.condition.when, 'value': retention.condition.value }
+    }
 
 def location(loc):
     """
     
-    """    
-    if loc is None:
+    """
+    if loc is values.unset or loc is None or (loc.zone is None and loc.geo is None):
         return None
-    if loc.get('zone') is None and loc.get('geo') is not None: 
-        return { 'zone': None, 'geo': loc['geo'] }
-    elif loc.get('geo') is None and loc.get('zone') is not None: 
-        return { 'zone': loc['zone'], 'geo': None }
-    else: 
-        return { 'zone': loc['zone'], 'geo': loc['geo'] }
+    else:
+        geo = None
+        if loc.geo is not None:
+            geo = { 'lat': loc.geo.lat, 'lon': loc.geo.lon, 'alt': loc.geo.alt }
+        return { 'zone': loc.zone, 'geo': geo }
 
+def plan(plan):
+    """
+    Account plan serializer.
+    """
+    if plan is values.unset or plan is None:
+        return None
 
-def methodImplementation(body, lang='javascript'):
+    return { 'type': plan.type, 'expiresAt': plan.expires_at }
+
+def methodImplementation(impl):
     """
     Serialize a method implementation object to JSON
     :param measurement: MethodInstance.MethodImplementation
     :return: jsonified string represenation of obj 
     """    
-    if body is None:
-        return None
-    return { 'funcBody': body, 'script': lang }
+    from connio.rest.api.v3.account.method import MethodInstance
+
+    if impl == values.unset:
+        return impl
+    elif isinstance(impl, MethodInstance.MethodImplementation):
+        if impl.body is None:
+            return values.unset
+        return { 'funcBody': impl.body, 'script': impl.lang }
+    else:
+        return values.unset
+
+def conditions(conditions):
+    """
+    Serialize a AlertInstance.Condition object to JSON
+    :param condition: AlertInstance.Condition
+    :return: jsonified string represenation of obj 
+    """    
+    def transform(condition):
+        def transform(handler):
+            return { 'key': handler.key, 'notification': handler.notification }
+        expression = { 'operation': condition.expression.operation, 'value': condition.expression.value }
+        return { 'severity': condition.severity, 'expression': expression, 'handlers': map(condition.handlers, transform) }
+
+    return map(conditions, transform)
+
+def notifications(notifications):
+    """
+    Serialize a AlertInstance.Notification object to JSON
+    :param notification: AlertInstance.Notification
+    :return: jsonified string represenation of obj 
+    """
+    def transform(notification):
+        return { 
+            'action': notification.action, 
+            'name': notification.name, 
+            'level': notification.level,            
+            'message': notification.message,
+            'method': notification.method,
+            'parameter': notification.parameter,
+            'to': notification.to,
+            'subject': notification.subject,
+        }
+
+    return map(notifications, transform)

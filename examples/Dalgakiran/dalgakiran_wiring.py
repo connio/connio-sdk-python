@@ -104,9 +104,13 @@ def wire():
     client.account.properties(compressor.id).create(name='plannedStopsMinutes', data_type='number', access_type='protected', publish_type='never', measurement=measurement)
 
     # settings
-    unit = PropertyInstance.MeasurementUnit('Month', 'months')
-    measurement = PropertyInstance.Measurement('custom', unit)    
-    client.account.properties(compressor.id).create(name='warrantyExpiresIn', data_type='number', access_type='public', publish_type='never', measurement=measurement)
+    # unit = PropertyInstance.MeasurementUnit('Month', 'months')
+    # measurement = PropertyInstance.Measurement('custom', unit)    
+    # client.account.properties(compressor.id).create(name='warrantyExpiresIn', data_type='number', access_type='public', publish_type='never', measurement=measurement)
+
+    client.account.properties(compressor.id).create(name='warrantyExpiryDate', data_type='string', access_type='public', publish_type='never')
+    
+
 
     # This can go to app maybe?
     description = """

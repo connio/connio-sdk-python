@@ -12,25 +12,34 @@
 #
 def getInit_body():
     return """/**
-    Initialize device `state` property with default values
-    @value {{ value, unit }} cost of electricity KWh
+  Initialize device `state` property with default values
+  @value {{ value, unit }} cost of electricity KWh
 */
+const defaultWarrantyInMonth = 12;
+
 let settings = Device.fetchModbusSettings();
 let state = Device.getEmptyState(value || { 'value': 0, 'unit': 'USD' });
 let defaultMaintCosts = { 
-    currency_symbol: "$",
-    air_filter_change: 0.0,
-    oil_change: 0.0,  
-    compressor_check: 0.0, 
-    oil_filter_change: 0.0, 
-    sep_filter_change : 0.0, 
-    bearing_lubricator: 0.0     
+    currencySymbol: "$",
+    airFilterChange: 0.0,
+    oilChange: 0.0,  
+    compressorCheck: 0.0, 
+    oilFilterChange: 0.0, 
+    separatorFilterChange : 0.0, 
+    bearingLubrication: 0.0     
 };
+
+let now = new Date();
+let warrantyExpiry = new Date(now.setMonth(now.getMonth() + defaultWarrantyInMonth));
 
 Device.api.setProperty("modbus_settings", {
   value: settings,
   time: new Date().toISOString()
 }).
+then(p => Device.api.setProperty('warrantyExpiryDate', {
+    value: warrantyExpiry.toISOString(),
+    time: new Date().toISOString()
+})).
 then(p => Device.api.setProperty('maintenanceCostList', {
         value: defaultMaintCosts,
         time: new Date().toISOString()

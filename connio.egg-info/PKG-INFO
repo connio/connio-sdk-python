@@ -1,6 +1,6 @@
 Metadata-Version: 1.1
 Name: connio
-Version: 0.0.2
+Version: 0.0.4
 Summary: Connio API client 
 Home-page: https://github.com/connio/connio-sdk-python/
 Author: Connio Inc.
@@ -12,7 +12,7 @@ Description:     Python Connio Helper Library
             DESCRIPTION
             The Connio Python SDK simplifies the process of making admin and data requests 
             to the Connio platform using the Connio REST API.
-            The Connio REST API lets to you create devices, writing data into device properties,
+            The Connio REST API lets to you create devices, write data into device properties,
             and much more.  See https://www.github.com/connio/connio-sdk-python for more information.
         
              LICENSE The Connio Python Helper Library is distributed under the MIT
