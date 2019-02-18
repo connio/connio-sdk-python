@@ -319,15 +319,23 @@ else {
 #
 def setCompressorState_body():
     return """/**
-    Sets compressor state property
-    Byte encoding [ 0, 13 ] => Code 13
+  Sets compressor state property
+  Byte encoding [ 0, 13 ] => Code 13
 */
 
+const compressorStatePropName       = "compressorState";
+const loadRunningMinutesPropName    = "loadRunningMinutes";
+const idleRunningMinutesPropName    = "idleRunningMinutes";
+const plannedStopsMinutesPropName   = "plannedStopsMinutes";
+const unplannedStopsMinutesPropName = "unplannedStopsMinutes";
+const plannedStopsPropName          = "plannedStops";
+const unplannedStopsPropName        = "unplannedStops";
+
 async function process(newState, stateTypes) {
-    let prop = await Device.api.getProperty("compressorState");
+    let prop = await Device.api.getProperty(compressorStatePropName);
     
     if (!prop.value) {
-        await Device.api.setProperty("compressorState", {
+        await Device.api.setProperty(compressorStatePropName, {
                 value: newState,
                 time: new Date().toISOString()
             });
@@ -339,19 +347,19 @@ async function process(newState, stateTypes) {
         let currProp = Object.assign({}, prop);
         
         if (newState.code !== currProp.value.code) {
-            var modifiedProp = await Device.api.setProperty("compressorState", {
+            var modifiedProp = await Device.api.setProperty(compressorStatePropName, {
                     value: newState,
                     time: new Date().toISOString()
                 });
                 
             if (stateTypes.PLANNED_STOPPAGES.includes(newState.code)) {
-                await Device.api.setProperty("plannedStops", {
+                await Device.api.setProperty(plannedStopsPropName, {
                         value: newState,
                         time: new Date().toISOString()
                     });
             }
             else if (stateTypes.UNPLANNED_STOPPAGES.includes(newState.code)) {
-                await Device.api.setProperty("unplannedStops", {
+                await Device.api.setProperty(unplannedStopsPropName, {
                         value: newState,
                         time: new Date().toISOString()
                     });
@@ -359,14 +367,14 @@ async function process(newState, stateTypes) {
                 
             // Calculate load & idle running durations
             // 
-            if (!currProp.value && stateTypes.LOAD_RUNNING.includes(currProp.value.code ) &&  !stateTypes.LOAD_RUNNING.includes(modifiedProp.value.code)) {
-                var lr = await Device.api.setProperty("loadRunningMinutes", {
+            if (currProp.value && stateTypes.LOAD_RUNNING.includes(currProp.value.code ) &&  !stateTypes.LOAD_RUNNING.includes(modifiedProp.value.code)) {
+                var lr = await Device.api.setProperty(loadRunningMinutesPropName, {
                         value: (Date.parse(modifiedProp.time) - Date.parse(currProp.time)) / (1000 * 60),
                         time: new Date().toISOString()
                     });
             }
-            else if (!currProp.value && stateTypes.IDLE_RUNNING.includes(currProp.value.code) &&  !stateTypes.IDLE_RUNNING.includes(modifiedProp.value.code)) {
-                var ir = await Device.api.setProperty("idleRunningMinutes", {
+            else if (currProp.value && stateTypes.IDLE_RUNNING.includes(currProp.value.code) &&  !stateTypes.IDLE_RUNNING.includes(modifiedProp.value.code)) {
+                var ir = await Device.api.setProperty(idleRunningMinutesPropName, {
                         value: (Date.parse(modifiedProp.time) - Date.parse(currProp.time)) / (1000 * 60),
                         time: new Date().toISOString()
                     });
@@ -374,16 +382,16 @@ async function process(newState, stateTypes) {
             
             // Calculate unplanned & planned stoppage durations
             //
-            if (!currProp.value && stateTypes.UNPLANNED_STOPPAGES.includes(currProp.value.code) && !stateTypes.UNPLANNED_STOPPAGES.includes(modifiedProp.value.code)) {
+            if (currProp.value && stateTypes.UNPLANNED_STOPPAGES.includes(currProp.value.code) && !stateTypes.UNPLANNED_STOPPAGES.includes(modifiedProp.value.code)) {
                 // Unplanned stoppage is over
-                await Device.api.setProperty("unplannedStops", {
+                await Device.api.setProperty(unplannedStopsMinutesPropName, {
                         value: (Date.parse(modifiedProp.time) - Date.parse(currProp.time)) / (1000 * 60),
                         time: new Date().toISOString()
                     });
             }
-            else if (!currProp.value && stateTypes.PLANNED_STOPPAGES.includes(currProp.value.code) && !stateTypes.PLANNED_STOPPAGES.includes(modifiedProp.value.code)) {
+            else if (currProp.value && stateTypes.PLANNED_STOPPAGES.includes(currProp.value.code) && !stateTypes.PLANNED_STOPPAGES.includes(modifiedProp.value.code)) {
                 // Planned stoppage is over
-                await Device.api.setProperty("plannedStopsMinutes", {
+                await Device.api.setProperty(plannedStopsMinutesPropName, {
                         value: (Date.parse(modifiedProp.time) - Date.parse(currProp.time)) / (1000 * 60),
                         time: new Date().toISOString()
                     });
@@ -397,7 +405,6 @@ async function process(newState, stateTypes) {
     }
 };
 
-    
 let table = Device.fetchCompressorStates();
 let stateTypes = Device.fetchCompressorStateTypes();
 
@@ -662,8 +669,13 @@ then(property => {
 #
 def setMaintCounters_body():
     return """/**
-    24 bytes = long (4 byte) * 6
+  24 bytes = long (4 byte) * 6
 */
+
+const maintCountersPropName = 'maintCounters';
+const maintLogPropName      = 'maintenanceLog';
+const maintCostsPropName    = 'maintenanceCostList';
+
 const maintTypes = [
   "airFilterChange",
   "oilFilterChange",
@@ -673,28 +685,70 @@ const maintTypes = [
   "bearingLubrication"
 ];
 
-let timeLeftInMinutes = {};
-for (var x = 0; x < maintTypes.length; x++) {
-    timeLeftInMinutes[maintTypes[x]] = 0;
-}
+const defaultMaintCosts = { 
+    currencySymbol: "$",
+    currency: "USD",
+    airFilterChange: 0.0,
+    oilChange: 0.0,  
+    compressorCheck: 0.0, 
+    oilFilterChange: 0.0, 
+    separatorFilterChange : 0.0, 
+    bearingLubrication: 0.0     
+};
 
-for (var i = 0; i < maintTypes.length*4; i+=4) {
-    let minutes  = value.slice(i+0, i+1) << 24
-        minutes |= value.slice(i+1, i+2) << 16;
-        minutes |= value.slice(i+2, i+3) <<  8;
-        minutes |= value.slice(i+3, i+4);
+async function f(value) {
+    let timeLeftInMinutes = {};
+    for (var x = 0; x < maintTypes.length; x++) {
+        timeLeftInMinutes[maintTypes[x]] = 0;
+    }
     
-    timeLeftInMinutes[maintTypes[i/4]] = Math.floor(minutes / 60);
+    for (var i = 0; i < maintTypes.length*4; i+=4) {
+        let minutes  = value.slice(i+0, i+1) << 24
+            minutes |= value.slice(i+1, i+2) << 16;
+            minutes |= value.slice(i+2, i+3) <<  8;
+            minutes |= value.slice(i+3, i+4);
+        
+        timeLeftInMinutes[maintTypes[i/4]] = Math.floor(minutes / 60);
+    }
+    
+    let currCounters = Object.assign({}, await Device.api.getProperty(maintCountersPropName).then(p => p ? p.value : undefined));
+    
+    let newMaintCounters = await Device.api.setProperty(maintCountersPropName, {
+        value: timeLeftInMinutes,
+        time: new Date().toISOString()
+    })
+     .then(property => property.value);
+    
+    
+    try {
+        // check if any maintenance counter is reset, then make a log
+        if (currCounters) {
+            let mcost = await Device.api.getProperty(maintCostsPropName).then(p=>p.value) || defaultMaintCosts;
+            
+            let maintenanceLog = { items: [] };
+            for (var i = 0; i < maintTypes.length; i++) {
+                if (newMaintCounters[maintTypes[i]] < currCounters[maintTypes[i]]) {
+                    let item = { name: maintTypes[i], cost: mcost[maintTypes[i]], unit: mcost.currency };
+                    maintenanceLog.items.push(item);
+                }
+            }
+            
+            if (maintenanceLog.items.length > 0) {
+                await Device.api.setProperty(maintLogPropName, {
+                        value: maintenanceLog,
+                        time: new Date().toISOString()
+                    });
+            }
+        }
+    }
+    catch (e) {
+        await Device.api.log("error", e.toString());
+    }
+    
+    done(null, null);
 }
 
-// Update time left to next scheduled maintenance
-Device.api.setProperty("maintCounters", {
-  value: timeLeftInMinutes,
-  time: new Date().toISOString()
-  }).
-then(property => {
-    done(null, property.value);
-});
+return f(value);
 """
 
 #

@@ -21,6 +21,7 @@ let settings = Device.fetchModbusSettings();
 let state = Device.getEmptyState(value || { 'value': 0, 'unit': 'USD' });
 let defaultMaintCosts = { 
     currencySymbol: "$",
+    currency: "USD",
     airFilterChange: 0.0,
     oilChange: 0.0,  
     compressorCheck: 0.0, 
@@ -206,7 +207,7 @@ return convert(value.value, value.byteCount);"""
 #
 def getCompressorInfo_body():
     return """/**
-
+  Build a view of compressor details.
 */
 const serNumPropName        = "cfgSerialNumber";
 const modelPropName         = "cfgLogikaModel";
@@ -214,7 +215,7 @@ const fwVerPropName         = "cfgLogikaFwVersion";
 const compStatePropName     = "compressorState";
 const connStatusPropName    = "connectionStatus";
 const activityPropName      = "active";
-const warrantyEndPropName   = "warrantyExpiresIn";
+const warrantyEndDatePropName   = "warrantyExpiryDate";
 
 async function f() {    
     if (Device.customIds && !Device.customIds.sn) {
@@ -236,8 +237,12 @@ async function f() {
         connectivity = "online-inactive";
     }
     
-    let warrantyInfoProp = await Device.api.getProperty(warrantyEndPropName);
-    let timeToWarranty = warrantyInfoProp.value || 0;
+    const defaultWarrantyInMonth = 12;
+    let now = new Date();
+    let defaultWarrantyExpiry = new Date(now.setMonth(now.getMonth() + defaultWarrantyInMonth));
+
+    let warrantyExpiry = await Device.api.getProperty(warrantyEndDatePropName).then(p => p.value ? Date.parse(p.value) : defaultWarrantyExpiry.toISOString());
+    let timeToWarranty = new Date(warrantyExpiry - Date.now()).getMonth() + 1;
     
     // In case that we use a counter to decrement the warranty time
     if (timeToWarranty < 0) {
@@ -253,7 +258,7 @@ async function f() {
         logikaRelease: logika_release,
         connectivity: connectivity,
         status: status,
-        warrantyEnd: timeToWarranty + " " + warrantyInfoProp.meta.measurement.unit.symbol,
+        warrantyEnd: timeToWarranty + " months",
     };
     return device;
 }
@@ -263,10 +268,10 @@ return Promise.resolve(f());
 #
 #
 #
-def getDashboardParallel_body():
+def getDashboard_body():
     return """/**
-*
-*
+*  Build the default dashboard view of the compressor.
+*  Some information must be populated by calling `preaggregate()` method ahead of time.
 */
 /** @desc Logika-Base */
 const PRESSURE_PROPERTY = 'workingPressure';
@@ -344,12 +349,12 @@ Device.api.getProperty(STATE_PROPERTY)
 
 def getLatestValues_body():
     return """/**
-
+*  Returns the most recent values of compressor pressure and temperature.
 */
 const PRESSURE_PROPERTY = 'workingPressure';
 const TEMPERATURE_PROPERTY = 'screwTemperature';
 
-async function main() {
+async function getValues() {
     let [pressureProp, temperatureProp] = await Promise.all([
       Device.api.getProperty(PRESSURE_PROPERTY),
       Device.api.getProperty(TEMPERATURE_PROPERTY)
@@ -359,9 +364,215 @@ async function main() {
         pressure: pressureProp.value || 0,
         temperature: temperatureProp.value || 0,
     };
-
     return done(null, result);
 };
 
-main();
+getValues();
+"""
+
+def getHistOEE_body():
+    return """/**
+*  Returns the historical OEE values based on the given query.
+*/
+
+let query = value;
+const propName = "non-existing-prop-name";
+
+let q = { startRelative: { value: query.from.value, unit: query.from.unit }, aggregators: [ {name: 'sum', sampling: { value: query.sampling.value, unit: query.sampling.unit } } ] };
+
+Device.api.readData(propName, q)
+    .then(resultSet => { 
+        let items = resultSet.results[0].values.map(obj => {
+            return obj;
+        });
+        done(null, items);
+     });
+"""
+
+def getHistMtbf_body():
+    return """/**
+*  Returns the historical MTbf values based on the given query.
+*/
+
+let query = value;
+const propName = "non-existing-prop-name";
+
+let q = { startRelative: { value: query.from.value, unit: query.from.unit }, aggregators: [ {name: 'sum', sampling: { value: query.sampling.value, unit: query.sampling.unit } } ] };
+
+Device.api.readData(propName, q)
+    .then(resultSet => { 
+        let items = resultSet.results[0].values.map(obj => {
+            return obj;
+        });
+        done(null, items);
+     });
+"""
+
+def getHistMttr_body():
+    return """/**
+*  Returns the historical MTtr values based on the given query.
+*/
+
+let query = value;
+const propName = "non-existing-prop-name";
+
+let q = { startRelative: { value: query.from.value, unit: query.from.unit }, aggregators: [ {name: 'sum', sampling: { value: query.sampling.value, unit: query.sampling.unit } } ] };
+
+Device.api.readData(propName, q)
+    .then(resultSet => { 
+        let items = resultSet.results[0].values.map(obj => {
+            return obj;
+        });
+        done(null, items);
+     });
+"""
+
+def getHistEstimPowerConsumption_body():
+    return """/**
+*  Returns the historical power consumption values based on the given query.
+*/
+
+/*
+ value.from
+   Contains `value` and `unit` sub attributes. The relative start time is the current date and time minus 
+   the specified value and unit. Possible unit values are “milliseconds”, “seconds”, “minutes”, “hours”, “days”, 
+   “weeks”, “months”, and “years”. For example, if the start time is 5 minutes, the query will return 
+   all matching data points for the last 5 minutes.
+ value.sampling  
+   Contains `value` and `unit` sub attributes.
+   
+   Example 1 to pass method invoker dialog:
+   
+   {
+	"value": { "from": { "value": 30, "unit": "days" }, "sampling": { "value": 1, "unit": "days"  } }
+   }
+   
+   Exmaple 2:
+   
+   {
+	 value: { 
+	    from: { 
+	        value: 30, 
+	        unit: "days" 
+	    }, 
+	    sampling: { 
+	        value: 1, 
+	        unit: "days"  
+	    } 
+	 }
+   } 
+*/
+
+let query = value;
+
+const IDLE_RUNNING_MINUTES_PNAME = "idleRunningMinutes";
+const LOAD_RUNNING_MINUTES_PNAME = "loadRunningMinutes";
+
+const ENERGY_CONSUMPTION_CONSTANT = 10.0 * 1.2;
+const ENERGY_IDLE_CONSUMPTION_RATIO = 0.27;
+
+const IDLE_PWR_MULTIPLIER = ENERGY_CONSUMPTION_CONSTANT * ENERGY_IDLE_CONSUMPTION_RATIO;
+const LOAD_PWR_MULTIPLIER = ENERGY_CONSUMPTION_CONSTANT;
+
+let q = { startRelative: { value: query.from.value, unit: query.from.unit }, aggregators: [ {name: 'sum', sampling: { value: query.sampling.value, unit: query.sampling.unit } } ] };
+
+let idleRunning;
+let loadRunning;
+
+Device.api.readData(IDLE_RUNNING_MINUTES_PNAME, q)
+    .then(resultSet => { 
+        idleRunning = resultSet.results[0].values.map(obj => {
+            return { v: (obj.v || 0) / 60.0 * IDLE_PWR_MULTIPLIER, t: obj.t };
+        });
+        return Device.api.readData(LOAD_RUNNING_MINUTES_PNAME, q)
+     })
+    .then(resultSet => { 
+        loadRunning = resultSet.results[0].values.map(obj => {
+            return { v: (obj.v || 0) / 60.0 * LOAD_PWR_MULTIPLIER, t: obj.t };
+        });
+        
+        let results = idleRunning.concat(loadRunning).sort(function(a,b){
+          // Turn your strings into dates, and then subtract them
+          // to get a value that is either negative, positive, or zero.
+          return new Date(b.t) - new Date(a.t);
+        });
+        
+        // TODO: x/y is missing
+        
+        done(null, results);
+     });
+"""
+
+def getHistEstimEnergyConsumption_body():
+    return """/**
+*  Returns the historical energy consumption values based on the given query.
+*/
+
+/*
+ value.from
+   Contains `value` and `unit` sub attributes. The relative start time is the current date and time minus 
+   the specified value and unit. Possible unit values are “milliseconds”, “seconds”, “minutes”, “hours”, “days”, 
+   “weeks”, “months”, and “years”. For example, if the start time is 5 minutes, the query will return 
+   all matching data points for the last 5 minutes.
+ value.sampling  
+   Contains `value` and `unit` sub attributes.
+   
+   Example 1 to pass method invoker dialog:
+   
+   {
+	"value": { "from": { "value": 30, "unit": "days" }, "sampling": { "value": 1, "unit": "days"  } }
+   }
+   
+   Exmaple 2:
+   
+   {
+	 value: { 
+	    from: { 
+	        value: 30, 
+	        unit: "days" 
+	    }, 
+	    sampling: { 
+	        value: 1, 
+	        unit: "days"  
+	    } 
+	 }
+   } 
+*/
+
+let query = value;
+
+const IDLE_RUNNING_MINUTES_PNAME = "idleRunningMinutes";
+const LOAD_RUNNING_MINUTES_PNAME = "loadRunningMinutes";
+
+const ENERGY_CONSUMPTION_CONSTANT = 10.0 * 1.2;
+const ENERGY_IDLE_CONSUMPTION_RATIO = 0.27;
+
+const IDLE_PWR_MULTIPLIER = ENERGY_CONSUMPTION_CONSTANT * ENERGY_IDLE_CONSUMPTION_RATIO;
+const LOAD_PWR_MULTIPLIER = ENERGY_CONSUMPTION_CONSTANT;
+
+let q = { startRelative: { value: query.from.value, unit: query.from.unit }, aggregators: [ {name: 'sum', sampling: { value: query.sampling.value, unit: query.sampling.unit } } ] };
+
+let idleRunning;
+let loadRunning;
+
+Device.api.readData(IDLE_RUNNING_MINUTES_PNAME, q)
+    .then(resultSet => { 
+        idleRunning = resultSet.results[0].values.map(obj => {
+            return { v: (obj.v || 0) / 60.0 * IDLE_PWR_MULTIPLIER, t: obj.t };
+        });
+        return Device.api.readData(LOAD_RUNNING_MINUTES_PNAME, q)
+     })
+    .then(resultSet => { 
+        loadRunning = resultSet.results[0].values.map(obj => {
+            return { v: (obj.v || 0) / 60.0 * LOAD_PWR_MULTIPLIER, t: obj.t };
+        });
+        
+        let results = idleRunning.concat(loadRunning).sort(function(a,b){
+          // Turn your strings into dates, and then subtract them
+          // to get a value that is either negative, positive, or zero.
+          return new Date(b.t) - new Date(a.t);
+        });
+        
+        done(null, results);
+     });
 """

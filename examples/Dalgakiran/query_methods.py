@@ -73,14 +73,31 @@ return Device.api.readData(value.pname, q[0])
 #
 def queryPropertySummary_body():
     return """/**
+  Builds a summary/stats view of the given property from the timeseries database.
 */
 async function f() {
-    let prop = await Device.api.getProperty(value.pname);
-    let stats = await Device.queryAggregates({ pname: value.pname, agg: value.agg });
     
-    let result = { value: prop.value, unit: value.unit };
+    // Acquire property definition and historical data in parallel
+    let [prop, stats] = await Promise.all([
+        Device.api.getProperty(value.pname),
+        Device.queryAggregates({ pname: value.pname, agg: value.agg })
+    ]);
+
+    let result = {
+        value: prop.value,
+        unit: value.unit
+    };
+    
     //default field name is `average`
-    result[value.fname || 'average'] = stats.map(i => i || undefined);
+    result[value.fname || 'average'] = stats.map(i => i);
+    
+    // Result may be requested as a member of a context object
+    // such as in getDashboardParallel.
+    if (value.asContextMember) {
+        let context = {};
+        context[value.asContextMember] = result;
+        return context;
+    }
     
     return result;
 }
@@ -123,7 +140,7 @@ return Promise.resolve(f());
 #
 def queryTimeToMaintenance_body():
     return """/**
-@param value is the context
+  @param value is the context
 */
 const maintCostsPropName    = "maintenanceCostList";
 const maintCountersPropName = "maintCounters";
@@ -134,6 +151,7 @@ async function f() {
     
     let defaultMaintCosts = { 
         currencySymbol: "$",
+        currency: "USD",
         airFilterChange: 0.0,
         oilChange: 0.0,  
         compressorCheck: 0.0, 
@@ -143,45 +161,59 @@ async function f() {
     };
     
     let defaultCycles = { 
-        airFilterChange: 0,
-        oilChange: 0,  
-        compressorCheck: 0, 
-        oilFilterChange: 0, 
-        separatorFilterChange : 0, 
-        bearingLubrication: 0     
+        airFilterChange: 2997,
+        oilChange: 3000,  
+        compressorCheck: 3000, 
+        oilFilterChange: 3000, 
+        separatorFilterChange : 6000, 
+        bearingLubrication: 29999     
     };
     
     let mcost = await Device.api.getProperty(maintCostsPropName).then(p=>p.value) || defaultMaintCosts;
     let mCycles = await Device.api.getProperty(maintCyclesPropName).then(p=>p.value) || defaultCycles;
-    // Hours left until the next maintenances by category
-    let mCounters = await Device.api.getProperty(maintCountersPropName).then(p=>p.value) || defaultCycles;
-    
-    let hoursToBearingLub        = ((mCycles.bearingLubrication * 60)   - mCounters.bearingLubrication) / 60.0;
-    let hoursToAirFilterChange   = ((mCycles.airFilterChange * 60)      - mCounters.airFilterChange) / 60.0;
-    let hoursToOilFilterChange   = ((mCycles.oilFilterChange * 60)      - mCounters.oilFilterChange) / 60.0;
-    let hoursToOilChange         = ((mCycles.oilChange * 60)            - mCounters.oilChange) / 60.0;
-    let hoursToSepFilterChange   = ((mCycles.separatorFilterChange * 60) - mCounters.separatorFilterChange) / 60.0;
-    let hoursToCompressorCheck   = ((mCycles.compressorCheck * 60)      - mCounters.compressorCheck) / 60.0;
     
     let plannedMaintenanceList = [ 
-        { maintenance: "Bearing Lubrication", cost: mcost.bearingLubricator, hours: hoursToBearingLub, days: Math.ceil(hoursToBearingLub / 24.0) },
-        { maintenance: "Air Filter Change", cost: mcost.airFilterChange, hours: hoursToAirFilterChange, days: Math.ceil(hoursToAirFilterChange / 24.0) },
-        { maintenance: "Oil Filter Change", cost: mcost.oilFilterChange, hours: hoursToOilFilterChange, days: Math.ceil(hoursToOilFilterChange / 24.0) },
-        { maintenance: "Oil Change", cost: mcost.oilChange, hours: hoursToOilChange, days: Math.ceil(hoursToOilChange / 24.0) },
-        { maintenance: "Seperator Filter Change", cost: mcost.separatorFilterChange, hours: hoursToSepFilterChange, days: Math.ceil(hoursToSepFilterChange / 24.0) },
-        { maintenance: "Compressor Check", cost: mcost.compressorCheck, hours: hoursToCompressorCheck, days: Math.ceil(hoursToCompressorCheck / 24.0) }
+        { maintenance: "Bearing Lubrication", cost: mcost.bearingLubrication, hours: 0, days: undefined, cycle: Math.ceil(mCycles.bearingLubrication / 24) },
+        { maintenance: "Air Filter Change", cost: mcost.airFilterChange, hours: 0, days: undefined, cycle: Math.ceil(mCycles.airFilterChange / 24) },
+        { maintenance: "Oil Filter Change", cost: mcost.oilFilterChange, hours: 0, days: undefined, cycle: Math.ceil(mCycles.oilFilterChange / 24) },
+        { maintenance: "Oil Change", cost: mcost.oilChange, hours: 0, days: undefined, cycle: Math.ceil(mCycles.oilChange / 24) },
+        { maintenance: "Seperator Filter Change", cost: mcost.separatorFilterChange, hours: 0, days: undefined, cycle: Math.ceil(mCycles.separatorFilterChange / 24) },
+        { maintenance: "Compressor Check", cost: mcost.compressorCheck, hours: 0, days: undefined, cycle: Math.ceil(mCycles.compressorCheck / 24) }
     ];
+
+    // Hours left until the next maintenances by category
+    let mCounters = await Device.api.getProperty(maintCountersPropName).then(p=>p.value);
     
-    // sort the list ascending - next maintenance
-    plannedMaintenanceList.sort(function(a, b) {
-        return a.hours - b.hours;
-    });
+    if ( mCounters ) {
+        let hoursToBearingLub        = ((mCycles.bearingLubrication * 60)   - mCounters.bearingLubrication) / 60.0;
+        let hoursToAirFilterChange   = ((mCycles.airFilterChange * 60)      - mCounters.airFilterChange) / 60.0;
+        let hoursToOilFilterChange   = ((mCycles.oilFilterChange * 60)      - mCounters.oilFilterChange) / 60.0;
+        let hoursToOilChange         = ((mCycles.oilChange * 60)            - mCounters.oilChange) / 60.0;
+        let hoursToSepFilterChange   = ((mCycles.separatorFilterChange * 60) - mCounters.separatorFilterChange) / 60.0;
+        let hoursToCompressorCheck   = ((mCycles.compressorCheck * 60)      - mCounters.compressorCheck) / 60.0;
+        
+        plannedMaintenanceList[0].hours = hoursToBearingLub;
+        plannedMaintenanceList[0].days = Math.ceil(hoursToBearingLub / 24.0);
+        plannedMaintenanceList[1].hours = hoursToAirFilterChange;
+        plannedMaintenanceList[1].days = Math.ceil(hoursToAirFilterChange / 24.0);
+        plannedMaintenanceList[2].hours = hoursToOilFilterChange;
+        plannedMaintenanceList[2].days = Math.ceil(hoursToOilFilterChange / 24.0);
+        plannedMaintenanceList[3].hours = hoursToOilChange;
+        plannedMaintenanceList[3].days = Math.ceil(hoursToOilChange / 24.0);
+        plannedMaintenanceList[4].hours = hoursToSepFilterChange;
+        plannedMaintenanceList[4].days = Math.ceil(hoursToSepFilterChange / 24.0);
+        plannedMaintenanceList[5].hours = hoursToCompressorCheck;
+        plannedMaintenanceList[5].days = Math.ceil(hoursToCompressorCheck / 24.0);
+        
+        // sort the list ascending - next maintenance
+        plannedMaintenanceList.sort(function(a, b) {
+            return a.hours - b.hours;
+        });
+    }
     
     context['maintenance'] = {
-        /** @deprecated */
         currencySymbol: mcost.currencySymbol,
-
-        unit: mcost.currencySymbol,
+        unit: mcost.currency,
         upcoming: plannedMaintenanceList
     };    
     return context;
@@ -254,9 +286,12 @@ return context;
 #
 def queryEstimPowerConsumption_body():
     return """/**
-@param value is the context
+  @param value is the context
 */
 let context = value;
+
+const IDLE_RUNNING = 10;
+const LOAD_RUNNING = 11;
 
 const ENERGY_CONSUMPTION_CONSTANT = 10.0 * 1.1;
 const ENERGY_IDLE_CONSUMPTION_RATIO = 0.27;
@@ -284,7 +319,7 @@ for (let i = 0; i < 4; i++) {
 }
 
 context['power'] = {
-    value: estimatedPowerUsageAvg.map(i => i || 0),
+    value: estimatedPowerUsageAvg.map(i => i),
     unit: 'kW'
 };
                                                                 
@@ -326,7 +361,7 @@ return Promise.all([totalHoursMaxP, totalHoursMinP, totalLoadHoursMaxP, totalLoa
             loadRatio.push(0);
         }
         else {
-            loadRatio.push((tLhMax - tLhMin) / totalH);
+            loadRatio.push((tLhMax - tLhMin) / totalH * 100);
         }
     }
     
@@ -346,24 +381,22 @@ return Promise.all([totalHoursMaxP, totalHoursMinP, totalLoadHoursMaxP, totalLoa
 #
 def queryStoppages_body():
     return """/**
-@param value is the context
+  @param value is the context
 */
-async function f() {
-    let context = value;
+let context = value;
 
-    let nbrOfPlanned = await Device.queryAggregates({ pname: "plannedStops", agg: "count" });
-    let nbrOfUnplanned = await Device.queryAggregates({ pname: "unplannedStops", agg: "count" });
-    let nbrOfPowerCut = await Device.queryAggregates({ pname: "powercutStops", agg: "count" });
-
+return Promise.all([
+    Device.queryAggregates({ pname: "plannedStops", agg: "count" }),
+    Device.queryAggregates({ pname: "unplannedStops", agg: "count" }),
+    Device.queryAggregates({ pname: "powercutStops", agg: "count" })
+]).then(results => {
     context["stoppages"] = {
-        planned:  nbrOfPlanned.map(i => i || 0),
-        unplanned: nbrOfUnplanned.map(i => i || 0),
-        powercut: nbrOfPowerCut.map(i => i || 0)
+        planned:  results[0].map(i => i || 0),
+        unplanned: results[1].map(i => i || 0),
+        powercut: results[2].map(i => i || 0)
     };
-
     return context;
-}
-return Promise.resolve(f()); 
+});
 """
 
 #
@@ -556,12 +589,12 @@ async function f(context) {
         Device.queryEstimEnergyConsumption(context),
         Device.queryEstimPowerConsumption(context),
         Device.queryUsageHours(context),
-        // Device.queryLoadRatio(context),
-        // Device.queryStoppages(context),
-        // Device.queryEstimCostOfRunning(context),
-        // Device.queryOEE(context),
-        // Device.queryMtbf(context),
-        // Device.queryMttr(context)
+        Device.queryLoadRatio(context),
+        Device.queryStoppages(context),
+        Device.queryEstimCostOfRunning(context),
+        //Device.queryOEE(context),
+        //Device.queryMtbf(context),
+        //Device.queryMttr(context)
     ]);
 
     // Merge results into context

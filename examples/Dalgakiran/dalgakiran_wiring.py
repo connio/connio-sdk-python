@@ -75,6 +75,7 @@ def wire():
     client.account.properties(compressor.id).create(name='totalLoadHours', data_type='number', access_type='protected', publish_type='never', 
         description='Total hours compressor was on load', measurement=measurement)
     client.account.properties(compressor.id).create(name='maintCounters', data_type='object', access_type='protected', publish_type='never', description='Time from the last maintenance in minutes')
+    client.account.properties(compressor.id).create(name='maintenanceLog', data_type='object', access_type='protected', publish_type='never', description='Log of compressor maintenances')
     unit = PropertyInstance.MeasurementUnit('Percentage', '%')
     measurement = PropertyInstance.Measurement('percentage', unit)    
     client.account.properties(compressor.id).create(name='loadPercInLast100h', data_type='number', access_type='protected', publish_type='never', 
@@ -114,16 +115,18 @@ def wire():
 
     # This can go to app maybe?
     description = """
-Maintenance price list as:
+Asagidaki sekilde bakim ucretlerini girebilirsiniz:
 {
-    "bearing_lubricator": 0,
-    "sep_filter_change": 0,
-    "compressor_check": 0,
-    "air_filter_change": 0,
-    "currency_symbol": "$",
-    "oil_change": 0,
-    "oil_filter_change": 0
-}"""
+  "currencySymbol": "$",
+  "currency": "USD",  
+  "oilFilterChange": 0,
+  "oilChange": 0,
+  "bearingLubrication": 0,
+  "compressorCheck": 0,
+  "airFilterChange": 0,
+  "separatorFilterChange": 0
+}
+"""
     client.account.properties(compressor.id).create(name='maintenanceCostList', data_type='object', access_type='public', publish_type='never', 
       description=description)
 
@@ -133,9 +136,16 @@ Maintenance price list as:
     #------ Add base profile methods
     
     client.account.methods(compressor.id).create(name='init', method_impl= MethodInstance.MethodImplementation(getInit_body()), access_type='public', description="e.g. { 'value': 0, 'unit': '$' }")
-    client.account.methods(compressor.id).create(name='getDashboardParallel', method_impl= MethodInstance.MethodImplementation(getDashboardParallel_body()), access_type='public')
+    client.account.methods(compressor.id).create(name='getDashboardParallel', method_impl= MethodInstance.MethodImplementation(getDashboard_body()), access_type='public')
+    client.account.methods(compressor.id).create(name='getDashboard', method_impl= MethodInstance.MethodImplementation(getDashboard_body()), access_type='public')
     client.account.methods(compressor.id).create(name='getLatestValues', method_impl= MethodInstance.MethodImplementation(getLatestValues_body()), access_type='public')
     client.account.methods(compressor.id).create(name='preaggregate', method_impl= MethodInstance.MethodImplementation(preaggregate_body()), access_type='public')
+
+    client.account.methods(compressor.id).create(name='getHistOEE', method_impl= MethodInstance.MethodImplementation(getHistOEE_body()), access_type='public')
+    client.account.methods(compressor.id).create(name='getHistMttr', method_impl= MethodInstance.MethodImplementation(getHistMttr_body()), access_type='public')
+    client.account.methods(compressor.id).create(name='getHistMtbf', method_impl= MethodInstance.MethodImplementation(getHistMtbf_body()), access_type='public')
+    client.account.methods(compressor.id).create(name='getHistEstimPowerConsumption', method_impl= MethodInstance.MethodImplementation(getHistEstimPowerConsumption_body()), access_type='public')
+    client.account.methods(compressor.id).create(name='getHistEstimEnergyConsumption', method_impl= MethodInstance.MethodImplementation(getHistEstimEnergyConsumption_body()), access_type='public')
 
     accessLevel1 = 'protected'
     accessLevel1_1 = 'private'
@@ -220,12 +230,18 @@ if __name__ == '__main__':
     #Device IMEI: 861359035276375
     #Device name: DK.Test.Cihaz.1
     #Device friendly name: DK Test 1 [GSM]
+    #Description: >FTPUPDATE,0001,IP=107.170.178.138;PORT=21;APN=internet;USER=mitrackftp;PASS=mitrack2017;PATH=/files/;FILE=MITRACK_Q_DAL.bin;
 
     #Device IMEI: 869867035753377
     #Device name: DK.Test.Cihaz.2
     #Device friendly name: DK Test 2 [ETHER]
 
-    #Device IMEI: 000000000000000
+    #Device MAC:  00:1e:c0:91:8c:8f
     #Device name: DK.Test.Cihaz.3
-    #Device friendly name: DK Test 3 [Simul]
+    #Device friendly name: DK Test 3 [ETHER]
+    # 40.36666, 49.83518
+
+    #Device SN:  SN-001-001
+    #Device name: DK.Cihaz.Simul
+    #Device friendly name: DK Cihaz Simul
     wire()
