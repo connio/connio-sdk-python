@@ -19,17 +19,83 @@ import L9_wiring as L9c
 import L26_wiring as L26c
 import L33_wiring as L33c
 
-def wire():
-    ACCOUNT_KEYID = os.environ.get('CONNIO_ACCOUNT_KEYID', '_key_500600814475760930')
-    ACCOUNT_KEYSECRET = os.environ.get('CONNIO_ACCOUNT_KEYSECRET', '0b51ab06dc554165bda3db495eb00737')
+from gateway_wiring import *
+import app_wiring as app
 
-    client = Client(username=ACCOUNT_KEYID, 
-                    password=ACCOUNT_KEYSECRET)
+def wire(keyID, keySecret):
+    client = Client(username=keyID, 
+                    password=keySecret)
 
     # Get master account details
     master = client.accounts.get().fetch()    
     print('Master account: ' + master.name)
-                                     
+
+    # Create compressor app profile
+    compressorManager = client.account.appprofiles.create(name='CompressorManager',
+                                                  friendly_name='Compressor Manager',
+                                                  description='Dalgakıran Compressor Management App',
+                                                  version='1.0',
+                                                  vendor_name='Dalgakıran'
+                                                )
+
+     #------ Add profile properties
+    
+    unit = PropertyInstance.MeasurementUnit('', 'TL')
+    measurement = PropertyInstance.Measurement('currency', unit)    
+    client.account.properties(compressorManager.id).create(name='electric_cost_per_kWh', data_type='number', access_type='public', publish_type='never', measurement=measurement)
+    
+    #------ Add profile methods
+
+    client.account.methods(compressorManager.id).create(name='getDashboard', method_impl= MethodInstance.MethodImplementation(app.getDashboard_body()), access_type='public')
+    client.account.methods(compressorManager.id).create(name='getElectricCostPerkWh', method_impl= MethodInstance.MethodImplementation(app.getElectricCostPerkWh_body()), access_type='public')
+    
+
+    #---
+
+
+    # Create compressor app profile
+    compressorManagerApp = client.account.apps.create(name='CompressorManager',
+                                                  friendly_name='Compressor Manager',
+                                                  profile='CompressorManager',
+                                                  tags=['icon:cogs:#0077c3']
+                                                )
+
+
+
+    #---
+
+
+    # Create new Minova Gateway profile
+    compressor = client.account.deviceprofiles.create(name='ModbusGateway', 
+                                                  friendly_name='Generic Modbus Gateway',
+                                                  base_profile='Gateway',
+                                                  description='Modbus gateway',
+                                                  tags=['gw'],
+                                                  device_class='gateway',
+                                                  product_name='MiTrack-Q',
+                                                  vendor_name='Minova'
+                                                )
+
+     #------ Add profile properties
+    
+    client.account.properties(compressor.id).create(name='gateway_info', data_type='object', access_type='protected', publish_type='never')
+    client.account.properties(compressor.id).create(name='modbus_errors', data_type='string', access_type='protected', publish_type='never')
+    client.account.properties(compressor.id).create(name='modbus_readrequest', data_type='string', access_type='public', publish_type='never')    
+    client.account.properties(compressor.id).create(name='modbus_settings', data_type='string', access_type='public', publish_type='never')
+    client.account.properties(compressor.id).create(name='modbus_writerequest', data_type='string', access_type='public', publish_type='never')
+    
+    #------ Add profile methods
+
+    client.account.methods(compressor.id).create(name='readTag', method_impl= MethodInstance.MethodImplementation(readTag_body()), access_type='protected')
+    client.account.methods(compressor.id).create(name='writeAndReadTag', method_impl= MethodInstance.MethodImplementation(writeAndReadTag_body()), access_type='protected')
+    client.account.methods(compressor.id).create(name='writeTag', method_impl= MethodInstance.MethodImplementation(writeTag_body()), access_type='protected')
+    client.account.methods(compressor.id).create(name='restart', method_impl= MethodInstance.MethodImplementation(restart_body()), access_type='public')
+    client.account.methods(compressor.id).create(name='setModbusSettings', method_impl= MethodInstance.MethodImplementation(setModbusSettings_body()), access_type='public')
+
+
+    #---
+
+
     # Create new Logika base profile
     compressor = client.account.deviceprofiles.create(name='BaseLogikaProfile', 
                                                   friendly_name='Logika Base',
@@ -59,27 +125,34 @@ def wire():
     unit = PropertyInstance.MeasurementUnit('Celsius', '°C')
     measurement = PropertyInstance.Measurement('temperature', unit)
     client.account.properties(compressor.id).create(name='screwTemperature', data_type='number', access_type='protected', publish_type='never', 
-        description='Main Screw Temperature (°C * 10)', measurement=measurement, boundaries={'min': 0, 'max': 70})
+        description='Main Screw Temperature (°C * 10)', measurement=measurement, boundaries={'min': -10, 'max': 125})
+    
     unit = PropertyInstance.MeasurementUnit('Bar', 'bar')
     measurement = PropertyInstance.Measurement('pressure', unit)
     client.account.properties(compressor.id).create(name='workingPressure', data_type='number', access_type='protected', publish_type='never', 
-        description='Main Working Pressure (Bar * 10)', measurement=measurement, boundaries={'min': 0, 'max': 10})
+        description='Main Working Pressure (Bar * 10)', measurement=measurement, boundaries={'min': 0, 'max': 16})
+    
     unit = PropertyInstance.MeasurementUnit('Volt', 'V')
     measurement = PropertyInstance.Measurement('electricity', unit)
     client.account.properties(compressor.id).create(name='controllerSupplyVoltage', data_type='number', access_type='protected', publish_type='never', 
-        description='Main Screw Temperature (V * 10)', measurement=measurement, boundaries={'min': 0, 'max': 100})
+        description='Main Screw Temperature (V * 10)', measurement=measurement, boundaries={'min': 0, 'max': 300})
+    
     client.account.properties(compressor.id).create(name='cfgMaintCycles', data_type='object', access_type='protected', publish_type='never')
+    
     unit = PropertyInstance.MeasurementUnit('Hour', 'h')
     measurement = PropertyInstance.Measurement('time', unit)    
     client.account.properties(compressor.id).create(name='totalHours', data_type='number', access_type='protected', publish_type='never', description='Total hours compressor was working', measurement=measurement)
+    
     client.account.properties(compressor.id).create(name='totalLoadHours', data_type='number', access_type='protected', publish_type='never', 
         description='Total hours compressor was on load', measurement=measurement)
     client.account.properties(compressor.id).create(name='maintCounters', data_type='object', access_type='protected', publish_type='never', description='Time from the last maintenance in minutes')
     client.account.properties(compressor.id).create(name='maintenanceLog', data_type='object', access_type='protected', publish_type='never', description='Log of compressor maintenances')
+    
     unit = PropertyInstance.MeasurementUnit('Percentage', '%')
     measurement = PropertyInstance.Measurement('percentage', unit)    
     client.account.properties(compressor.id).create(name='loadPercInLast100h', data_type='number', access_type='protected', publish_type='never', 
         description="On load minutes in last 100 hours of motor running (100% is 6000)", measurement=measurement, boundaries={'min': 0, 'max': 100})
+    
     unit = PropertyInstance.MeasurementUnit('Count', '#')
     measurement = PropertyInstance.Measurement('custom', unit)
     client.account.properties(compressor.id).create(name='nbrOfStartsInLastHour', data_type='number', access_type='protected', publish_type='never', measurement=measurement)
@@ -136,7 +209,7 @@ Asagidaki sekilde bakim ucretlerini girebilirsiniz:
     #------ Add base profile methods
     
     client.account.methods(compressor.id).create(name='init', method_impl= MethodInstance.MethodImplementation(getInit_body()), access_type='public', description="e.g. { 'value': 0, 'unit': '$' }")
-    client.account.methods(compressor.id).create(name='getDashboardParallel', method_impl= MethodInstance.MethodImplementation(getDashboard_body()), access_type='public')
+    #client.account.methods(compressor.id).create(name='getDashboardParallel', method_impl= MethodInstance.MethodImplementation(getDashboard_body()), access_type='public')
     client.account.methods(compressor.id).create(name='getDashboard', method_impl= MethodInstance.MethodImplementation(getDashboard_body()), access_type='public')
     client.account.methods(compressor.id).create(name='getLatestValues', method_impl= MethodInstance.MethodImplementation(getLatestValues_body()), access_type='public')
     client.account.methods(compressor.id).create(name='preaggregate', method_impl= MethodInstance.MethodImplementation(preaggregate_body()), access_type='public')
@@ -166,8 +239,8 @@ Asagidaki sekilde bakim ucretlerini girebilirsiniz:
     client.account.methods(compressor.id).create(name='queryStoppages', method_impl= MethodInstance.MethodImplementation(queryStoppages_body()), access_type=accessLevel1_1)  
     client.account.methods(compressor.id).create(name='queryEstimCostOfRunning', method_impl= MethodInstance.MethodImplementation(queryEstimCostOfRunning_body()), access_type=accessLevel1_1)
     client.account.methods(compressor.id).create(name='queryOEE', method_impl= MethodInstance.MethodImplementation(queryOEE_body()), access_type=accessLevel1_1)
-    client.account.methods(compressor.id).create(name='queryMtbf', method_impl= MethodInstance.MethodImplementation(queryMtbf_body()), access_type=accessLevel1_1)
-    client.account.methods(compressor.id).create(name='queryMttr', method_impl= MethodInstance.MethodImplementation(queryMttr_body()), access_type=accessLevel1_1)  
+    #client.account.methods(compressor.id).create(name='queryMtbf', method_impl= MethodInstance.MethodImplementation(queryMtbf_body()), access_type=accessLevel1_1)
+    #client.account.methods(compressor.id).create(name='queryMttr', method_impl= MethodInstance.MethodImplementation(queryMttr_body()), access_type=accessLevel1_1)  
 
     client.account.methods(compressor.id).create(name='convertToHours', method_impl= MethodInstance.MethodImplementation(convertToHours_body()), access_type=accessLevel1_1)
     client.account.methods(compressor.id).create(name='convertToDec', method_impl= MethodInstance.MethodImplementation(convertToDec_body()), access_type=accessLevel1_1)
@@ -244,4 +317,15 @@ if __name__ == '__main__':
     #Device SN:  SN-001-001
     #Device name: DK.Cihaz.Simul
     #Device friendly name: DK Cihaz Simul
-    wire()
+
+    keyID = ''
+    keySecret = ''
+
+    if len(sys.argv == 2):
+        keyID = sys.argv[1]
+        keySecret = sys.argv[2]
+    
+    keyID = os.environ.get('CONNIO_ACCOUNT_KEYID', keyID)
+    keySecret = os.environ.get('CONNIO_ACCOUNT_KEYSECRET', keySecret)
+
+    wire(keyID, keySecret)

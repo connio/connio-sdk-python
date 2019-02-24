@@ -45,29 +45,21 @@ def readAndWrite(connection):
             # { 'method': 'setLogikaFwVersion', 'value': [ 3, 1 ] },
             # { 'method': 'setAlarms', 'value': [0,0,0,2,0,0,0,0] },
             # { 'method': 'setNonAckAlarms', 'value': [0,0,0,2,0,0,0,0] },
-            { 'method': 'setScrewTemperature', 'value': [1, 4] },
-            { 'method': 'setWorkingPressure', 'value': [ 0, 21 ] },
+            # { 'method': 'setScrewTemperature', 'value': [1, 4] },
+            # { 'method': 'setWorkingPressure', 'value': [ 0, 21 ] },
             # # { 'method': 'setAuxiliaryPressure', 'value': 68.1 },            
             # { 'method': 'setTotalLoadHours', 'value': [15, 34] },
             # { 'method': 'setTotalHours', 'value': [34, 56] },
             # { 'method': 'setCompressorState', 'value': [ 0, 13 ] },
             # { 'method': 'setControllerState', 'value': [ 0, 5 ] },
-            { 'method': 'setCompressorState', 'value': [ 0, 11 ] }
+            # { 'method': 'setCompressorState', 'value': [ 0, 11 ] }
         ]})
-        connection.publish("connio/data/out/devices/{}/methods/json".format(deviceId), data)
+        # connection.publish("connio/data/out/devices/{}/methods/json".format(deviceId), data)
                
         # payload = json.dumps(reading)        
         # connection.publish("connio/data/out/devices/{}/methods/parseReading".format(deviceId), payload)
 
         #connection.publish("connio/data/out/devices/{}/properties/cfgReleaseNo".format(deviceId), "23.233")
-
-        #connection.publish("connio/data/out/devices/{}/json
-        # { 't': ...., 'value': [0,0,0,2,0,0,0,0], 'prop': 'someproprname' },
-        # { 't': ...., 'value': [0,0,0,2,0,0,0,0], 'prop': 'someproprname' },                   
-        # { 't': ....  'value': [0,0,0,2,0,0,0,0], 'meth': 'setAlarms'},
-        # { 't': ....  'value': [0,0,0,2,0,0,0,0], 'meth': 'setAlarms'},
-
-
 
         print(_blue("•"))
         time.sleep(writeSettings.get('frequency', 5))
@@ -76,16 +68,13 @@ def readAndWrite(connection):
 if __name__ == '__main__':
 
     # Default is our test environment
-    BROKER_ADDR = os.environ.get("CONNIO_BROKER_ADDR", "mqtt.connio.cloud")
+    BROKER_ADDR = os.environ.get("CONNIO_BROKER_ADDR", "mqtt.skywaveiot.com")
 
     # Provisioning credentials
-    username = os.environ.get("CONNIO_PROVISION_KEY_ID", "_key_499569128223998049")
-    password = os.environ.get("CONNIO_PROVISION_KEY_SECRET", "0af19086c6a1485e890b996776bb58f0")
+    username = os.environ.get("CONNIO_PROVISION_KEY_ID", "_key_535199912233292681")
+    password = os.environ.get("CONNIO_PROVISION_KEY_SECRET", "3f5aa9fe100d4e2282acbae9492ab78b")
 
-    # Account wide unique device id, could be sn, mac, imei, esn, or cid
-    # cid = os.environ.get("CONNIO_DEVICE_MAC", "00:1e:c0:91:8c:8f")
-    # cidMap = CidMap("mac", cid)
-    cid = os.environ.get("CONNIO_DEVICE_SN", "SN-001-001")
+    cid = os.environ.get("CONNIO_DEVICE_SN", "C001-001")
     cidMap = CidMap("sn", cid)
 
     session = Session()

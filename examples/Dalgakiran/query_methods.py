@@ -12,8 +12,6 @@
 # queryStoppages
 # queryEstimCostOfRunning
 # queryOEE
-# queryMtbf
-# queryMttr
 
 #
 #
@@ -276,7 +274,6 @@ context['energy'] = {
     value: estimatedEnergyAvg.map(i => i || 0),
     unit: 'kWh'
 };
-                                                                
 
 return context;
 """
@@ -322,7 +319,7 @@ context['power'] = {
     value: estimatedPowerUsageAvg.map(i => i),
     unit: 'kW'
 };
-                                                                
+
 return context;
 """
 
@@ -462,105 +459,82 @@ return Promise.resolve(f());
 #
 def queryOEE_body():
     return """/**
-* Availability = Wt / Lt where Wt is Working Time, Lt is Loaded Time
-* 
-* LoadedTime = period - (total hours - unplanned stoppage duration)
-*
-* WorkingTime = Total hours
-*
-* OEE = A x Perf x Q
-* 
-* MTbf = Lt / Nbr of unplanned stoppages
-* 
-* MTtr = Unplanned stoppages / Nbr of unplanned stoppages
-*/
+ * @param value is the context
+ * 
+ * 
+ * Availability = Wt / Lt where Wt is Working Time, Lt is Loaded Time
+ * 
+ * Lt (Loaded Time) = Load Running Duration + Idle Running Duration + Unplanned stopages Duration
+ *
+ * Wt (Working Time) = Load Running Duration + Idle Running Duration
+ *
+ * OEE = A x Perf x Q
+ * 
+ * MTbf = Lt / Nbr of unplanned stoppages
+ * 
+ * MTtr = Unplanned stoppages / Nbr of unplanned stoppages
+ */
 
-let query = value;
+let context = value;
+const perf  = 1;
+const quality = 1;
 
-const PNAME = "non-existing-prop-name";
+let oee = [];
+let mtbf = [];
+let mttr = [];
 
-let q = { startRelative: { value: query.from.value, unit: query.from.unit }, aggregators: [ {name: 'sum', sampling: { value: query.sampling.value, unit: query.sampling.unit } } ] };
+let availability = 1;
 
-Device.api.readData(PNAME, q)
-    .then(resultSet => { 
-        let items = resultSet.results[0].values.map(obj => {
-            return obj;
-        });
-        done(null, items);
-     });
+let durationCeiling = [24, 24 * 7, 24 * 30, 24 * 365];
+
+// For 4 periods: 24h, 7d, 1m, 1y 
+for (let i = 0; i < 4; i++) {
+   
+   // Make sure not to exceed period duration if state duration is longer 
+   let ceiling = durationCeiling[i];
+   
+   let Lt = Math.min(context.loadRunningHours[i], ceiling) + Math.min(context.idleRunningHours[i], ceiling) + Math.min(context.unplannedStoppageHours[i], ceiling);
+   let Wt = Math.min(context.loadRunningHours[i], ceiling) + Math.min(context.idleRunningHours[i], ceiling);
+
+   availability = Wt / Lt;
+   
+   oee.push(availability * perf * quality);
+   
+  let mtbfi = Lt / context.stoppages.unplanned[i];
+  mtbf.push(mtbfi);
+   
+  let mttri = Math.min(context.unplannedStoppageHours[i], ceiling) / context.stoppages.unplanned[i];
+  mttr.push(mttri)
+}
+
+context['oee'] = {
+    performance: [ 1, 1, 1, 1 ],
+    quality: [ 1, 1, 1, 1 ],
+    average: oee.map(i => i * 100 || 0),
+    unit: '%'
+};
+
+context['mtbf'] = {
+    average: mtbf.map(i => i || 0),
+    unit: 'h'
+};
+
+context['mttr'] = {
+    average: mttr.map(i => i || 0),
+    unit: 'h'
+};
+
+return context;
 """
 
-#
-#
-#
-def queryMtbf_body():
-    return """/**
-* Availability = Wt / Lt where Wt is Working Time, Lt is Loaded Time
-* 
-* LoadedTime = period - (total hours - unplanned stoppage duration)
-*
-* WorkingTime = Total hours
-*
-* OEE = A x Perf x Q
-* 
-* MTbf = Lt / Nbr of unplanned stoppages
-* 
-* MTtr = Unplanned stoppages / Nbr of unplanned stoppages
-*/
-
-let query = value;
-
-const PNAME = "non-existing-prop-name";
-
-let q = { startRelative: { value: query.from.value, unit: query.from.unit }, aggregators: [ {name: 'sum', sampling: { value: query.sampling.value, unit: query.sampling.unit } } ] };
-
-Device.api.readData(PNAME, q)
-    .then(resultSet => { 
-        let items = resultSet.results[0].values.map(obj => {
-            return obj;
-        });
-        done(null, items);
-     });
-"""
-
-#
-#
-#
-def queryMttr_body():
-    return """/**
-* Availability = Wt / Lt where Wt is Working Time, Lt is Loaded Time
-* 
-* LoadedTime = period - (total hours - unplanned stoppage duration)
-*
-* WorkingTime = Total hours
-*
-* OEE = A x Perf x Q
-* 
-* MTbf = Lt / Nbr of unplanned stoppages
-* 
-* MTtr = Unplanned stoppages / Nbr of unplanned stoppages
-*/
-
-let query = value;
-
-const PNAME = "non-existing-prop-name";
-
-let q = { startRelative: { value: query.from.value, unit: query.from.unit }, aggregators: [ {name: 'sum', sampling: { value: query.sampling.value, unit: query.sampling.unit } } ] };
-
-Device.api.readData(PNAME, q)
-    .then(resultSet => { 
-        let items = resultSet.results[0].values.map(obj => {
-            return obj;
-        });
-        done(null, items);
-     });
-"""
 
 #
 #
 #
 def preaggregate_body():
     return """/**
+*/
+/**
 */
 async function f(context) {
     // Call the methods below in parallel.
@@ -577,24 +551,44 @@ async function f(context) {
     // Merge results into context
     results.forEach(result => Object.assign(context, result));
     
+    // Get compressor state to add duration of the current state to timings
+    let compressorStateProp = await Device.api.getProperty("compressorState");
+    if (compressorStateProp.value) {
+        let stateTypes = Device.fetchCompressorStateTypes();
+        
+        let deltaInMinutes = (Date.now() - Date.parse(compressorStateProp.time)) / (1000 * 60);
+        
+        if (stateTypes.LOAD_RUNNING.includes(compressorStateProp.value.code) && context._loadMinutes) {
+            context._loadMinutes.total[0] =  (context._loadMinutes.total[0] || 0) + deltaInMinutes;
+        }
+        else if (stateTypes.IDLE_RUNNING.includes(compressorStateProp.value.code) && context._idleMinutes) {
+            context._idleMinutes.total[0] =  (context._idleMinutes.total[0] || 0) + deltaInMinutes;
+        }
+        else if (stateTypes.UNPLANNED_STOPPAGES.includes(compressorStateProp.value.code) && context._unplndStopMinutes) {
+            context._unplndStopMinutes.total[0] =  (context._unplndStopMinutes.total[0] || 0) + deltaInMinutes;
+        }
+        else if (stateTypes.PLANNED_STOPPAGES.includes(compressorStateProp.value.code) && context._plndStopMinutes) {
+            context._plndStopMinutes.total[0] =  (context._plndStopMinutes.total[0] || 0) + deltaInMinutes;
+        }
+    }
+    
     // Perform calculations using intermediary fields and place them into context
     context.idleRunningHours = context._idleMinutes ? context._idleMinutes.total.map(i => (i || 0) / 60.0) : 0;
     context.loadRunningHours = context._loadMinutes ? context._loadMinutes.total.map(i => (i || 0) / 60.0) : 0;
     context.unplannedStoppageHours = context._unplndStopMinutes ? context._unplndStopMinutes.total.map(i => (i || 0) / 60.0) : 0;
     context.plannedStoppageHours = context._plndStopMinutes ? context._plndStopMinutes.total.map(i => (i || 0) / 60.0) : 0;
+   
     
     // Call the methods below in parallel.
     // These methods are dependent on the data produced by previously called methods.
     results = await Promise.all([
         Device.queryEstimEnergyConsumption(context),
         Device.queryEstimPowerConsumption(context),
-        Device.queryUsageHours(context),
+        //Device.queryUsageHours(context),
         Device.queryLoadRatio(context),
         Device.queryStoppages(context),
         Device.queryEstimCostOfRunning(context),
-        //Device.queryOEE(context),
-        //Device.queryMtbf(context),
-        //Device.queryMttr(context)
+        Device.queryOEE(context),
     ]);
 
     // Merge results into context

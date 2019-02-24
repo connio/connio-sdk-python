@@ -21,13 +21,16 @@ def wire(client):
 
     unit = PropertyInstance.MeasurementUnit('Bar', 'bar')
     measurement = PropertyInstance.Measurement('pressure', unit)
-    client.account.properties(compressor.id).create(name='auxPressure', data_type='number', access_type='protected', publish_type='never', measurement=measurement, boundaries={'min': 0, 'max': 10})
+    client.account.properties(compressor.id).create(name='auxPressure', data_type='number', access_type='protected', publish_type='never', measurement=measurement, boundaries={'min': 0, 'max': 16})
+    
     unit = PropertyInstance.MeasurementUnit('Volt', 'V')
     measurement = PropertyInstance.Measurement('electricity', unit)
-    client.account.properties(compressor.id).create(name='ptcInput', data_type='number', access_type='protected', publish_type='never', measurement=measurement, boundaries={'min': 0, 'max': 100})
+    client.account.properties(compressor.id).create(name='ptcInput', data_type='number', access_type='protected', publish_type='never', measurement=measurement, boundaries={'min': 0, 'max': 300})
+    
     unit = PropertyInstance.MeasurementUnit('Frequence', 'Hz')
     measurement = PropertyInstance.Measurement('custom', unit)
-    client.account.properties(compressor.id).create(name='analogueOutFreq', data_type='number', access_type='protected', publish_type='never', measurement=measurement, boundaries={'min': 0, 'max': 100})
+    client.account.properties(compressor.id).create(name='analogueOutFreq', data_type='number', access_type='protected', publish_type='never', 
+      measurement=measurement, boundaries={'min': 0, 'max': 400})
   
     client.account.properties(compressor.id).create(name='configSwitches', data_type='object', access_type='protected', publish_type='never')
     client.account.properties(compressor.id).create(name='configSelections', data_type='object', access_type='protected', publish_type='never')

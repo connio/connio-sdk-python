@@ -302,6 +302,13 @@ async function main(context) {
             max: pressureProp.meta.boundaries.max,
         };
     }
+    else {
+        // in case that no boundary has been provided
+        context.temperature.range = {
+            min: 0,
+            max: 100,
+        };
+    }
     
     context.temperature.value = temperatureProp.value || 0;
     context.temperature.unit = temperatureProp.meta.measurement && temperatureProp.meta.measurement.unit && temperatureProp.meta.measurement.unit.symbol;
@@ -310,6 +317,13 @@ async function main(context) {
         context.temperature.range = {
             min: temperatureProp.meta.boundaries.min,
             max: temperatureProp.meta.boundaries.max,
+        };
+    }
+    else {
+        // in case that no boundary has been provided
+        context.temperature.range = {
+            min: 0,
+            max: 100,
         };
     }
 
