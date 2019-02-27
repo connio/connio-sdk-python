@@ -273,6 +273,108 @@ def getDashboard_body():
 *  Build the default dashboard view of the compressor.
 *  Some information must be populated by calling `preaggregate()` method ahead of time.
 */
+
+/** @desc Logika-Base */
+const PRESSURE_PROPERTY = 'workingPressure';
+/** @desc Logika-Base */
+const TEMPERATURE_PROPERTY = 'screwTemperature';
+/** @desc Logika-Base */
+const COMPRESSOR_STATE_PROPERTY = 'compressorState';
+
+/** @desc Logika-Base */
+const STATE_PROPERTY = 'state';
+
+const OFFLINE = 'offline';
+
+async function main(context) {
+    Object.assign(context, {
+        costOfkWh: value,
+    });
+    
+    // Acquire temperature and pressure values in parallel
+    let [pressureProp, temperatureProp, compressorStateProp, periods] = await Promise.all([
+       Device.api.getProperty(PRESSURE_PROPERTY),
+       Device.api.getProperty(TEMPERATURE_PROPERTY),
+       Device.api.getProperty(COMPRESSOR_STATE_PROPERTY),
+       Device.processCompressorStates()
+    ]);
+    
+    context.periods = periods;
+
+    context.pressure.value = pressureProp.value || 0;
+    context.pressure.unit = pressureProp.meta.measurement && pressureProp.meta.measurement.unit && pressureProp.meta.measurement.unit.symbol;
+
+    if (pressureProp.meta.boundaries) {
+        context.pressure.range = {
+            min: pressureProp.meta.boundaries.min,
+            max: pressureProp.meta.boundaries.max,
+        };
+    }
+    
+    context.temperature.value = temperatureProp.value || 0;
+    context.temperature.unit = temperatureProp.meta.measurement && temperatureProp.meta.measurement.unit && temperatureProp.meta.measurement.unit.symbol;
+
+    if (temperatureProp.meta.boundaries) {
+        context.temperature.range = {
+            min: temperatureProp.meta.boundaries.min,
+            max: temperatureProp.meta.boundaries.max,
+        };
+    }
+    else {
+        context.temperature.range = {
+            min: 0,
+            max: 100,
+        };
+    }
+
+    // Call the methods below in parallel.
+    // These methods do not have any dependence on other method output.
+    let results = await Promise.all([
+        Device.getCompressorInfo(),
+        Device.queryWarningAlarmSummary(context),
+        Device.queryTimeToMaintenance(context),
+        // Calculates average OEE, MTtr, MTbf, Energy Consumption, Power Consumption, Cost of Running 
+        // and stoppages for 24hr, 7 days, 30 days and 1 year
+        Device.calculateAll(context),
+        Device.hasInverter(context)
+    ]);
+    
+    // Clean all periods
+    context.periods = undefined;
+    
+    // Merge results into context
+    results.forEach(result => Object.assign(context, result));
+    
+    return {
+        ...context,
+        
+        /** @desc Reset current values for offline compressor */
+        pressure: {
+            ...context.pressure,
+            value: context.connectivity === OFFLINE ? 0 : context.pressure.value,
+        },
+        temperature: {
+            ...context.temperature,
+            value: context.connectivity === OFFLINE ? 0 : context.temperature.value,
+        },
+    };
+};
+
+Device.api.getProperty(STATE_PROPERTY)
+ .then(property => property.value || Device.getEmptyView())
+ .then(context => main(context))
+ .then(context => Device.api.setProperty(STATE_PROPERTY, { value: context, time: new Date().toISOString() }))
+ .then(property => done(null, property.value));
+"""
+
+#
+#
+#
+def getDashboard_OLD_body():
+    return """/**
+*  Build the default dashboard view of the compressor.
+*  Some information must be populated by calling `preaggregate()` method ahead of time.
+*/
 /** @desc Logika-Base */
 const PRESSURE_PROPERTY = 'workingPressure';
 /** @desc Logika-Base */
@@ -386,101 +488,194 @@ getValues();
 
 def getHistOEE_body():
     return """/**
-*  Returns the historical OEE values based on the given query.
+*  Gets historical OEE
 */
 
 let query = value;
-const propName = "non-existing-prop-name";
 
-let q = { startRelative: { value: query.from.value, unit: query.from.unit }, aggregators: [ {name: 'sum', sampling: { value: query.sampling.value, unit: query.sampling.unit } } ] };
-
-Device.api.readData(propName, q)
-    .then(resultSet => { 
-        let items = resultSet.results[0].values.map(obj => {
-            return obj;
+const reducer = (yearly, daily) => {
+    if (yearly.length == 0) {
+        yearly.push(daily);
+    }
+    else if (new Date(yearly[yearly.length-1].date).getUTCMonth() == new Date(daily.date).getUTCMonth()) {
+        yearly[yearly.length-1].idleRunningDur += daily.idleRunningDur;
+        yearly[yearly.length-1].loadRunningDur += daily.loadRunningDur;
+        yearly[yearly.length-1].unplannedDur += daily.unplannedDur;
+    }
+    else {
+        yearly.push({ 
+            idleRunningDur: daily.idleRunningDur,
+            loadRunningDur: daily.loadRunningDur,
+            unplannedDur: daily.unplannedDur,
+            date: daily.date
         });
-        done(null, items);
-     });
+    }
+    return yearly;
+}
+
+let now = new Date();
+let startMonth = now.setUTCMonth(now.getUTCMonth() - 12);
+
+Device.processCompressorStates().then(periods => {
+    if (query.from.unit == 'WEEKS' || query.from.unit == 'MONTHS') {
+        let results = periods.map( p => {
+            return {
+                v: ((p.Availability * p.Quality * p.Perf) * 100).toFixed(2),
+                t: p.date + "T23:59:59.999Z"
+            }
+        });
+        done(null, results.reverse().slice(0, 30));
+    }
+    else {
+        // Yearly
+        let results = periods
+                        .filter(p => Date.parse(p.date) > startMonth)
+                        .reduce(reducer, [])
+                        .map( p => {
+                            let Lt = p.idleRunningDur + p.loadRunningDur + p.unplannedDur;
+                            let Wt = p.idleRunningDur + p.loadRunningDur;
+    
+                            let availability = Wt / Lt;
+                            
+                            return {
+                                v: ((availability * 1.0 * 1.0) * 100).toFixed(2),
+                                t: p.date + "T23:59:59.999Z"
+                            }
+                        });
+        done(null, results.reverse().slice(0, 12));
+    }
+});
 """
 
 def getHistMtbf_body():
     return """/**
-*  Returns the historical MTbf values based on the given query.
-*/
-
+ * Gets historical Mean time between failures
+ */ 
 let query = value;
-const propName = "non-existing-prop-name";
 
-let q = { startRelative: { value: query.from.value, unit: query.from.unit }, aggregators: [ {name: 'sum', sampling: { value: query.sampling.value, unit: query.sampling.unit } } ] };
-
-Device.api.readData(propName, q)
-    .then(resultSet => { 
-        let items = resultSet.results[0].values.map(obj => {
-            return obj;
+const reducer = (yearly, daily) => {
+    if (yearly.length == 0) {
+        yearly.push(daily);
+    }
+    else if (new Date(yearly[yearly.length-1].date).getUTCMonth() == new Date(daily.date).getUTCMonth()) {
+        yearly[yearly.length-1].idleRunningDur += daily.idleRunningDur;
+        yearly[yearly.length-1].loadRunningDur += daily.loadRunningDur;
+        yearly[yearly.length-1].unplannedDur += daily.unplannedDur;
+        yearly[yearly.length-1].unplannedStops += daily.unplannedStops;
+    }
+    else {
+        yearly.push({ 
+            idleRunningDur: daily.idleRunningDur,
+            loadRunningDur: daily.loadRunningDur,
+            unplannedDur: daily.unplannedDur,
+            unplannedStops: daily.unplannedStops,
+            date: daily.date
         });
-        done(null, items);
-     });
+    }
+    return yearly;
+}
+
+let now = new Date();
+let startMonth = now.setUTCMonth(now.getUTCMonth() - 12);
+
+Device.processCompressorStates().then(periods => {
+    if (query.from.unit == 'WEEKS' || query.from.unit == 'MONTHS') {
+        let results = periods.map( p => {
+            let Lt = p.idleRunningDur + p.loadRunningDur + p.unplannedDur;
+            let mtbf = (p.unplannedStops == 0 ? "-" : (Lt / p.unplannedStops).toFixed(2));
+            
+            return {
+                v: mtbf,
+                t: p.date + "T23:59:59.999Z"
+            }
+        });
+        done(null, results.reverse().slice(0, 30));
+    }
+    else {
+        // Yearly
+        let results = periods
+                        .filter(p => Date.parse(p.date) > startMonth)
+                        .reduce(reducer, [])
+                        .map( p => {
+                            let Lt = p.idleRunningDur + p.loadRunningDur + p.unplannedDur;
+                            let mtbf = (p.unplannedStops == 0 ? "-" : (Lt / p.unplannedStops).toFixed(2));
+                            
+                            return {
+                                v: mtbf,
+                                t: p.date + "T23:59:59.999Z"
+                            }
+                        });
+        done(null, results.reverse().slice(0, 12));
+    }
+});
 """
 
 def getHistMttr_body():
     return """/**
-*  Returns the historical MTtr values based on the given query.
-*/
-
+* Gets historical MTtr values
+*/ 
 let query = value;
-const propName = "non-existing-prop-name";
 
-let q = { startRelative: { value: query.from.value, unit: query.from.unit }, aggregators: [ {name: 'sum', sampling: { value: query.sampling.value, unit: query.sampling.unit } } ] };
-
-Device.api.readData(propName, q)
-    .then(resultSet => { 
-        let items = resultSet.results[0].values.map(obj => {
-            return obj;
+const reducer = (yearly, daily) => {
+    if (yearly.length == 0) {
+        yearly.push(daily);
+    }
+    else if (new Date(yearly[yearly.length-1].date).getUTCMonth() == new Date(daily.date).getUTCMonth()) {
+        yearly[yearly.length-1].idleRunningDur += daily.idleRunningDur;
+        yearly[yearly.length-1].loadRunningDur += daily.loadRunningDur;
+        yearly[yearly.length-1].unplannedDur += daily.unplannedDur;
+        yearly[yearly.length-1].unplannedStops += daily.unplannedStops;
+    }
+    else {
+        yearly.push({ 
+            idleRunningDur: daily.idleRunningDur,
+            loadRunningDur: daily.loadRunningDur,
+            unplannedDur: daily.unplannedDur,
+            unplannedStops: daily.unplannedStops,
+            date: daily.date
         });
-        done(null, items);
-     });
+    }
+    return yearly;
+}
+
+let now = new Date();
+let startMonth = now.setUTCMonth(now.getUTCMonth() - 12);
+
+Device.processCompressorStates().then(periods => {
+    if (query.from.unit == 'WEEKS' || query.from.unit == 'MONTHS') {
+        let results = periods.map( p => {
+            let mttr = (p.unplannedStops == 0 ? "-" : (p.unplannedDur / p.unplannedStops).toFixed(2));
+            
+            return {
+                v: mttr,
+                t: p.date + "T23:59:59.999Z"
+            }
+        });
+        done(null, results.reverse().slice(0, 30));
+    }
+    else {
+        // Yearly
+        let results = periods
+                        .filter(p => Date.parse(p.date) > startMonth)
+                        .reduce(reducer, [])
+                        .map( p => {
+                            let mttr = (p.unplannedStops == 0 ? "-" : (p.unplannedDur / p.unplannedStops).toFixed(2));
+                            
+                            return {
+                                v: mttr,
+                                t: p.date + "T23:59:59.999Z"
+                            }
+                        });
+        done(null, results.reverse().slice(0, 12));
+    }
+});
 """
 
 def getHistEstimPowerConsumption_body():
     return """/**
 *  Returns the historical power consumption values based on the given query.
 */
-
-/*
- value.from
-   Contains `value` and `unit` sub attributes. The relative start time is the current date and time minus 
-   the specified value and unit. Possible unit values are “milliseconds”, “seconds”, “minutes”, “hours”, “days”, 
-   “weeks”, “months”, and “years”. For example, if the start time is 5 minutes, the query will return 
-   all matching data points for the last 5 minutes.
- value.sampling  
-   Contains `value` and `unit` sub attributes.
-   
-   Example 1 to pass method invoker dialog:
-   
-   {
-	"value": { "from": { "value": 30, "unit": "days" }, "sampling": { "value": 1, "unit": "days"  } }
-   }
-   
-   Exmaple 2:
-   
-   {
-	 value: { 
-	    from: { 
-	        value: 30, 
-	        unit: "days" 
-	    }, 
-	    sampling: { 
-	        value: 1, 
-	        unit: "days"  
-	    } 
-	 }
-   } 
-*/
-
 let query = value;
-
-const IDLE_RUNNING_MINUTES_PNAME = "idleRunningMinutes";
-const LOAD_RUNNING_MINUTES_PNAME = "loadRunningMinutes";
 
 const ENERGY_CONSUMPTION_CONSTANT = 10.0 * 1.2;
 const ENERGY_IDLE_CONSUMPTION_RATIO = 0.27;
@@ -488,75 +683,62 @@ const ENERGY_IDLE_CONSUMPTION_RATIO = 0.27;
 const IDLE_PWR_MULTIPLIER = ENERGY_CONSUMPTION_CONSTANT * ENERGY_IDLE_CONSUMPTION_RATIO;
 const LOAD_PWR_MULTIPLIER = ENERGY_CONSUMPTION_CONSTANT;
 
-let q = { startRelative: { value: query.from.value, unit: query.from.unit }, aggregators: [ {name: 'sum', sampling: { value: query.sampling.value, unit: query.sampling.unit } } ] };
+const reducer = (yearly, daily) => {
+    if (yearly.length == 0) {
+        yearly.push(daily);
+    }
+    else if (new Date(yearly[yearly.length-1].date).getUTCMonth() == new Date(daily.date).getUTCMonth()) {
+        yearly[yearly.length-1].idleRunningDur += daily.idleRunningDur;
+        yearly[yearly.length-1].loadRunningDur += daily.loadRunningDur;
+        yearly[yearly.length-1].unplannedDur += daily.unplannedDur;
+    }
+    else {
+        yearly.push({ 
+            idleRunningDur: daily.idleRunningDur,
+            loadRunningDur: daily.loadRunningDur,
+            unplannedDur: daily.unplannedDur,
+            date: daily.date
+        });
+    }
+    return yearly;
+}
 
-let idleRunning;
-let loadRunning;
+let now = new Date();
+let startMonth = now.setUTCMonth(now.getUTCMonth() - 12);
 
-Device.api.readData(IDLE_RUNNING_MINUTES_PNAME, q)
-    .then(resultSet => { 
-        idleRunning = resultSet.results[0].values.map(obj => {
-            return { v: (obj.v || 0) / 60.0 * IDLE_PWR_MULTIPLIER, t: obj.t };
+Device.processCompressorStates().then(periods => {
+    if (query.from.unit == 'WEEKS' || query.from.unit == 'MONTHS') {
+        let results = periods.map( p => {
+            return {
+                v: (( (p.loadRunningDur * LOAD_PWR_MULTIPLIER) + (p.idleRunningDur * IDLE_PWR_MULTIPLIER) ) / 
+                    (p.loadRunningDur + p.idleRunningDur) ) || 0,
+                t: p.date + "T23:59:59.999Z"
+            }
         });
-        return Device.api.readData(LOAD_RUNNING_MINUTES_PNAME, q)
-     })
-    .then(resultSet => { 
-        loadRunning = resultSet.results[0].values.map(obj => {
-            return { v: (obj.v || 0) / 60.0 * LOAD_PWR_MULTIPLIER, t: obj.t };
-        });
-        
-        let results = idleRunning.concat(loadRunning).sort(function(a,b){
-          // Turn your strings into dates, and then subtract them
-          // to get a value that is either negative, positive, or zero.
-          return new Date(b.t) - new Date(a.t);
-        });
-        
-        // TODO: x/y is missing
-        
-        done(null, results);
-     });
+        done(null, results.reverse().slice(0, 30));
+    }
+    else {
+        // Yearly
+        let results = periods
+                        .filter(p => Date.parse(p.date) > startMonth)
+                        .reduce(reducer, [])
+                        .map( p => {
+                            return {
+                                v: (( (p.loadRunningDur * LOAD_PWR_MULTIPLIER) + (p.idleRunningDur * IDLE_PWR_MULTIPLIER) ) / 
+                                    (p.loadRunningDur + p.idleRunningDur) ) || 0,
+                                t: p.date + "T23:59:59.999Z"
+                            }
+                        });
+        done(null, results.reverse().slice(0, 12));
+    }
+});
 """
 
 def getHistEstimEnergyConsumption_body():
     return """/**
 *  Returns the historical energy consumption values based on the given query.
 */
-
-/*
- value.from
-   Contains `value` and `unit` sub attributes. The relative start time is the current date and time minus 
-   the specified value and unit. Possible unit values are “milliseconds”, “seconds”, “minutes”, “hours”, “days”, 
-   “weeks”, “months”, and “years”. For example, if the start time is 5 minutes, the query will return 
-   all matching data points for the last 5 minutes.
- value.sampling  
-   Contains `value` and `unit` sub attributes.
-   
-   Example 1 to pass method invoker dialog:
-   
-   {
-	"value": { "from": { "value": 30, "unit": "days" }, "sampling": { "value": 1, "unit": "days"  } }
-   }
-   
-   Exmaple 2:
-   
-   {
-	 value: { 
-	    from: { 
-	        value: 30, 
-	        unit: "days" 
-	    }, 
-	    sampling: { 
-	        value: 1, 
-	        unit: "days"  
-	    } 
-	 }
-   } 
-*/
-
 let query = value;
-
-const IDLE_RUNNING_MINUTES_PNAME = "idleRunningMinutes";
-const LOAD_RUNNING_MINUTES_PNAME = "loadRunningMinutes";
 
 const ENERGY_CONSUMPTION_CONSTANT = 10.0 * 1.2;
 const ENERGY_IDLE_CONSUMPTION_RATIO = 0.27;
@@ -564,29 +746,51 @@ const ENERGY_IDLE_CONSUMPTION_RATIO = 0.27;
 const IDLE_PWR_MULTIPLIER = ENERGY_CONSUMPTION_CONSTANT * ENERGY_IDLE_CONSUMPTION_RATIO;
 const LOAD_PWR_MULTIPLIER = ENERGY_CONSUMPTION_CONSTANT;
 
-let q = { startRelative: { value: query.from.value, unit: query.from.unit }, aggregators: [ {name: 'sum', sampling: { value: query.sampling.value, unit: query.sampling.unit } } ] };
+const reducer = (yearly, daily) => {
+    if (yearly.length == 0) {
+        yearly.push(daily);
+    }
+    else if (new Date(yearly[yearly.length-1].date).getUTCMonth() == new Date(daily.date).getUTCMonth()) {
+        yearly[yearly.length-1].idleRunningDur += daily.idleRunningDur;
+        yearly[yearly.length-1].loadRunningDur += daily.loadRunningDur;
+        yearly[yearly.length-1].unplannedDur += daily.unplannedDur;
+    }
+    else {
+        yearly.push({ 
+            idleRunningDur: daily.idleRunningDur,
+            loadRunningDur: daily.loadRunningDur,
+            unplannedDur: daily.unplannedDur,
+            date: daily.date
+        });
+    }
+    return yearly;
+}
 
-let idleRunning;
-let loadRunning;
+let now = new Date();
+let startMonth = now.setUTCMonth(now.getUTCMonth() - 12);
 
-Device.api.readData(IDLE_RUNNING_MINUTES_PNAME, q)
-    .then(resultSet => { 
-        idleRunning = resultSet.results[0].values.map(obj => {
-            return { v: (obj.v || 0) / 60.0 * IDLE_PWR_MULTIPLIER, t: obj.t };
+Device.processCompressorStates().then(periods => {
+    if (query.from.unit == 'WEEKS' || query.from.unit == 'MONTHS') {
+        let results = periods.map( p => {
+            return {
+                v: ((p.loadRunningDur * LOAD_PWR_MULTIPLIER) + (p.idleRunningDur * IDLE_PWR_MULTIPLIER)) || 0,
+                t: p.date + "T23:59:59.999Z"
+            }
         });
-        return Device.api.readData(LOAD_RUNNING_MINUTES_PNAME, q)
-     })
-    .then(resultSet => { 
-        loadRunning = resultSet.results[0].values.map(obj => {
-            return { v: (obj.v || 0) / 60.0 * LOAD_PWR_MULTIPLIER, t: obj.t };
-        });
-        
-        let results = idleRunning.concat(loadRunning).sort(function(a,b){
-          // Turn your strings into dates, and then subtract them
-          // to get a value that is either negative, positive, or zero.
-          return new Date(b.t) - new Date(a.t);
-        });
-        
-        done(null, results);
-     });
+        done(null, results.reverse().slice(0, 30));
+    }
+    else {
+        // Yearly
+        let results = periods
+                        .filter(p => Date.parse(p.date) > startMonth)
+                        .reduce(reducer, [])
+                        .map( p => {
+                            return {
+                                v: ((p.loadRunningDur * LOAD_PWR_MULTIPLIER) + (p.idleRunningDur * IDLE_PWR_MULTIPLIER)) || 0,
+                                t: p.date + "T23:59:59.999Z"
+                            }
+                        });
+        done(null, results.reverse().slice(0, 12));
+    }
+});
 """

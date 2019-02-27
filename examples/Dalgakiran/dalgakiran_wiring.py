@@ -27,8 +27,10 @@ def wire(keyID, keySecret):
                     password=keySecret)
 
     # Get master account details
-    master = client.accounts.get().fetch()    
-    print('Master account: ' + master.name)
+    # master = client.accounts.get().fetch()    
+    # print('Master account: ' + master.name)
+
+    print('Creating the system')
 
     # Create compressor app profile
     compressorManager = client.account.appprofiles.create(name='CompressorManager',
@@ -59,7 +61,6 @@ def wire(keyID, keySecret):
                                                   profile='CompressorManager',
                                                   tags=['icon:cogs:#0077c3']
                                                 )
-
 
 
     #---
@@ -214,11 +215,37 @@ Asagidaki sekilde bakim ucretlerini girebilirsiniz:
     client.account.methods(compressor.id).create(name='getLatestValues', method_impl= MethodInstance.MethodImplementation(getLatestValues_body()), access_type='public')
     client.account.methods(compressor.id).create(name='preaggregate', method_impl= MethodInstance.MethodImplementation(preaggregate_body()), access_type='public')
 
-    client.account.methods(compressor.id).create(name='getHistOEE', method_impl= MethodInstance.MethodImplementation(getHistOEE_body()), access_type='public')
-    client.account.methods(compressor.id).create(name='getHistMttr', method_impl= MethodInstance.MethodImplementation(getHistMttr_body()), access_type='public')
-    client.account.methods(compressor.id).create(name='getHistMtbf', method_impl= MethodInstance.MethodImplementation(getHistMtbf_body()), access_type='public')
-    client.account.methods(compressor.id).create(name='getHistEstimPowerConsumption', method_impl= MethodInstance.MethodImplementation(getHistEstimPowerConsumption_body()), access_type='public')
-    client.account.methods(compressor.id).create(name='getHistEstimEnergyConsumption', method_impl= MethodInstance.MethodImplementation(getHistEstimEnergyConsumption_body()), access_type='public')
+    client.account.methods(compressor.id).create(name='showOEE', method_impl= MethodInstance.MethodImplementation(showOEE_body()), access_type='public')
+    client.account.methods(compressor.id).create(name='getHistOEE', method_impl= MethodInstance.MethodImplementation(getHistOEE_body()), access_type='public', description="""{
+ "value": {
+  "from": { "unit": "WEEKS", "value":	1 }, 
+  "sampling": { "unit": "HOURS", "value": 1 }
+  }
+}""")
+    client.account.methods(compressor.id).create(name='getHistMttr', method_impl= MethodInstance.MethodImplementation(getHistMttr_body()), access_type='public', description="""{
+ "value": {
+  "from": { "unit": "WEEKS", "value":	1 }, 
+  "sampling": { "unit": "HOURS", "value": 1 }
+  }
+}""")
+    client.account.methods(compressor.id).create(name='getHistMtbf', method_impl= MethodInstance.MethodImplementation(getHistMtbf_body()), access_type='public', description="""{
+ "value": {
+  "from": { "unit": "WEEKS", "value":	1 }, 
+  "sampling": { "unit": "HOURS", "value": 1 }
+  }
+}""")
+    client.account.methods(compressor.id).create(name='getHistEstimPowerConsumption', method_impl= MethodInstance.MethodImplementation(getHistEstimPowerConsumption_body()), access_type='public', description="""{
+ "value": {
+  "from": { "unit": "WEEKS", "value":	1 }, 
+  "sampling": { "unit": "HOURS", "value": 1 }
+  }
+}""")
+    client.account.methods(compressor.id).create(name='getHistEstimEnergyConsumption', method_impl= MethodInstance.MethodImplementation(getHistEstimEnergyConsumption_body()), access_type='public', description="""{
+ "value": {
+  "from": { "unit": "WEEKS", "value":	1 }, 
+  "sampling": { "unit": "HOURS", "value": 1 }
+  }
+}""")
 
     accessLevel1 = 'protected'
     accessLevel1_1 = 'private'
@@ -232,13 +259,18 @@ Asagidaki sekilde bakim ucretlerini girebilirsiniz:
     client.account.methods(compressor.id).create(name='queryPropertySummary', method_impl= MethodInstance.MethodImplementation(queryPropertySummary_body()), access_type=accessLevel1)
     client.account.methods(compressor.id).create(name='queryWarningAlarmSummary', method_impl= MethodInstance.MethodImplementation(queryWarningAlarmSummary_body()), access_type=accessLevel1)
     client.account.methods(compressor.id).create(name='queryTimeToMaintenance', method_impl= MethodInstance.MethodImplementation(queryTimeToMaintenance_body()), access_type=accessLevel1_1)
-    client.account.methods(compressor.id).create(name='queryUsageHours', method_impl= MethodInstance.MethodImplementation(queryUsageHours_body()), access_type=accessLevel1_1)
-    client.account.methods(compressor.id).create(name='queryEstimEnergyConsumption', method_impl= MethodInstance.MethodImplementation(queryEstimEnergyConsumption_body()), access_type=accessLevel1_1)
-    client.account.methods(compressor.id).create(name='queryEstimPowerConsumption', method_impl= MethodInstance.MethodImplementation(queryEstimPowerConsumption_body()), access_type=accessLevel1_1)
     client.account.methods(compressor.id).create(name='queryLoadRatio', method_impl= MethodInstance.MethodImplementation(queryLoadRatio_body()), access_type=accessLevel1_1)
-    client.account.methods(compressor.id).create(name='queryStoppages', method_impl= MethodInstance.MethodImplementation(queryStoppages_body()), access_type=accessLevel1_1)  
-    client.account.methods(compressor.id).create(name='queryEstimCostOfRunning', method_impl= MethodInstance.MethodImplementation(queryEstimCostOfRunning_body()), access_type=accessLevel1_1)
-    client.account.methods(compressor.id).create(name='queryOEE', method_impl= MethodInstance.MethodImplementation(queryOEE_body()), access_type=accessLevel1_1)
+
+    client.account.methods(compressor.id).create(name='processCompressorState', method_impl= MethodInstance.MethodImplementation(processCompressorState_body()), access_type=accessLevel1_1)
+    client.account.methods(compressor.id).create(name='calculateAll', method_impl= MethodInstance.MethodImplementation(calculateAll_body()), access_type=accessLevel1_1)
+
+
+    # client.account.methods(compressor.id).create(name='queryUsageHours', method_impl= MethodInstance.MethodImplementation(queryUsageHours_body()), access_type=accessLevel1_1)
+    # client.account.methods(compressor.id).create(name='queryEstimEnergyConsumption', method_impl= MethodInstance.MethodImplementation(queryEstimEnergyConsumption_body()), access_type=accessLevel1_1)
+    # client.account.methods(compressor.id).create(name='queryEstimPowerConsumption', method_impl= MethodInstance.MethodImplementation(queryEstimPowerConsumption_body()), access_type=accessLevel1_1)    
+    # client.account.methods(compressor.id).create(name='queryStoppages', method_impl= MethodInstance.MethodImplementation(queryStoppages_body()), access_type=accessLevel1_1)  
+    # client.account.methods(compressor.id).create(name='queryEstimCostOfRunning', method_impl= MethodInstance.MethodImplementation(queryEstimCostOfRunning_body()), access_type=accessLevel1_1)
+    # client.account.methods(compressor.id).create(name='queryOEE', method_impl= MethodInstance.MethodImplementation(queryOEE_body()), access_type=accessLevel1_1)
     #client.account.methods(compressor.id).create(name='queryMtbf', method_impl= MethodInstance.MethodImplementation(queryMtbf_body()), access_type=accessLevel1_1)
     #client.account.methods(compressor.id).create(name='queryMttr', method_impl= MethodInstance.MethodImplementation(queryMttr_body()), access_type=accessLevel1_1)  
 
@@ -318,14 +350,14 @@ if __name__ == '__main__':
     #Device name: DK.Cihaz.Simul
     #Device friendly name: DK Cihaz Simul
 
-    keyID = ''
-    keySecret = ''
+    keyID = '_key_568443980812938669'
+    keySecret = '9b58f911028c49b79e01cf35a0845630'
 
-    if len(sys.argv == 2):
+    if len(sys.argv) == 2:
         keyID = sys.argv[1]
         keySecret = sys.argv[2]
     
-    keyID = os.environ.get('CONNIO_ACCOUNT_KEYID', keyID)
-    keySecret = os.environ.get('CONNIO_ACCOUNT_KEYSECRET', keySecret)
+    # keyID = os.environ.get('CONNIO_ACCOUNT_KEYID', keyID)
+    # keySecret = os.environ.get('CONNIO_ACCOUNT_KEYSECRET', keySecret)
 
     wire(keyID, keySecret)
