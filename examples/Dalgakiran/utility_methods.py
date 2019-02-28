@@ -7,6 +7,12 @@
 # makeWriteValue()
 # fetchWriteRequestList()
 
+# getHistOEE
+# getHistMttr
+# getHistMtbf
+# getHistEstimPowerConsumption()
+# getHistEstimEnergyConsumption()
+
 #
 #
 #
@@ -517,7 +523,7 @@ let now = new Date();
 let startMonth = now.setUTCMonth(now.getUTCMonth() - 12);
 
 Device.processCompressorStates().then(periods => {
-    if (query.from.unit == 'WEEKS' || query.from.unit == 'MONTHS') {
+    if (query.from.unit == 'DAYS' || query.from.unit == 'WEEKS' || query.from.unit == 'MONTHS') {
         let results = periods.map( p => {
             return {
                 v: ((p.Availability * p.Quality * p.Perf) * 100).toFixed(2),
@@ -579,7 +585,7 @@ let now = new Date();
 let startMonth = now.setUTCMonth(now.getUTCMonth() - 12);
 
 Device.processCompressorStates().then(periods => {
-    if (query.from.unit == 'WEEKS' || query.from.unit == 'MONTHS') {
+    if (query.from.unit == 'DAYS' || query.from.unit == 'WEEKS' || query.from.unit == 'MONTHS') {
         let results = periods.map( p => {
             let Lt = p.idleRunningDur + p.loadRunningDur + p.unplannedDur;
             let mtbf = (p.unplannedStops == 0 ? "-" : (Lt / p.unplannedStops).toFixed(2));
@@ -642,7 +648,7 @@ let now = new Date();
 let startMonth = now.setUTCMonth(now.getUTCMonth() - 12);
 
 Device.processCompressorStates().then(periods => {
-    if (query.from.unit == 'WEEKS' || query.from.unit == 'MONTHS') {
+    if (query.from.unit == 'DAYS' || query.from.unit == 'WEEKS' || query.from.unit == 'MONTHS') {
         let results = periods.map( p => {
             let mttr = (p.unplannedStops == 0 ? "-" : (p.unplannedDur / p.unplannedStops).toFixed(2));
             
@@ -707,7 +713,7 @@ let now = new Date();
 let startMonth = now.setUTCMonth(now.getUTCMonth() - 12);
 
 Device.processCompressorStates().then(periods => {
-    if (query.from.unit == 'WEEKS' || query.from.unit == 'MONTHS') {
+    if (query.from.unit == 'DAYS' || query.from.unit == 'WEEKS' || query.from.unit == 'MONTHS') {
         let results = periods.map( p => {
             return {
                 v: (( (p.loadRunningDur * LOAD_PWR_MULTIPLIER) + (p.idleRunningDur * IDLE_PWR_MULTIPLIER) ) / 
@@ -770,7 +776,7 @@ let now = new Date();
 let startMonth = now.setUTCMonth(now.getUTCMonth() - 12);
 
 Device.processCompressorStates().then(periods => {
-    if (query.from.unit == 'WEEKS' || query.from.unit == 'MONTHS') {
+    if (query.from.unit == 'DAYS' || query.from.unit == 'WEEKS' || query.from.unit == 'MONTHS') {
         let results = periods.map( p => {
             return {
                 v: ((p.loadRunningDur * LOAD_PWR_MULTIPLIER) + (p.idleRunningDur * IDLE_PWR_MULTIPLIER)) || 0,
