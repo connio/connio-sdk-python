@@ -23,6 +23,8 @@ from gateway_wiring import *
 import app_wiring as app
 
 def wire(keyID, keySecret):
+    start = time.time()
+
     client = Client(username=keyID, 
                     password=keySecret)
 
@@ -30,7 +32,7 @@ def wire(keyID, keySecret):
     # master = client.accounts.get().fetch()    
     # print('Master account: ' + master.name)
 
-    print('Creating the system')
+    print('Creating the system.....')
 
     # Create compressor app profile
     compressorManager = client.account.appprofiles.create(name='CompressorManager',
@@ -329,35 +331,38 @@ Asagidaki sekilde bakim ucretlerini girebilirsiniz:
     L26c.wire(client)
     L33c.wire(client)
 
+    print('System is created successfully in %.2f seconds' % (time.time() - start))
+
 if __name__ == '__main__':
-    #Mac 16:b4:12:7d:5d:da
 
-    #Device IMEI: 861359035276375
-    #Device name: DK.Test.Cihaz.1
-    #Device friendly name: DK Test 1 [GSM]
-    #Description: >FTPUPDATE,0001,IP=107.170.178.138;PORT=21;APN=internet;USER=mitrackftp;PASS=mitrack2017;PATH=/files/;FILE=MITRACK_Q_DAL.bin;
+    keyID = os.environ.get('DK_ACCOUNT_KEYID', '_key_570946869128168926')
+    keySecret = os.environ.get('DK_ACCOUNT_KEYSECRET', '249d7cd1bde84549a76b30e4eafeac54')
 
-    #Device IMEI: 869867035753377
-    #Device name: DK.Test.Cihaz.2
-    #Device friendly name: DK Test 2 [ETHER]
-
-    #Device MAC:  00:1e:c0:91:8c:8f
-    #Device name: DK.Test.Cihaz.3
-    #Device friendly name: DK Test 3 [ETHER]
-    # 40.36666, 49.83518
-
-    #Device SN:  SN-001-001
-    #Device name: DK.Cihaz.Simul
-    #Device friendly name: DK Cihaz Simul
-
-    keyID = '_key_568443980812938669'
-    keySecret = '9b58f911028c49b79e01cf35a0845630'
-
-    if len(sys.argv) == 2:
+    if len(sys.argv) == 3:
         keyID = sys.argv[1]
         keySecret = sys.argv[2]
-    
-    # keyID = os.environ.get('CONNIO_ACCOUNT_KEYID', keyID)
-    # keySecret = os.environ.get('CONNIO_ACCOUNT_KEYSECRET', keySecret)
 
     wire(keyID, keySecret)
+
+
+
+# Some sample device info
+#Mac 16:b4:12:7d:5d:da
+
+#Device IMEI: 861359035276375
+#Device name: DK.Test.Cihaz.1
+#Device friendly name: DK Test 1 [GSM]
+#Description: >FTPUPDATE,0001,IP=107.170.178.138;PORT=21;APN=internet;USER=mitrackftp;PASS=mitrack2017;PATH=/files/;FILE=MITRACK_Q_DAL.bin;
+
+#Device IMEI: 869867035753377
+#Device name: DK.Test.Cihaz.2
+#Device friendly name: DK Test 2 [ETHER]
+
+#Device MAC:  00:1e:c0:91:8c:8f
+#Device name: DK.Test.Cihaz.3
+#Device friendly name: DK Test 3 [ETHER]
+# 40.36666, 49.83518
+
+#Device SN:  SN-001-001
+#Device name: DK.Cihaz.Simul
+#Device friendly name: DK Cihaz Simul

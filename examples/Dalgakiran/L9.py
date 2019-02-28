@@ -69,7 +69,10 @@ const requests = {
   maintCounters:        { request: "r,meth:setMaintCounters,-,24,-,1,0x604" },
   controllerTime:       { request: "r,meth:setControllerTime,-,8,-,1,0x800" },
   // Controller specific
-  
+  P0:                   { request: "r,meth:setP0x,-,16,-,1,0x500" },
+  H0:                   { request: "r,meth:setH0x,-,16,-,1,0x508" },
+  t0:                   { request: "r,meth:sett0x,-,16,-,1,0x510" },
+  PA:                   { request: "r,meth:setPAx,-,4,-,1,0x52A" },
 };
 return requests[value].request;
 """
@@ -82,8 +85,11 @@ def fetchWriteRequest_body():
 
 */
 const requests = {
-    //WP:  { rprop: "cfgWPx", rcmd: "r,meth:setWPx,-,12,-,1,0x509", min: 1, max: 6, offset: "0x509" },
-    //WT:  { rprop: "cfgWTx", rcmd: "r,meth:setWTx,-,16,-,1,0x50F", min: 0, max: 7, offset: "0x50F", multiplier: 1 },
+    P0:  { rprop: "P0x", rcmd: "r,meth:setP0x,-,16,-,1,0x500", min: 0, max: 7, offset: "0x500", multiplier: 0.1 },
+    H0:  { rprop: "H0x", rcmd: "r,meth:setH0x,-,16,-,1,0x508", min: 0, max: 7, offset: "0x508", multiplier: 1 },
+    t0:  { rprop: "t0x", rcmd: "r,meth:sett0x,-,16,-,1,0x510", min: 1, max: 8, offset: "0x510", multiplier: 1 },
+    PA:  { rprop: "PAx", rcmd: "r,meth:setPAx,-,4,-,1,0x52A", min: 1, max: 2, offset: "0x52A", multiplier: 1 },
+
 };
 return requests[value];
 """
@@ -233,3 +239,140 @@ catch(e) {
     done(e);
 }"""
 
+#####################
+#
+#  P0x
+#
+#####################
+
+def setP0x_body():
+    return """/**
+    P01	RW	
+    P02	RW	bar
+    P03	RW	bar*10 (must be divided by 10)
+    P04	RW	bar*10 (must be divided by 10)
+    P05	RW	bar*10 (must be divided by 10)
+    P06	RW	bar*10 (must be divided by 10)
+    P07	RW	
+*/
+
+done(null, null);
+"""
+
+def writeP0x_body():
+    return """/**
+*/
+let args = {
+  tagKey: "P0",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  H0x
+#
+#####################
+
+def setH0x_body():
+    return """/**
+    H00
+    H01 °C
+    H02 °C
+    H03 °C
+    H04 °C
+    H05 °C
+    H06 °C
+    H07
+*/
+done(null, null);
+"""
+
+def writeH0x_body():
+    return """/**
+*/
+let args = {
+  tagKey: "H0",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  t0x
+#
+#####################
+
+def sett0x_body():
+    return """/**
+    t1 sec
+    t2 msec
+    t3 sec
+    t4 min
+    t5 sec
+    t6 hour
+    t7 min
+    t8
+*/
+done(null, null);
+"""
+
+def writet0x_body():
+    return """/**
+*/
+let args = {
+  tagKey: "t0",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  PAx
+#
+#####################
+
+def setPAx_body():
+    return """/**
+    PA1 Each nibble (4 bit) is a digit of the password (2 least significant nibbles)
+    PA2 Each nibble (4 bit) is a digit of the password (3 least significant nibbles)
+*/
+done(null, null);
+"""
+
+def writePAx_body():
+    return """/**
+*/
+let args = {
+  tagKey: "PA",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""

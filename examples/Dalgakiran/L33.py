@@ -89,23 +89,58 @@ def fetchReadRequest_body():
 
 */
 const requests = {
-  cfgSerialNumber:      { request: "r,meth:setSerialNumber,-,20,-,1,0x00" },
-  cfgLogikaModel :      { request: "r,meth:setModelNumber,-,2,-,1,0x0A" },
-  cfgLogikaFwVersion:   { request: "r,meth:setReleaseNo,-,2,-,1,0x0B" },
-  cfgLevel1Pwd:         { request: "r,meth:setLevel1Pwd,-,6,-,1,0x100" },
-  cfgLevel2Pwd:         { request: "r,meth:setLevel2Pwd,-,6,-,1,0x103" },
-  cfgLevel3Pwd:         { request: "r,meth:setLevel3Pwd,-,6,-,1,0x106" },
-  relayOutputs:         { request: "r,meth:setRelayOutputs,-,2,-,1,0x404" },
-  digitalInputs:        { request: "r,meth:setDigitalInputs,-,2,-,1,0x405" },
-  cfgMaintCycles:       { request: "r,meth:setMaintCycles,-,12,-,1,0x52C" },
-  totalHours:           { request: "r,meth:setTotalHours,-,4,-,1,0x600" },
-  totalLoadHours:       { request: "r,meth:setTotalLoadHours,-,4,-,1,0x602" },
-  maintCounters:        { request: "r,meth:setMaintCounters,-,24,-,1,0x604" },
-  loadPercInLast100h:   { request: "r,meth:setLoadPercInLast100h,-,2,-,1,0x610" },
-  nbrOfStartsInLastHour:{ request: "r,meth:setNbrOfStartsInLastHour,-,2,-,1,0x611" },
-  controllerTime:       { request: "r,meth:setControllerTime,-,8,-,1,0x800" },
+  cfgSerialNumber:                  { request: "r,meth:setSerialNumber,-,20,-,1,0x00" },
+  cfgLogikaModel:                   { request: "r,meth:setModelNumber,-,2,-,1,0x0A" },
+  cfgLogikaFwVersion:               { request: "r,meth:setReleaseNo,-,2,-,1,0x0B" },
+  cfgLevel1Pwd:                     { request: "r,meth:setLevel1Pwd,-,6,-,1,0x100" },
+  cfgLevel2Pwd:                     { request: "r,meth:setLevel2Pwd,-,6,-,1,0x103" },
+  cfgLevel3Pwd:                     { request: "r,meth:setLevel3Pwd,-,6,-,1,0x106" },
+  relayOutputs:                     { request: "r,meth:setRelayOutputs,-,2,-,1,0x404" },
+  digitalInputs:                    { request: "r,meth:setDigitalInputs,-,2,-,1,0x405" },
+  cfgMaintCycles:                   { request: "r,meth:setMaintCycles,-,12,-,1,0x52C" },
+  totalHours:                       { request: "r,meth:setTotalHours,-,4,-,1,0x600" },
+  totalLoadHours:                   { request: "r,meth:setTotalLoadHours,-,4,-,1,0x602" },
+  maintCounters:                    { request: "r,meth:setMaintCounters,-,24,-,1,0x604" },
+  loadPercInLast100h:               { request: "r,meth:setLoadPercInLast100h,-,2,-,1,0x610" },
+  nbrOfStartsInLastHour:            { request: "r,meth:setNbrOfStartsInLastHour,-,2,-,1,0x611" },
+  controllerTime:                   { request: "r,meth:setControllerTime,-,8,-,1,0x800" },
   // Controller specific
-  
+  DisplayedState:                   { request: "r,meth:setDisplayedState,-,2,-,1,0x403" },
+  SecondTemperature:                { request: "r,meth:setSecondTemperature,-,2,-,1,0x408" },
+  SecondPressure:                   { request: "r,meth:setSecondPressure,-,2,-,1,0x409" },
+  Drive24VSupply:                   { request: "r,meth:setDrive24VSupply,-,2,-,1,0x40B" },
+  DriveAnalogInput:                 { request: "r,meth:setDriveAnalogInput,-,2,-,1,0x40C" },
+  ConfigurationSwitches:            { request: "r,meth:setConfigurationSwitches,-,4,-,1,0x500" },
+  Language:                         { request: "r,meth:setLanguage,-,2,-,1,0x503" },
+  ClockTimers:                      { request: "r,meth:setClockTimers,-,84,-,1,0x700" },
+  PressureSelectionBits:            { request: "r,meth:setPressureSelectionBits,-,4,-,1,0x72A" },
+  DaylightSavingTimeAdjustment:     { request: "r,meth:setDaylightSavingTimeAdjustment,-,2,-,1,0x804" },
+  Indexes:                          { request: "r,meth:setIndexes,-,2,-,1,0x900" },
+  MaintenanceOperationRecords:      { request: "r,meth:setMaintenanceOperationRecords,-,120,-,1,0x901" },
+  DriveStatus:                      { request: "r,meth:setDriveStatus,-,2,-,1,0xA00" },
+  DriveMeasures:                    { request: "r,meth:setDriveMeasures,-,20,-,1,0xA01" },
+  DriveFaultString:                 { request: "r,meth:setDriveFaultString,-,26,-,1,0xA0B" },
+  DriveCommands:                    { request: "r,meth:setDriveCommands,-,2,-,1,0xA18" },
+  //
+  WP:                               { request: "r,meth:setWPx,-,12,-,1,0x504" },
+  SP:                               { request: "r,meth:setSPx,-,8,-,1,0x50A" },
+  SP5:                              { request: "r,meth:setSP5,-,2,-,1,0x542" },
+  SP6:                              { request: "r,meth:setSP6,-,2,-,1,0x548" },
+  WPs:                              { request: "r,meth:setWPs,-,2,-,1,0x50E" },
+  WPS2P:                            { request: "r,meth:setWPS2Px,-,6,-,1,0x50F" },
+  WPS2Ps:                           { request: "r,meth:setWPS2Ps,-,2,-,1,0x512" },
+  WT:                               { request: "r,meth:setWTx,-,14,-,1,0x513" },
+  STA:                              { request: "r,meth:setSTAx,-,4,-,1,0x51A" },
+  ST3:                              { request: "r,meth:setST3,-,2,-,1,0x51C" },
+  STT1:                             { request: "r,meth:setSTT1,-,2,-,1,0x51D" },
+  STD1:                             { request: "r,meth:setSTD1,-,2,-,1,0x51E" },
+  Wt:                               { request: "r,meth:setWtx,-,20,-,1,0x522" },
+  R0:                               { request: "r,meth:setR0x,-,4,-,1,0x53D" },
+  R03:                              { request: "r,meth:setR03,-,2,-,1,0x502" },
+  DS:                               { request: "r,meth:setDSx,-,12,-,1,0xA1B" },
+  DA:                               { request: "r,meth:setDAx,-,26,-,1,0xA22" },
+  DF:                               { request: "r,meth:setDFx,-,12,-,1,0xA2E" },
+  DF7:                              { request: "r,meth:setDF7,-,2,-,1,0x541" },
 };
 return requests[value].request;
 """
@@ -118,8 +153,33 @@ def fetchWriteRequest_body():
 
 */
 const requests = {
-    //WP:  { rprop: "cfgWPx", rcmd: "r,meth:setWPx,-,12,-,1,0x509", min: 1, max: 6, offset: "0x509" },
-    //WT:  { rprop: "cfgWTx", rcmd: "r,meth:setWTx,-,16,-,1,0x50F", min: 0, max: 7, offset: "0x50F", multiplier: 1 },
+    RelativeSpeed:                  { rprob: "RelativeSpeed", rcmd: "r,meth:setRelativeSpeed,-,0,1,0x40E", min: 1, max: 1, offset:"0x40E" },
+    ConfigurationSwitches:          { rprob: "ConfigurationSwitches", rcmd: "r,meth:setConfigurationSwitches,-,4,-,1,0x500", min: 1, max: 2, offset:"0x500" },
+    Language:                       { rprob: "Language", rcmd: "r,meth:setLanguage,-,2,-,1,0x503", min: 1, max: 1, offset:"0x503" },
+    ClockTimers:                    { rprob: "ClockTimers", rcmd: "r,meth:setClockTimers,-,84,-,1,0x700", min: 1, max: 1, offset:"0x700" },
+    PressureSelectionBits:          { rprob: "PressureSelectionBits", rcmd: "r,meth:setPressureSelectionBits,-,4,-,1,0x72A", min: 1, max: 1, offset:"0x72A" },
+    Indexes:                        { rprob: "Indexes", rcmd: "r,meth:setIndexes,-,2,-,1,0x900", min: 1, max: 1, offset:"0x900" },
+    MaintenanceOperationRecords:    { rprob: "MaintenanceOperationRecords", rcmd: "r,meth:setMaintenanceOperationRecords,-,120,-,1,0x901", min: 1, max: 1, offset:"0x901" },
+    //
+    WPx:                            { rprob: "WPx", rcmd: "r,meth:setWPx,-,12,-,1,0x504", min: 1, max: 6, offset:"0x504" },
+    SPx:                            { rprob: "SPx", rcmd: "r,meth:setSPx,-,8,-,1,0x50A", min: 1, max: 4, offset:"0x50A" },
+    SP5:                            { rprob: "SP5", rcmd: "r,meth:setSP5,-,2,-,1,0x542", min: 5, max: 5, offset:"0x542" },
+    SP6:                            { rprob: "SP6", rcmd: "r,meth:setSP6,-,2,-,1,0x548", min: 6, max: 6, offset:"0x548" },
+    WPs:                            { rprob: "WPs", rcmd: "r,meth:setWPs,-,2,-,1,0x50E", min: 1, max: 1, offset:"0x50E" },
+    WPS2Px:                         { rprob: "WPS2Px", rcmd: "r,meth:setWPS2Px,-,6,-,1,0x50F", min: 3, max: 5, offset:"0x50F" },
+    WPS2Ps:                         { rprob: "WPS2Ps", rcmd: "r,meth:setWPS2Ps,-,2,-,1,0x512", min: 1, max: 1, offset:"0x512" },
+    WTx:                            { rprob: "WTx", rcmd: "r,meth:setWTx,-,14,-,1,0x513", min: 1, max: 7, offset:"0x513" },
+    STAx:                           { rprob: "STAx", rcmd: "r,meth:setSTAx,-,4,-,1,0x51A", min: 1, max: 2, offset:"0x51A" },
+    ST3:                            { rprob: "ST3", rcmd: "r,meth:setST3,-,2,-,1,0x51C", min: 3, max: 3, offset:"0x51C" },
+    STT1:                           { rprob: "STT1", rcmd: "r,meth:setSTT1,-,2,-,1,0x51D", min: 1, max: 1, offset:"0x51D" },
+    STD1:                           { rprob: "STD1", rcmd: "r,meth:setSTD1,-,2,-,1,0x51E", min: 1, max: 1, offset:"0x51E" },
+    Wtx:                            { rprob: "Wtx", rcmd: "r,meth:setWtx,-,20,-,1,0x522", min: 1, max: 10, offset:"0x522" },
+    R0x:                            { rprob: "R0x", rcmd: "r,meth:setR0x,-,4,-,1,0x53D", min: 1, max: 2, offset:"0x53D" },
+    R03:                            { rprob: "R03", rcmd: "r,meth:setR03,-,2,-,1,0x502", min: 3, max: 3, offset:"0x502" },
+    DSx:                            { rprob: "DSx", rcmd: "r,meth:setDSx,-,12,-,1,0xA1B", min: 1, max: 6, offset:"0xA1B" },
+    DAx:                            { rprob: "DAx", rcmd: "r,meth:setDAx,-,26,-,1,0xA22", min: 0, max: 12, offset:"0xA22" },
+    DFx:                            { rprob: "DFx", rcmd: "r,meth:setDFx,-,12,-,1,0xA2E", min: 1, max: 6, offset:"0xA2E" },
+    DF7:                            { rprob: "DF7", rcmd: "r,meth:setDF7,-,2,-,1,0x541", min: 7, max: 7, offset:"0x541" },
     
 };
 return requests[value];
@@ -282,3 +342,850 @@ catch(e) {
     done(e);
 }"""
 
+#####################
+#
+#  DisplayedState
+#
+#####################
+
+def setDisplayedState_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+#####################
+#
+#  SecondTemperature
+#
+#####################
+
+def setSecondTemperature_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+#####################
+#
+#  SecondPressure
+#
+#####################
+
+def setSecondPressure_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+#####################
+#
+#  Drive24VSupply
+#
+#####################
+
+def setDrive24VSupply_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+#####################
+#
+#  DriveAnalogInput
+#
+#####################
+
+def setDriveAnalogInput_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+#####################
+#
+#  DriveStatus
+#
+#####################
+
+def setDriveStatus_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+#####################
+#
+#  DriveMeasures
+#
+#####################
+
+def setDriveMeasures_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+#####################
+#
+#  DriveFaultString
+#
+#####################
+
+def setDriveFaultString_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+#####################
+#
+#  DriveCommands
+#
+#####################
+
+def setDriveCommands_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+#####################
+#
+#  DaylightSavingTimeAdjustment
+#
+#####################
+
+def setDaylightSavingTimeAdjustment_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+#####################
+#
+#  RelativeSpeed
+#
+#####################
+
+def setRelativeSpeed_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeRelativeSpeed_body():
+    return """/**
+*/
+let args = {
+  tagKey: "RelativeSpeed",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  ConfigurationSwitches
+#
+#####################
+
+def setConfigurationSwitches_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeConfigurationSwitches_body():
+    return """/**
+*/
+let args = {
+  tagKey: "ConfigurationSwitches",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  Language
+#
+#####################
+
+def setLanguage_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeLanguage_body():
+    return """/**
+*/
+let args = {
+  tagKey: "Language",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  ClockTimers
+#
+#####################
+
+def setClockTimers_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeClockTimers_body():
+    return """/**
+*/
+let args = {
+  tagKey: "PTClockTimers",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  PressureSelectionBits
+#
+#####################
+
+def setPressureSelectionBits_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writePressureSelectionBits_body():
+    return """/**
+*/
+let args = {
+  tagKey: "PressureSelectionBits",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  Indexes
+#
+#####################
+
+def setIndexes_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeIndexes_body():
+    return """/**
+*/
+let args = {
+  tagKey: "Indexes",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  MaintenanceOperationRecords
+#
+#####################
+
+def setMaintenanceOperationRecords_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeMaintenanceOperationRecords_body():
+    return """/**
+*/
+let args = {
+  tagKey: "MaintenanceOperationRecords",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  WPx
+#
+#####################
+
+def setWPx_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeWPx_body():
+    return """/**
+*/
+let args = {
+  tagKey: "WP",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  SPx
+#
+#####################
+
+def setSPx_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeSPx_body():
+    return """/**
+*/
+let args = {
+  tagKey: "SP",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  SP5
+#
+#####################
+
+def setSP5_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeSP5_body():
+    return """/**
+*/
+let args = {
+  tagKey: "SP5",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  SP6
+#
+#####################
+
+def setSP6_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeSP6_body():
+    return """/**
+*/
+let args = {
+  tagKey: "SP6",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  ST3
+#
+#####################
+
+def setST3_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeST3_body():
+    return """/**
+*/
+let args = {
+  tagKey: "ST3",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  WPs
+#
+#####################
+
+def setWPs_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeWPs_body():
+    return """/**
+*/
+let args = {
+  tagKey: "WPs",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  WPS2Px
+#
+#####################
+
+def setWPS2Px_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeWPS2Px_body():
+    return """/**
+*/
+let args = {
+  tagKey: "WPS2P",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  WPS2Ps
+#
+#####################
+
+def setWPS2Ps_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeWPS2Ps_body():
+    return """/**
+*/
+let args = {
+  tagKey: "WPS2Ps",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  WTx
+#
+#####################
+
+def setWTx_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeWTx_body():
+    return """/**
+*/
+let args = {
+  tagKey: "WT",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  STAx
+#
+#####################
+
+def setSTAx_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeSTAx_body():
+    return """/**
+*/
+let args = {
+  tagKey: "STA",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  STT1
+#
+#####################
+
+def setSTT1_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeSTT1_body():
+    return """/**
+*/
+let args = {
+  tagKey: "STT1",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  STD1
+#
+#####################
+
+def setSTD1_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeSTD1_body():
+    return """/**
+*/
+let args = {
+  tagKey: "STD1",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  Wtx
+#
+#####################
+
+def setWtx_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeWtx_body():
+    return """/**
+*/
+let args = {
+  tagKey: "Wt",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  R0x
+#
+#####################
+
+def setR0x_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeR0x_body():
+    return """/**
+*/
+let args = {
+  tagKey: "R0",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  R03
+#
+#####################
+
+def setR03_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeR03_body():
+    return """/**
+*/
+let args = {
+  tagKey: "R03",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  DSx
+#
+#####################
+
+def setDSx_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeDSx_body():
+    return """/**
+*/
+let args = {
+  tagKey: "DS",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  DAx
+#
+#####################
+
+def setDAx_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeDAx_body():
+    return """/**
+*/
+let args = {
+  tagKey: "DA",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  DFx
+#
+#####################
+
+def setDFx_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeDFx_body():
+    return """/**
+*/
+let args = {
+  tagKey: "DF",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  DF7
+#
+#####################
+
+def setDF7_body():
+    return """/**
+*/
+done(null, null);
+"""
+
+def writeDF7_body():
+    return """/**
+*/
+let args = {
+  tagKey: "DF7",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
+"""
