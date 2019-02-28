@@ -183,7 +183,7 @@ def hasInverter_body():
     return"""/**
 * L9 doesn't have inverter
 */
-return false;
+return { hasInverter: false };
 """
 
 #

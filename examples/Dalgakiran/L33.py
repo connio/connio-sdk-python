@@ -284,7 +284,7 @@ def hasInverter_body():
     return"""/**
 * L33 has inverter
 */
-return true;
+return { hasInverter: true };
 """
 
 #
