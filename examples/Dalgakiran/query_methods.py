@@ -177,7 +177,7 @@ async function f() {
     let mcost = await Device.api.getProperty(maintCostsPropName).then(p=>p.value) || defaultMaintCosts;
     let mCycles = await Device.api.getProperty(maintCyclesPropName).then(p=>p.value) || defaultCycles;
     
-    let plannedMaintenanceList = [ 
+    let plannedMaintenanceList = [         
         { maintenance: "Bearing Lubrication", cost: mcost.bearingLubrication, hours: 0, days: undefined, cycle: Math.ceil(mCycles.bearingLubrication / 24) },
         { maintenance: "Air Filter Change", cost: mcost.airFilterChange, hours: 0, days: undefined, cycle: Math.ceil(mCycles.airFilterChange / 24) },
         { maintenance: "Oil Filter Change", cost: mcost.oilFilterChange, hours: 0, days: undefined, cycle: Math.ceil(mCycles.oilFilterChange / 24) },
@@ -190,12 +190,12 @@ async function f() {
     let mCounters = await Device.api.getProperty(maintCountersPropName).then(p=>p.value);
     
     if ( mCounters ) {
-        let hoursToBearingLub        = ((mCycles.bearingLubrication * 60)   - mCounters.bearingLubrication) / 60.0;
-        let hoursToAirFilterChange   = ((mCycles.airFilterChange * 60)      - mCounters.airFilterChange) / 60.0;
-        let hoursToOilFilterChange   = ((mCycles.oilFilterChange * 60)      - mCounters.oilFilterChange) / 60.0;
-        let hoursToOilChange         = ((mCycles.oilChange * 60)            - mCounters.oilChange) / 60.0;
-        let hoursToSepFilterChange   = ((mCycles.separatorFilterChange * 60) - mCounters.separatorFilterChange) / 60.0;
-        let hoursToCompressorCheck   = ((mCycles.compressorCheck * 60)      - mCounters.compressorCheck) / 60.0;
+        let hoursToBearingLub        = (mCycles.bearingLubrication - mCounters.bearingLubrication);
+        let hoursToAirFilterChange   = (mCycles.airFilterChange    - mCounters.airFilterChange);
+        let hoursToOilFilterChange   = (mCycles.oilFilterChange    - mCounters.oilFilterChange);
+        let hoursToOilChange         = (mCycles.oilChange          - mCounters.oilChange);
+        let hoursToSepFilterChange   = (mCycles.separatorFilterChange - mCounters.separatorFilterChange);
+        let hoursToCompressorCheck   = (mCycles.compressorCheck    - mCounters.compressorCheck);
         
         plannedMaintenanceList[0].hours = hoursToBearingLub;
         plannedMaintenanceList[0].days = Math.ceil(hoursToBearingLub / 24.0);
@@ -525,7 +525,6 @@ def calculateAll_body():
   and stoppages for 24hr, 7 days, 30 days and 1 year
 */
 
-
 /**
  * {@link https://github.com/lodash/lodash/blob/4.17.10/lodash.js#L11972 Lodash#isNil}
  * @param {*} x
@@ -572,7 +571,7 @@ function calc(periods, nbrOfDays, quality, perf) {
     let idleRunningDur  = 0;
     let loadRunningDur  = 0;
     let unplannedDur    = 0;
-
+    
     let offset = Math.max((periods.length - nbrOfDays), 0);
     for (let i = 0; (i+offset) < periods.length; i++) {
         let p = periods[i+offset];
@@ -589,9 +588,10 @@ function calc(periods, nbrOfDays, quality, perf) {
     let Wt = idleRunningDur + loadRunningDur;
     
     return {
-        OEE: Math.min(100, ((Wt / Lt * quality * perf) * 100)).toFixed(2),
-        MTbf: (unplannedStops == 0 ? "-" : (Lt / unplannedStops).toFixed(2)),
-        MTtr: (unplannedStops == 0 ? "-" : (unplannedDur / unplannedStops).toFixed(2)),
+        OEE: Math.min(100, ((Wt / Lt * quality * perf) * 100)),
+        Availability: Math.min(100, (Wt / Lt * 100)),
+        MTbf: (unplannedStops == 0 ? NaN : (Lt / unplannedStops)),
+        MTtr: (unplannedStops == 0 ? NaN : (unplannedDur / unplannedStops)),
         idleRunningDur: idleRunningDur,
         loadRunningDur: loadRunningDur,
         unplannedStops: unplannedStops,
@@ -617,8 +617,9 @@ async function f(context) {
     let p1year = calc(context.periods, 365, 1, 1);
     
     context['oee'] = {
-        performance: [ 1, 1, 1, 1 ],
-        quality: [ 1, 1, 1, 1 ],
+        performance: [ 100, 100, 100, 100 ],
+        quality: [ 100, 100, 100, 100 ],
+        availability: [ p24hr.Availability, p7days.Availability, p30days.Availability, p1year.Availability ],
         average: [ p24hr.OEE, p7days.OEE, p30days.OEE, p1year.OEE ],
         unit: '%'
     };
@@ -659,7 +660,6 @@ async function f(context) {
         value: context.energy.value.map(i => i * costOfkWh.value),
         unit: costOfkWh.unit
     };
-    
     
     let powercutCounts = await Device.queryAggregates({ pname: "powercutStops", agg: "count" });
     

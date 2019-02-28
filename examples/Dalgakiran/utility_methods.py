@@ -222,6 +222,7 @@ const compStatePropName     = "compressorState";
 const connStatusPropName    = "connectionStatus";
 const activityPropName      = "active";
 const warrantyEndDatePropName   = "warrantyExpiryDate";
+const WarrantyPeriod        = 60;
 
 async function f() {    
     if (Device.customIds && !Device.customIds.sn) {
@@ -265,6 +266,7 @@ async function f() {
         connectivity: connectivity,
         status: status,
         warrantyEnd: timeToWarranty + " months",
+        warranty: { endsInMonths: timeToWarranty, periodInMonths: WarrantyPeriod },
     };
     return device;
 }
@@ -526,7 +528,7 @@ Device.processCompressorStates().then(periods => {
     if (query.from.unit == 'DAYS' || query.from.unit == 'WEEKS' || query.from.unit == 'MONTHS') {
         let results = periods.map( p => {
             return {
-                v: ((p.Availability * p.Quality * p.Perf) * 100).toFixed(2),
+                v: ((p.Availability * p.Quality * p.Perf) * 100),
                 t: p.date + "T23:59:59.999Z"
             }
         });
@@ -544,7 +546,7 @@ Device.processCompressorStates().then(periods => {
                             let availability = Wt / Lt;
                             
                             return {
-                                v: ((availability * 1.0 * 1.0) * 100).toFixed(2),
+                                v: ((availability * 1.0 * 1.0) * 100),
                                 t: p.date + "T23:59:59.999Z"
                             }
                         });
@@ -588,7 +590,7 @@ Device.processCompressorStates().then(periods => {
     if (query.from.unit == 'DAYS' || query.from.unit == 'WEEKS' || query.from.unit == 'MONTHS') {
         let results = periods.map( p => {
             let Lt = p.idleRunningDur + p.loadRunningDur + p.unplannedDur;
-            let mtbf = (p.unplannedStops == 0 ? "-" : (Lt / p.unplannedStops).toFixed(2));
+            let mtbf = (p.unplannedStops == 0 ? NaN : (Lt / p.unplannedStops);
             
             return {
                 v: mtbf,
@@ -604,7 +606,7 @@ Device.processCompressorStates().then(periods => {
                         .reduce(reducer, [])
                         .map( p => {
                             let Lt = p.idleRunningDur + p.loadRunningDur + p.unplannedDur;
-                            let mtbf = (p.unplannedStops == 0 ? "-" : (Lt / p.unplannedStops).toFixed(2));
+                            let mtbf = (p.unplannedStops == 0 ? NaN : (Lt / p.unplannedStops));
                             
                             return {
                                 v: mtbf,
@@ -650,7 +652,7 @@ let startMonth = now.setUTCMonth(now.getUTCMonth() - 12);
 Device.processCompressorStates().then(periods => {
     if (query.from.unit == 'DAYS' || query.from.unit == 'WEEKS' || query.from.unit == 'MONTHS') {
         let results = periods.map( p => {
-            let mttr = (p.unplannedStops == 0 ? "-" : (p.unplannedDur / p.unplannedStops).toFixed(2));
+            let mttr = (p.unplannedStops == 0 ? NaN : (p.unplannedDur / p.unplannedStops));
             
             return {
                 v: mttr,
@@ -665,7 +667,7 @@ Device.processCompressorStates().then(periods => {
                         .filter(p => Date.parse(p.date) > startMonth)
                         .reduce(reducer, [])
                         .map( p => {
-                            let mttr = (p.unplannedStops == 0 ? "-" : (p.unplannedDur / p.unplannedStops).toFixed(2));
+                            let mttr = (p.unplannedStops == 0 ? NaN : (p.unplannedDur / p.unplannedStops));
                             
                             return {
                                 v: mttr,
