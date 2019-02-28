@@ -282,10 +282,9 @@ return { IDLE_RUNNING: [ 6 ],
 #
 def hasInverter_body():
     return"""/**
-@param value is the context
+* L33 has inverter
 */
-// TODO
-done(null, null);
+return true;
 """
 
 #

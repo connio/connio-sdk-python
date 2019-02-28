@@ -326,7 +326,7 @@ Device.api.getProperty("state")
 
 """
 
-def processCompressorState_body():
+def processCompressorStates_body():
     return """/**
 * This method processes compressor states and calculate operation times (i.e idle/load running, number of unplanned stops, etc..)
 * Accepts number of months to process. Default is 13 for full year (yes it is 13 not 12 for a reason)
@@ -364,7 +364,7 @@ def processCompressorState_body():
     period.Perf = 1.0;
     
     let date = new Date(twe)
-    period.date = `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}-${date.getUTCDate()}`;
+    period.date = `${date.getUTCFullYear()}-${('0' + (date.getUTCMonth() + 1)).slice(-2)}-${ ('0' + date.getUTCDate()).slice(-2)}`;
     
     period.tw_ends = new Date(twe).toISOString();
     period.tw_begins = new Date(twb).toISOString();

@@ -181,10 +181,9 @@ return { IDLE_RUNNING: [ 6 ],
 #
 def hasInverter_body():
     return"""/**
-@param value is the context
+* L9 doesn't have inverter
 */
-// Do Nothing
-done(null, null);
+return false;
 """
 
 #

@@ -53,7 +53,7 @@ def getElectricCostPerkWh_body():
     
     done(null, {
         unit: electric_cost_per_kWh.meta.measurement.unit.symbol,
-        value: electric_cost_per_kWh.value,
+        value: electric_cost_per_kWh.value || 0,
     });
 })();
 """

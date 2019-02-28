@@ -263,7 +263,7 @@ Asagidaki sekilde bakim ucretlerini girebilirsiniz:
     client.account.methods(compressor.id).create(name='queryTimeToMaintenance', method_impl= MethodInstance.MethodImplementation(queryTimeToMaintenance_body()), access_type=accessLevel1_1)
     client.account.methods(compressor.id).create(name='queryLoadRatio', method_impl= MethodInstance.MethodImplementation(queryLoadRatio_body()), access_type=accessLevel1_1)
 
-    client.account.methods(compressor.id).create(name='processCompressorState', method_impl= MethodInstance.MethodImplementation(processCompressorState_body()), access_type=accessLevel1_1)
+    client.account.methods(compressor.id).create(name='processCompressorStates', method_impl= MethodInstance.MethodImplementation(processCompressorStates_body()), access_type=accessLevel1_1)
     client.account.methods(compressor.id).create(name='calculateAll', method_impl= MethodInstance.MethodImplementation(calculateAll_body()), access_type=accessLevel1_1)
 
 
