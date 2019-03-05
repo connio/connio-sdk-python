@@ -72,7 +72,7 @@ const requests = {
   P0:                   { request: "r,meth:setP0x,-,16,-,1,0x500" },
   H0:                   { request: "r,meth:setH0x,-,16,-,1,0x508" },
   t0:                   { request: "r,meth:sett0x,-,16,-,1,0x510" },
-  PA:                   { request: "r,meth:setPAx,-,4,-,1,0x52A" },
+  //PA:                   { request: "r,meth:setPAx,-,4,-,1,0x52A" },
 };
 return requests[value].request;
 """
@@ -88,7 +88,7 @@ const requests = {
     P0:  { rprop: "P0x", rcmd: "r,meth:setP0x,-,16,-,1,0x500", min: 0, max: 7, offset: "0x500", multiplier: 0.1 },
     H0:  { rprop: "H0x", rcmd: "r,meth:setH0x,-,16,-,1,0x508", min: 0, max: 7, offset: "0x508", multiplier: 1 },
     t0:  { rprop: "t0x", rcmd: "r,meth:sett0x,-,16,-,1,0x510", min: 1, max: 8, offset: "0x510", multiplier: 1 },
-    PA:  { rprop: "PAx", rcmd: "r,meth:setPAx,-,4,-,1,0x52A", min: 1, max: 2, offset: "0x52A", multiplier: 1 },
+    //PA:  { rprop: "PAx", rcmd: "r,meth:setPAx,-,4,-,1,0x52A", min: 1, max: 2, offset: "0x52A", multiplier: 1 },
 
 };
 return requests[value];
@@ -246,16 +246,41 @@ catch(e) {
 
 def setP0x_body():
     return """/**
-    P01	RW	
-    P02	RW	bar
+    P00	RW 	bar
+    P01	RW	bar*10 (must be divided by 10)
+    P02	RW	bar*10 (must be divided by 10)
     P03	RW	bar*10 (must be divided by 10)
     P04	RW	bar*10 (must be divided by 10)
     P05	RW	bar*10 (must be divided by 10)
     P06	RW	bar*10 (must be divided by 10)
-    P07	RW	
+    P07	RW	bar*10 (must be divided by 10)
 */
 
-done(null, null);
+const itemCount = 8;
+const tagPropName = "P0x";
+
+let P0x = {};
+for (var x = 0; x < itemCount; x++) {
+    P0x['P0' + x.toString()] = '-';
+}
+
+Device.api.log("debug", tagPropName + ": " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+        // Exception: P0x is not x10 scale like other values
+        if (i > 0) itemValue = itemValue / 10;
+        P0x['P0' + ((i/2)+1).toString()] = itemValue.toString() + ' bar';
+    }
+    
+    Device.api.setProperty(tagPropName, {
+      value: P0x,
+      time: new Date().toISOString()
+      }).
+    then(property => {
+        done(null, property.value);
+    });
+ });
 """
 
 def writeP0x_body():
@@ -282,16 +307,39 @@ Device.writeAndReadTag(req);
 
 def setH0x_body():
     return """/**
-    H00
+    H00 °C
     H01 °C
     H02 °C
     H03 °C
     H04 °C
     H05 °C
     H06 °C
-    H07
+    H07 °C
 */
-done(null, null);
+
+const itemCount = 8;
+const tagPropName = "H0x";
+
+let H0x = {};
+for (var x = 0; x < itemCount; x++) {
+    H0x['H0' + x.toString()] = '-';
+}
+
+Device.api.log("debug", tagPropName + ": " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+        H0x['H0' + ((i/2)+1).toString()] = itemValue.toString() + ' °C';
+    }
+    
+    Device.api.setProperty(tagPropName, {
+      value: H0x,
+      time: new Date().toISOString()
+      }).
+    then(property => {
+        done(null, property.value);
+    });
+ });
 """
 
 def writeH0x_body():
@@ -327,8 +375,31 @@ def sett0x_body():
     t7 min
     t8
 */
-done(null, null);
-"""
+
+const itemCount = 8;
+const tagPropName = "t0x";
+
+let t0x = {};
+for (var x = 0; x < itemCount; x++) {
+    t0x['t0' + (x+1).toString()] = '-';
+}
+
+Device.api.log("debug", tagPropName + ": " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+        t0x['t0' + ((i/2)+1).toString()] = itemValue.toString();
+    }
+    
+    Device.api.setProperty(tagPropName, {
+      value: t0x,
+      time: new Date().toISOString()
+      }).
+    then(property => {
+        done(null, property.value);
+    });
+ });
+ """
 
 def writet0x_body():
     return """/**
@@ -357,6 +428,7 @@ def setPAx_body():
     PA1 Each nibble (4 bit) is a digit of the password (2 least significant nibbles)
     PA2 Each nibble (4 bit) is a digit of the password (3 least significant nibbles)
 */
+//TODO: NOT IMPLEMENTED
 done(null, null);
 """
 

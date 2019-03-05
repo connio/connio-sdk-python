@@ -590,7 +590,7 @@ Device.processCompressorStates().then(periods => {
     if (query.from.unit == 'DAYS' || query.from.unit == 'WEEKS' || query.from.unit == 'MONTHS') {
         let results = periods.map( p => {
             let Lt = p.idleRunningDur + p.loadRunningDur + p.unplannedDur;
-            let mtbf = (p.unplannedStops == 0 ? NaN : (Lt / p.unplannedStops);
+            let mtbf = (p.unplannedStops == 0 ? NaN : (Lt / p.unplannedStops));
             
             return {
                 v: mtbf,
