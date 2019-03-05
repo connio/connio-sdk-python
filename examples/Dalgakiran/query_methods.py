@@ -310,6 +310,10 @@ async function f(context) {
         Device.queryPropertySummary({ pname: "workingPressure", agg: "avg", unit: "bar", asContextMember: 'pressure' }),
         Device.queryPropertySummary({ pname: "screwTemperature", agg: "avg", unit: "°C", asContextMember: 'temperature' }),
         Device.queryLoadRatio(context),
+        // Calculates average OEE, MTtr, MTbf, Energy Consumption, Power Consumption, Cost of Running 
+        // and stoppages for 24hr, 7 days, 30 days and 1 year
+        Device.calculateAll(context),
+        Device.queryTimeToMaintenance(context),
     ]);
     
     // Merge results into context

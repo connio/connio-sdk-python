@@ -224,7 +224,18 @@ const activityPropName      = "active";
 const warrantyEndDatePropName   = "warrantyExpiryDate";
 const WarrantyPeriod        = 60;
 
-async function f() {    
+function calcDateDiff(date1, date2) {
+    var diff = Math.floor(date1.getTime() - date2.getTime());
+    var day = 1000 * 60 * 60 * 24;
+
+    var days = Math.floor(diff/day);
+    var months = Math.floor(days/31);
+    var years = Math.floor(months/12);
+
+    return months;
+}
+
+async function f(warrantyPeriod) {    
     if (Device.customIds && !Device.customIds.sn) {
         Device.customIds.sn = await Device.api.getProperty(serNumPropName).then(p=>p.value || "-");
     }
@@ -244,12 +255,11 @@ async function f() {
         connectivity = "online-inactive";
     }
     
-    const defaultWarrantyInMonth = 12;
     let now = new Date();
-    let defaultWarrantyExpiry = new Date(now.setMonth(now.getMonth() + defaultWarrantyInMonth));
+    let defaultWarrantyExpiry = new Date(now.setMonth(now.getMonth() + warrantyPeriod));
 
     let warrantyExpiry = await Device.api.getProperty(warrantyEndDatePropName).then(p => p.value ? Date.parse(p.value) : defaultWarrantyExpiry.toISOString());
-    let timeToWarranty = new Date(warrantyExpiry - Date.now()).getMonth() + 1;
+    let timeToWarranty = calcDateDiff(new Date(warrantyExpiry), new Date());
     
     // In case that we use a counter to decrement the warranty time
     if (timeToWarranty < 0) {
@@ -266,11 +276,11 @@ async function f() {
         connectivity: connectivity,
         status: status,
         warrantyEnd: timeToWarranty + " months",
-        warranty: { endsInMonths: timeToWarranty, periodInMonths: WarrantyPeriod },
+        warranty: { endsInMonths: timeToWarranty, periodInMonths: warrantyPeriod },
     };
     return device;
 }
-return Promise.resolve(f());
+return Promise.resolve(f(value || WarrantyPeriod));
 """
 
 #
@@ -339,11 +349,7 @@ async function main(context) {
     // These methods do not have any dependence on other method output.
     let results = await Promise.all([
         Device.getCompressorInfo(),
-        Device.queryWarningAlarmSummary(context),
-        Device.queryTimeToMaintenance(context),
-        // Calculates average OEE, MTtr, MTbf, Energy Consumption, Power Consumption, Cost of Running 
-        // and stoppages for 24hr, 7 days, 30 days and 1 year
-        Device.calculateAll(context),
+        Device.queryWarningAlarmSummary(context),        
         Device.hasInverter(context)
     ]);
     
