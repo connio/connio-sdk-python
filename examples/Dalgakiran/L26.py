@@ -98,7 +98,7 @@ const requests = {
   // Controller specific
   auxPressure:          { request: "r,meth:setAuxPressure,3,2,0,1,0x407" },
   ptcInput:             { request: "r,meth:setPTCInput,60,2,1,1,0x408" },
-  analogueOut:          { request: "r,meth:setAnalogOutFreq,60,2,1,1,0x40B" },
+  analogueOut:          { request: "r,meth:setAnalogueOutFreq,60,2,1,1,0x40B" },
   configSwitches:       { request: "r,meth:setConfigSwitches,-,2,-,1,0x500" },
   configSelections:     { request: "r,meth:setConfigSelections,-,4,-,1,0x501" },
   //
@@ -356,7 +356,7 @@ Device.api.setProperty("ptcInput", {
 def setAnalogueOutFreq_body():
     return """/**
 */
-Device.api.setProperty("analogOutFreq", {
+Device.api.setProperty("analogueOutFreq", {
     value: Device.convertToDec({ values: value, default: 0}),
     time: new Date().toISOString()
  })
