@@ -1,5 +1,5 @@
 
-# init()
+# init(hasInverter)
 # getInitialState()
 # convertToHours()
 # convertToDecimal()    
@@ -16,14 +16,14 @@
 #
 #
 #
-def getInit_body():
+def getInit_body(hasInverter):
     return """/**
   Initialize device `state` property with default values
   @value {{ value, unit }} cost of electricity KWh
 */
 const defaultWarrantyInMonth = 12;
 
-let settings = Device.fetchModbusSettings();
+let settings = Device.fetchModbusSettings(hasInverter);
 let state = Device.getEmptyState(value || { 'value': 0, 'unit': 'USD' });
 let defaultMaintCosts = { 
     currencySymbol: "$",

@@ -40,6 +40,8 @@ def wire(client):
 
     accessLevel3 = 'private'
     
+    client.account.methods(compressor.id).create(name='setRelayOutputs', method_impl= MethodInstance.MethodImplementation(setRelayOutputs_body()), access_type=accessLevel3)
+    client.account.methods(compressor.id).create(name='setDigitalInputs', method_impl= MethodInstance.MethodImplementation(setDigitalInputs_body()), access_type=accessLevel3)
     client.account.methods(compressor.id).create(name='setP0x', method_impl= MethodInstance.MethodImplementation(setP0x_body()), access_type=accessLevel3)
     client.account.methods(compressor.id).create(name='setH0x', method_impl= MethodInstance.MethodImplementation(setH0x_body()), access_type=accessLevel3)
     client.account.methods(compressor.id).create(name='sett0x', method_impl= MethodInstance.MethodImplementation(sett0x_body()), access_type=accessLevel3)

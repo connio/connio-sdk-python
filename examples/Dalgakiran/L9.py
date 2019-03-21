@@ -57,8 +57,8 @@ def fetchReadRequest_body():
 */
 const requests = {
   cfgSerialNumber:      { request: "r,meth:setSerialNumber,-,20,-,1,0x00" },
-  cfgLogikaModel :      { request: "r,meth:setModelNumber,-,2,-,1,0x0A" },
-  cfgLogikaFwVersion:   { request: "r,meth:setReleaseNo,-,2,-,1,0x0B" },
+  cfgLogikaModel :      { request: "r,meth:setLogikaModel,-,2,-,1,0x0A" },
+  cfgLogikaFwVersion:   { request: "r,meth:setLogikaFwVersion,-,2,-,1,0x0B" },
   cfgLevel1Pwd:         { request: "r,meth:setLevel1Pwd,-,4,-,1,0x100" },
   cfgLevel2Pwd:         { request: "r,meth:setLevel2Pwd,-,4,-,1,0x102" },
   relayOutputs:         { request: "r,meth:setRelayOutputs,-,2,-,1,0x403" },
@@ -238,6 +238,74 @@ catch(e) {
     done(e);
 }"""
 
+#
+#
+#
+def setRelayOutputs_body():
+    return """/**
+Bit mapped allocation:
+  0x0001 RL1
+  0x0002 RL1
+  0x0004 RL3
+  0x0008 RL4 
+  0x0010 RL5
+*/
+let outputMap = Device.convertToDec({ values: value, default: 0});
+
+let result = [];
+if (outputMap & 1) result.push("RL1");
+if (outputMap & 2) result.push("RL2");
+if (outputMap & 4) result.push("RL3");
+if (outputMap & 8) result.push("RL4");
+if (outputMap & 16) result.push("RL5");
+
+if (result.length == 0) result = ["-"];
+
+Device.api.setProperty("relayOutputs", {
+    value: result.toString(),
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
+#
+#
+#
+def setDigitalInputs_body():
+    return """/**
+Bit mapped allocation:
+  0x0001 IN1
+  0x0002 IN2
+  0x0004 IN3
+  0x0008 IN4
+  0x0010 Pressure switch state (if enabled)
+
+Note that although the codes are same, meanings are different per controller. 
+See controller manuel.
+*/
+
+let outputMap = Device.convertToDec({ values: value, default: 0});
+
+let result = [];
+if (outputMap & 1) result.push("IN1");
+if (outputMap & 2) result.push("IN2");
+if (outputMap & 4) result.push("IN3");
+if (outputMap & 8) result.push("IN4");
+if (outputMap & 16) result.push("Pressure switch state (if enabled)");
+
+if (result.length == 0) result = ["-"];
+
+Device.api.setProperty("digitalInputs", {
+    value: result.toString(),
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
 #####################
 #
 #  P0x
@@ -270,7 +338,7 @@ Device.api.log("debug", tagPropName + ": " + value.toString())
         let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
         // Exception: P0x is not x10 scale like other values
         if (i > 0) itemValue = itemValue / 10;
-        P0x['P0' + ((i/2)+1).toString()] = itemValue.toString() + ' bar';
+        P0x['P0' + (i/2).toString()] = itemValue.toString() + ' bar';
     }
     
     Device.api.setProperty(tagPropName, {
@@ -329,7 +397,7 @@ Device.api.log("debug", tagPropName + ": " + value.toString())
  .then(p => {
     for (var i = 0; i < itemCount * 2; i+=2) {
         let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
-        H0x['H0' + ((i/2)+1).toString()] = itemValue.toString() + ' °C';
+        H0x['H0' + (i/2).toString()] = itemValue.toString() + ' °C';
     }
     
     Device.api.setProperty(tagPropName, {

@@ -69,6 +69,8 @@ def wire(client):
     accessLevel3 = 'private'
 
     # Controller specific SET methods (private)
+    client.account.methods(compressor.id).create(name='setRelayOutputs', method_impl= MethodInstance.MethodImplementation(setRelayOutputs_body()), access_type=accessLevel3)
+    client.account.methods(compressor.id).create(name='setDigitalInputs', method_impl= MethodInstance.MethodImplementation(setDigitalInputs_body()), access_type=accessLevel3)
     client.account.methods(compressor.id).create(name='setAuxPressure', method_impl= MethodInstance.MethodImplementation(setAuxPressure_body()), access_type=accessLevel3)
     client.account.methods(compressor.id).create(name='setPTCInput', method_impl= MethodInstance.MethodImplementation(setPTCInput_body()), access_type=accessLevel3)
     client.account.methods(compressor.id).create(name='setAnalogueOutFreq', method_impl= MethodInstance.MethodImplementation(setAnalogueOutFreq_body()), access_type=accessLevel3)
@@ -103,6 +105,10 @@ def wire(client):
     client.account.methods(compressor.id).create(name='readAnalogueOutFreq', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('analogueOut')), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='readConfigSwitches', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('configSwitches')), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='readConfigSelections', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('configSelections')), access_type=accessLevel4)
+    client.account.methods(compressor.id).create(name='readDriveStatus', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('driveStatus')), access_type=accessLevel4)
+    client.account.methods(compressor.id).create(name='readDriveMeasures', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('driveMeasures')), access_type=accessLevel4)
+    client.account.methods(compressor.id).create(name='readDriveFaultString', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('driveFaultString')), access_type=accessLevel4)
+
     #
     client.account.methods(compressor.id).create(name='readWPx', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('WP')), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='readWTx', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('WT')), access_type=accessLevel4)

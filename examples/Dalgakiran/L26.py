@@ -6,6 +6,7 @@
 # ~fetchControllerStates()
 # ~fetchCompressorStates()
 # ~fetchCompressorStateTypes()
+# ~hasInverter()
 
 #
 #
@@ -81,8 +82,8 @@ def fetchReadRequest_body():
 */
 const requests = {
   cfgSerialNumber:      { request: "r,meth:setSerialNumber,-,20,-,1,0x00" },
-  cfgLogikaModel :      { request: "r,meth:setModelNumber,-,2,-,1,0x0A" },
-  cfgLogikaFwVersion:   { request: "r,meth:setReleaseNo,-,2,-,1,0x0B" },
+  cfgLogikaModel :      { request: "r,meth:setLogikaModel,-,2,-,1,0x0A" },
+  cfgLogikaFwVersion:   { request: "r,meth:setLogikaFwVersion,-,2,-,1,0x0B" },
   cfgLevel1Pwd:         { request: "r,meth:setLevel1Pwd,-,6,-,1,0x100" },
   cfgLevel2Pwd:         { request: "r,meth:setLevel2Pwd,-,6,-,1,0x103" },
   cfgLevel3Pwd:         { request: "r,meth:setLevel3Pwd,-,6,-,1,0x106" },
@@ -101,6 +102,9 @@ const requests = {
   analogueOut:          { request: "r,meth:setAnalogueOutFreq,60,2,1,1,0x40B" },
   configSwitches:       { request: "r,meth:setConfigSwitches,-,2,-,1,0x500" },
   configSelections:     { request: "r,meth:setConfigSelections,-,4,-,1,0x501" },
+  driveStatus:          { request: "r,meth:setDriveStatus,-,2,-,1,0xC00" },
+  driveMeasures:        { request: "r,meth:setDriveMeasures,-,20,-,1,0xC01" },
+  driveFaultString:     { request: "r,meth:setDriveFaultString,-,26,-,1,0xC0B" },
   //
   WP:                   { request: "r,meth:setWPx,-,12,-,1,0x509" },
   WT:                   { request: "r,meth:setWTx,-,16,-,1,0x50F" },
@@ -155,26 +159,49 @@ return requests[value];
 #
 #
 #
-def fetchModbusSettings_body():
+def fetchModbusSettings_body(hasInverter):
     return """/**
-
 */
-return "/dev/ttyS1:9600:8:N:1|"+
-"g0:0,g1:3600,g2:60,g3:3,g4:5|"+
-"r,meth:setAlarms,5,8,1,1,0x200|"+
-"r,meth:setNonAckAlarms,5,8,1,1,0x204|"+
-"r,meth:setControllerState,5,2,1,1,0x400|"+
-"r,meth:setCompressorState,5,2,1,1,0x401|"+
-"r,meth:setBlockingAlarm,5,2,1,1,0x402|"+
-"r,meth:setScrewTemperature,3,2,0,1,0x405|"+
-"r,meth:setWorkingPressure,3,2,0,1,0x406|"+
-"r,meth:setAuxPressure,3,2,0,1,0x407|"+
-"r,meth:setPTCInput,60,2,1,1,0x408|"+
-"r,meth:setControllerSupplyVoltage,60,2,1,1,0x409|"+
-"r,meth:setAnalogueOutFreq,60,2,1,1,0x40B|"+
-"r,meth:setTotalHours,3600,4,1,1,0x600|"+
-"r,meth:setTotalLoadHours,3600,4,1,1,0x602|"+
-"r,meth:setMaintCounters,3600,24,1,1,0x604"
+if (hasInverter) {
+  return "/dev/ttyS1:9600:8:N:1|"+
+    "g0:0,g1:3600,g2:60,g3:3,g4:5|"+
+    "r,meth:setAlarms,5,8,1,1,0x200|"+
+    "r,meth:setNonAckAlarms,5,8,1,1,0x204|"+
+    "r,meth:setControllerState,5,2,1,1,0x400|"+
+    "r,meth:setCompressorState,5,2,1,1,0x401|"+
+    "r,meth:setBlockingAlarm,5,2,1,1,0x402|"+
+    "r,meth:setScrewTemperature,3,2,0,1,0x405|"+
+    "r,meth:setWorkingPressure,3,2,0,1,0x406|"+
+    "r,meth:setAuxPressure,3,2,0,1,0x407|"+
+    "r,meth:setPTCInput,60,2,1,1,0x408|"+
+    "r,meth:setControllerSupplyVoltage,60,2,1,1,0x409|"+
+    "r,meth:setAnalogueOutFreq,60,2,1,1,0x40B|"+
+    "r,meth:setDRx,60,14,1,1,0x544|"+
+    "r,meth:setTotalHours,3600,4,1,1,0x600|"+
+    "r,meth:setTotalLoadHours,3600,4,1,1,0x602|"+
+    "r,meth:setMaintCounters,3600,24,1,1,0x604|"+
+    "r,meth:setDriveStatus,60,2,0,1,0xC00|"+
+    "r,meth:setDriveMeasures,5,20,0,1,0xC01";
+}
+else {
+  return "/dev/ttyS1:9600:8:N:1|"+
+    "g0:0,g1:3600,g2:60,g3:3,g4:5|"+
+    "r,meth:setAlarms,5,8,1,1,0x200|"+
+    "r,meth:setNonAckAlarms,5,8,1,1,0x204|"+
+    "r,meth:setControllerState,5,2,1,1,0x400|"+
+    "r,meth:setCompressorState,5,2,1,1,0x401|"+
+    "r,meth:setBlockingAlarm,5,2,1,1,0x402|"+
+    "r,meth:setScrewTemperature,3,2,0,1,0x405|"+
+    "r,meth:setWorkingPressure,3,2,0,1,0x406|"+
+    "r,meth:setAuxPressure,3,2,0,1,0x407|"+
+    "r,meth:setPTCInput,60,2,1,1,0x408|"+
+    "r,meth:setControllerSupplyVoltage,60,2,1,1,0x409|"+
+    "r,meth:setAnalogueOutFreq,60,2,1,1,0x40B|"+
+    "r,meth:setDRx,60,14,1,1,0x544|"+
+    "r,meth:setTotalHours,3600,4,1,1,0x600|"+
+    "r,meth:setTotalLoadHours,3600,4,1,1,0x602|"+
+    "r,meth:setMaintCounters,3600,24,1,1,0x604";
+}
 """
 
 #
@@ -249,7 +276,7 @@ def hasInverter_body():
 @param value is the context
 */
 const INVERTER = 'DANFOSS FC'
-const CFG_DRIVE_PROTOCOL = 'C10';
+const CFG_DRIVE_PROTOCOL = 'DRx';
 
 async function fn() {
     const context = value;
@@ -319,6 +346,94 @@ try {
 catch(e) {
     done(e);
 }"""
+
+#
+#
+#
+def setRelayOutputs_body():
+    return """/**
+Bit mapped allocation:
+    0x0001: RL1
+    0x0002: RL2
+    0x0004: RL3
+    0x0008: RL4
+    0x0010: RL5
+    0x0020: RL6
+    0x0040: RL7
+*/
+let outputMap = Device.convertToDec({ values: value, default: 0});
+
+let result = [];
+if (outputMap & 1) result.push("RL1");
+if (outputMap & 2) result.push("RL2");
+if (outputMap & 4) result.push("RL3");
+if (outputMap & 8) result.push("RL4");
+if (outputMap & 16) result.push("RL5");
+if (outputMap & 32) result.push("RL6");
+if (outputMap & 64) result.push("RL7");
+
+if (result.length == 0) result = ["-"];
+
+Device.api.setProperty("relayOutputs", {
+    value: result.toString(),
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
+#
+#
+#
+def setDigitalInputs_body():
+    return """/**
+Bit mapped allocation (below L26):
+  0x0001: IN1
+  0x0002: IN2
+  0x0004: IN3
+  0x0008: IN4
+  0x0010: IN5
+  0x0020: IN6
+  0x0040: IN7
+  0x0080: Phase R (Phase Check Unit Logika Control)
+  0x0100: Phase S (Phase Check Unit Logika Control)
+  0x0200: Phase T (Phase Check Unit Logika Control)
+  0x0400: INVERTER FAULT INPUT
+  0x0800: PTC state
+  0x1000: Phases Sequence Correct (Phase Check Unit Logika Control)
+
+Note that although the codes are same, meanings are different per controller. 
+See controller manuel.
+*/
+
+let outputMap = Device.convertToDec({ values: value, default: 0});
+
+let result = [];
+if (outputMap & 1) result.push("IN1");
+if (outputMap & 2) result.push("IN2");
+if (outputMap & 4) result.push("IN3");
+if (outputMap & 8) result.push("IN4");
+if (outputMap & 16) result.push("IN5");
+if (outputMap & 32) result.push("IN6");
+if (outputMap & 64) result.push("IN7");
+if (outputMap & 128) result.push("Phase R");
+if (outputMap & 256) result.push("Phase S");
+if (outputMap & 512) result.push("Phase T");
+if (outputMap & 1024) result.push("INVERTER FAULT INPUT");
+if (outputMap & 2048) result.push("PTC state");
+if (outputMap & 4096) result.push("Phases Sequence Correct");
+
+if (result.length == 0) result = ["-"];
+
+Device.api.setProperty("digitalInputs", {
+    value: result.toString(),
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
 
 #
 #
@@ -435,12 +550,12 @@ Device.api.setProperty("configSelections", {
 
 def setWPx_body():
     return """/**
-    WP1	RW	bar
-    WP2	RW	bar*10 (must be divided by 10)
-    WP3	RW	bar*10 (must be divided by 10)
-    WP4	RW	bar*10 (must be divided by 10)
-    WP5	RW	bar*10 (must be divided by 10)
-    WP6	RW	bar*10 (must be divided by 10)
+WP1	RW	bar
+WP2	RW	bar*10 (must be divided by 10)
+WP3	RW	bar*10 (must be divided by 10)
+WP4	RW	bar*10 (must be divided by 10)
+WP5	RW	bar*10 (must be divided by 10)
+WP6	RW	bar*10 (must be divided by 10)
 */
 
 const itemCount = 6;
@@ -1316,4 +1431,130 @@ let req = Device.makeWriteRequest(args);
 req.done = r => done(null, r);
 
 Device.writeAndReadTag(req);
+"""
+
+#####################
+#
+#  DriveStatus
+#
+#####################
+
+def setDriveStatus_body():
+    return """/**
+Bit mapped allocation:
+  0x0001 Ready 
+  0x0002 Running 
+  0x0004 LowSpeed 
+  0x0008 UnderFMin 
+  0x0080 Alarm
+  0x0100 Fault
+*/
+let outputMap = Device.convertToDec({ values: value, default: 0});
+
+let result = [];
+if (outputMap & 1) result.push("Ready");
+if (outputMap & 2) result.push("Running");
+if (outputMap & 4) result.push("LowSpeed");
+if (outputMap & 8) result.push("UnderFMin");
+if (outputMap & 128) result.push("Alarm");
+if (outputMap & 256) result.push("Fault");
+
+if (result.length == 0) result = ["-"];
+
+Device.api.setProperty("driveStatus", {
+    value: result.toString(),
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
+#####################
+#
+#  DriveMeasures
+#
+#####################
+
+def setDriveMeasures_body():
+    return """/**
+Elements contains (depends on drive selected):
+  0-FREQ [Hz*10]
+  1-POWER [kW*10 or %*10]
+  2-CURRENT [A*10 or %*10]
+  3-MOTOR_VOLTAGE [V or %] or for Emerson ENERGY METER L [KW*100] 
+  4-DRIVE_TEMP [°C or %] or for Emerson ENERGY METER H [MW*10] 
+  5-RPM [rpm]
+  6-ENERGY(less significant 16bit) [kWh] 
+  7-ENERGY(most significant 16bit) [kWh] 
+  8-FMIN [Hz*10]
+  9-FMAX [Hz*10]
+*/
+
+let frequency = Device.convertToDec({ values: value.splice(0, 2), default: 0});
+let power = Device.convertToDec({ values: value.splice(2, 4), default: 0});
+let current = Device.convertToDec({ values: value.splice(4, 6), default: 0});
+let voltage = Device.convertToDec({ values: value.splice(6, 8), default: 0});
+let temp = Device.convertToDec({ values: value.splice(8, 10), default: 0});
+let rpm = Device.convertToDec({ values: value.splice(10, 12), default: 0});
+let energy = Device.convertToDec({ values: value.splice(12, 16), default: 0});
+let fmin = Device.convertToDec({ values: value.splice(16, 18), default: 0});
+let fmax = Device.convertToDec({ values: value.splice(18), default: 0});
+
+let drive = {
+  frequency: frequency / 10,
+  power: power / 10,
+  current: current / 10,
+  voltage: voltage,
+  temp: temp,
+  rpm: rpm,
+  energy: energy,
+  fmin: fmin / 10,
+  fmax: fmax / 10
+};
+
+//let msg = `${drive.frequency}, ${drive.power}, ${drive.current}, ${drive.voltage}, ${drive.temp}, ${drive.rpm}, ${drive.energy}, ${drive.fmin}, ${drive.fmax}`;
+//Device.api.log("info", msg).then(i => done(null, null));
+
+Device.api.setProperty("driveMeasures", {
+    value: drive,
+    time: new Date().toISOString()
+}).then(prop => {
+   done(null, null);
+});
+"""
+
+#####################
+#
+#  DriveFaultString
+#
+#####################
+
+def setDriveFaultString_body():
+    return """/**
+ASCII string '\0' terminated
+*/
+function toFaultString(fault) {
+    let flag = false;
+    let faultString = "";
+    
+    for (let i = 0; i < fault.length; i++) {
+      if ( fault[i] != 0 && !flag ) {
+          faultString += String.fromCharCode(fault[i]);
+      }
+      else if ( fault[i] == 0 ) {
+          flag = true;
+      }
+    }
+    return faultString;
+}
+(async function f(faultString) {
+    await Device.api.setProperty("driveFaultString", {
+        value: faultString,
+        time: new Date().toISOString()
+    });
+    
+    done(null, faultString);
+    
+})(toFaultString(value));
 """

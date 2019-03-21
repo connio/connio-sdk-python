@@ -6,6 +6,7 @@
 # ~fetchControllerStates()
 # ~fetchCompressorStates()
 # ~fetchCompressorStateTypes()
+# ~hasInverter()
 
 #
 #
@@ -90,8 +91,8 @@ def fetchReadRequest_body():
 */
 const requests = {
   cfgSerialNumber:                  { request: "r,meth:setSerialNumber,-,20,-,1,0x00" },
-  cfgLogikaModel:                   { request: "r,meth:setModelNumber,-,2,-,1,0x0A" },
-  cfgLogikaFwVersion:               { request: "r,meth:setReleaseNo,-,2,-,1,0x0B" },
+  cfgLogikaModel:                   { request: "r,meth:setLogikaModel,-,2,-,1,0x0A" },
+  cfgLogikaFwVersion:               { request: "r,meth:setLogikaFwVersion,-,2,-,1,0x0B" },
   cfgLevel1Pwd:                     { request: "r,meth:setLevel1Pwd,-,6,-,1,0x100" },
   cfgLevel2Pwd:                     { request: "r,meth:setLevel2Pwd,-,6,-,1,0x103" },
   cfgLevel3Pwd:                     { request: "r,meth:setLevel3Pwd,-,6,-,1,0x106" },
@@ -104,34 +105,28 @@ const requests = {
   loadPercInLast100h:               { request: "r,meth:setLoadPercInLast100h,-,2,-,1,0x610" },
   nbrOfStartsInLastHour:            { request: "r,meth:setNbrOfStartsInLastHour,-,2,-,1,0x611" },
   controllerTime:                   { request: "r,meth:setControllerTime,-,8,-,1,0x800" },
-  // Controller specific
-  DisplayedState:                   { request: "r,meth:setDisplayedState,-,2,-,1,0x403" },
-  SecondTemperature:                { request: "r,meth:setSecondTemperature,-,2,-,1,0x408" },
-  SecondPressure:                   { request: "r,meth:setSecondPressure,-,2,-,1,0x409" },
-  Drive24VSupply:                   { request: "r,meth:setDrive24VSupply,-,2,-,1,0x40B" },
-  DriveAnalogInput:                 { request: "r,meth:setDriveAnalogInput,-,2,-,1,0x40C" },
-  ConfigurationSwitches:            { request: "r,meth:setConfigurationSwitches,-,4,-,1,0x500" },
-  Language:                         { request: "r,meth:setLanguage,-,2,-,1,0x503" },
-  ClockTimers:                      { request: "r,meth:setClockTimers,-,84,-,1,0x700" },
-  PressureSelectionBits:            { request: "r,meth:setPressureSelectionBits,-,4,-,1,0x72A" },
-  DaylightSavingTimeAdjustment:     { request: "r,meth:setDaylightSavingTimeAdjustment,-,2,-,1,0x804" },
-  Indexes:                          { request: "r,meth:setIndexes,-,2,-,1,0x900" },
-  MaintenanceOperationRecords:      { request: "r,meth:setMaintenanceOperationRecords,-,120,-,1,0x901" },
-  DriveStatus:                      { request: "r,meth:setDriveStatus,-,2,-,1,0xA00" },
-  DriveMeasures:                    { request: "r,meth:setDriveMeasures,-,20,-,1,0xA01" },
-  DriveFaultString:                 { request: "r,meth:setDriveFaultString,-,26,-,1,0xA0B" },
-  DriveCommands:                    { request: "r,meth:setDriveCommands,-,2,-,1,0xA18" },
+  // ---- Controller specific ----
+  workingFlags:                     { request: "r,meth:setWorkingFlags,-,2,-,1,0x403" },
+  secondTemperature:                { request: "r,meth:setSecondTemperature,-,2,-,1,0x408" },
+  secondPressure:                   { request: "r,meth:setSecondPressure,-,2,-,1,0x409" },
+  configSwitches:                   { request: "r,meth:setConfigSwitches,-,4,-,1,0x500" },
+  drive24VSupply:                   { request: "r,meth:setDrive24VSupply,-,2,-,1,0x40B" },
+  driveAnalogInput:                 { request: "r,meth:setDriveAnalogInput,-,2,-,1,0x40C" },
+  driveStatus:                      { request: "r,meth:setDriveStatus,-,2,-,1,0xA00" },
+  driveMeasures:                    { request: "r,meth:setDriveMeasures,-,20,-,1,0xA01" },
+  driveFaultString:                 { request: "r,meth:setDriveFaultString,-,26,-,1,0xA0B" },
+  driveCommands:                    { request: "r,meth:setDriveCommands,-,2,-,1,0xA18" },
   //
   WP:                               { request: "r,meth:setWPx,-,12,-,1,0x504" },
   SP:                               { request: "r,meth:setSPx,-,8,-,1,0x50A" },
   SP5:                              { request: "r,meth:setSP5,-,2,-,1,0x542" },
   SP6:                              { request: "r,meth:setSP6,-,2,-,1,0x548" },
-  WPs:                              { request: "r,meth:setWPs,-,2,-,1,0x50E" },
-  WPS2P:                            { request: "r,meth:setWPS2Px,-,6,-,1,0x50F" },
-  WPS2Ps:                           { request: "r,meth:setWPS2Ps,-,2,-,1,0x512" },
+  //WPs:                              { request: "r,meth:setWPs,-,2,-,1,0x50E" },
+  //WPS2P:                            { request: "r,meth:setWPS2Px,-,6,-,1,0x50F" },
+  //WPS2Ps:                           { request: "r,meth:setWPS2Ps,-,2,-,1,0x512" },
   WT:                               { request: "r,meth:setWTx,-,14,-,1,0x513" },
-  STA:                              { request: "r,meth:setSTAx,-,4,-,1,0x51A" },
-  ST3:                              { request: "r,meth:setST3,-,2,-,1,0x51C" },
+  STA:                              { request: "r,meth:setSTAx,-,6,-,1,0x51A" },
+  //ST3:                              { request: "r,meth:setST3,-,2,-,1,0x51C" },
   STT1:                             { request: "r,meth:setSTT1,-,2,-,1,0x51D" },
   STD1:                             { request: "r,meth:setSTD1,-,2,-,1,0x51E" },
   Wt:                               { request: "r,meth:setWtx,-,20,-,1,0x522" },
@@ -153,33 +148,25 @@ def fetchWriteRequest_body():
 
 */
 const requests = {
-    RelativeSpeed:                  { rprob: "RelativeSpeed", rcmd: "r,meth:setRelativeSpeed,-,0,1,0x40E", min: 1, max: 1, offset:"0x40E" },
-    ConfigurationSwitches:          { rprob: "ConfigurationSwitches", rcmd: "r,meth:setConfigurationSwitches,-,4,-,1,0x500", min: 1, max: 2, offset:"0x500" },
-    Language:                       { rprob: "Language", rcmd: "r,meth:setLanguage,-,2,-,1,0x503", min: 1, max: 1, offset:"0x503" },
-    ClockTimers:                    { rprob: "ClockTimers", rcmd: "r,meth:setClockTimers,-,84,-,1,0x700", min: 1, max: 1, offset:"0x700" },
-    PressureSelectionBits:          { rprob: "PressureSelectionBits", rcmd: "r,meth:setPressureSelectionBits,-,4,-,1,0x72A", min: 1, max: 1, offset:"0x72A" },
-    Indexes:                        { rprob: "Indexes", rcmd: "r,meth:setIndexes,-,2,-,1,0x900", min: 1, max: 1, offset:"0x900" },
-    MaintenanceOperationRecords:    { rprob: "MaintenanceOperationRecords", rcmd: "r,meth:setMaintenanceOperationRecords,-,120,-,1,0x901", min: 1, max: 1, offset:"0x901" },
-    //
-    WPx:                            { rprob: "WPx", rcmd: "r,meth:setWPx,-,12,-,1,0x504", min: 1, max: 6, offset:"0x504" },
-    SPx:                            { rprob: "SPx", rcmd: "r,meth:setSPx,-,8,-,1,0x50A", min: 1, max: 4, offset:"0x50A" },
-    SP5:                            { rprob: "SP5", rcmd: "r,meth:setSP5,-,2,-,1,0x542", min: 5, max: 5, offset:"0x542" },
-    SP6:                            { rprob: "SP6", rcmd: "r,meth:setSP6,-,2,-,1,0x548", min: 6, max: 6, offset:"0x548" },
-    WPs:                            { rprob: "WPs", rcmd: "r,meth:setWPs,-,2,-,1,0x50E", min: 1, max: 1, offset:"0x50E" },
-    WPS2Px:                         { rprob: "WPS2Px", rcmd: "r,meth:setWPS2Px,-,6,-,1,0x50F", min: 3, max: 5, offset:"0x50F" },
-    WPS2Ps:                         { rprob: "WPS2Ps", rcmd: "r,meth:setWPS2Ps,-,2,-,1,0x512", min: 1, max: 1, offset:"0x512" },
-    WTx:                            { rprob: "WTx", rcmd: "r,meth:setWTx,-,14,-,1,0x513", min: 1, max: 7, offset:"0x513" },
-    STAx:                           { rprob: "STAx", rcmd: "r,meth:setSTAx,-,4,-,1,0x51A", min: 1, max: 2, offset:"0x51A" },
-    ST3:                            { rprob: "ST3", rcmd: "r,meth:setST3,-,2,-,1,0x51C", min: 3, max: 3, offset:"0x51C" },
-    STT1:                           { rprob: "STT1", rcmd: "r,meth:setSTT1,-,2,-,1,0x51D", min: 1, max: 1, offset:"0x51D" },
-    STD1:                           { rprob: "STD1", rcmd: "r,meth:setSTD1,-,2,-,1,0x51E", min: 1, max: 1, offset:"0x51E" },
-    Wtx:                            { rprob: "Wtx", rcmd: "r,meth:setWtx,-,20,-,1,0x522", min: 1, max: 10, offset:"0x522" },
-    R0x:                            { rprob: "R0x", rcmd: "r,meth:setR0x,-,4,-,1,0x53D", min: 1, max: 2, offset:"0x53D" },
-    R03:                            { rprob: "R03", rcmd: "r,meth:setR03,-,2,-,1,0x502", min: 3, max: 3, offset:"0x502" },
-    DSx:                            { rprob: "DSx", rcmd: "r,meth:setDSx,-,12,-,1,0xA1B", min: 1, max: 6, offset:"0xA1B" },
-    DAx:                            { rprob: "DAx", rcmd: "r,meth:setDAx,-,26,-,1,0xA22", min: 0, max: 12, offset:"0xA22" },
-    DFx:                            { rprob: "DFx", rcmd: "r,meth:setDFx,-,12,-,1,0xA2E", min: 1, max: 6, offset:"0xA2E" },
-    DF7:                            { rprob: "DF7", rcmd: "r,meth:setDF7,-,2,-,1,0x541", min: 7, max: 7, offset:"0x541" },
+    WP:      { rprob: "WPx", rcmd: "r,meth:setWPx,-,12,-,1,0x504", min: 1, max: 6, offset:"0x504" },
+    SP:      { rprob: "SPx", rcmd: "r,meth:setSPx,-,8,-,1,0x50A", min: 1, max: 4, offset:"0x50A" },
+    SP5:     { rprob: "SP5", rcmd: "r,meth:setSP5,-,2,-,1,0x542", min: 5, max: 5, offset:"0x542" },
+    SP6:     { rprob: "SP6", rcmd: "r,meth:setSP6,-,2,-,1,0x548", min: 6, max: 6, offset:"0x548" },
+    //WPs:     { rprob: "WPs", rcmd: "r,meth:setWPs,-,2,-,1,0x50E", min: 1, max: 1, offset:"0x50E" },
+    //WPS2P:   { rprob: "WPS2Px", rcmd: "r,meth:setWPS2Px,-,6,-,1,0x50F", min: 3, max: 5, offset:"0x50F" },
+    //WPS2Ps:  { rprob: "WPS2Ps", rcmd: "r,meth:setWPS2Ps,-,2,-,1,0x512", min: 1, max: 1, offset:"0x512" },
+    WT:      { rprob: "WTx", rcmd: "r,meth:setWTx,-,14,-,1,0x513", min: 1, max: 7, offset:"0x513" },
+    STA:     { rprob: "STAx", rcmd: "r,meth:setSTAx,-,6,-,1,0x51A", min: 1, max: 3, offset:"0x51A" },
+    //ST3:     { rprob: "ST3", rcmd: "r,meth:setST3,-,2,-,1,0x51C", min: 3, max: 3, offset:"0x51C" },
+    STT1:    { rprob: "STT1", rcmd: "r,meth:setSTT1,-,2,-,1,0x51D", min: 1, max: 1, offset:"0x51D" },
+    STD1:    { rprob: "STD1", rcmd: "r,meth:setSTD1,-,2,-,1,0x51E", min: 1, max: 1, offset:"0x51E" },
+    Wt:      { rprob: "Wtx_", rcmd: "r,meth:setWtx,-,20,-,1,0x522", min: 1, max: 10, offset:"0x522" },
+    R0:      { rprob: "R0x", rcmd: "r,meth:setR0x,-,4,-,1,0x53D", min: 1, max: 2, offset:"0x53D" },
+    R03:     { rprob: "R03", rcmd: "r,meth:setR03,-,2,-,1,0x502", min: 3, max: 3, offset:"0x502" },
+    DS:      { rprob: "DSx", rcmd: "r,meth:setDSx,-,12,-,1,0xA1B", min: 1, max: 6, offset:"0xA1B" },
+    DA:      { rprob: "DAx", rcmd: "r,meth:setDAx,-,26,-,1,0xA22", min: 0, max: 12, offset:"0xA22" },
+    DF:      { rprob: "DFx", rcmd: "r,meth:setDFx,-,12,-,1,0xA2E", min: 1, max: 6, offset:"0xA2E" },
+    DF7:     { rprob: "DF7", rcmd: "r,meth:setDF7,-,2,-,1,0x541", min: 7, max: 7, offset:"0x541" },
     
 };
 return requests[value];
@@ -188,22 +175,48 @@ return requests[value];
 #
 #
 #
-def fetchModbusSettings_body():
+def fetchModbusSettings_body(hasInverter):
     return """/**
 */
-return "/dev/ttyS1:9600:8:N:1|"+
-"g0:0,g1:3600,g2:60,g3:3,g4:5|"+
-"r,meth:setAlarms,5,12,1,1,0x200|"+
-"r,meth:setNonAckAlarms,5,12,1,1,0x204|"+
-"r,meth:setControllerState,5,2,1,1,0x400|"+
-"r,meth:setCompressorState,5,2,1,1,0x401|"+
-"r,meth:setBlockingAlarm,5,2,1,1,0x402|"+
-"r,meth:setScrewTemperature,3,2,0,1,0x406|"+
-"r,meth:setWorkingPressure,3,2,0,1,0x407|"+
-"r,meth:setControllerSupplyVoltage,60,2,1,1,0x40A|"+
-"r,meth:setTotalHours,3600,4,1,1,0x600|"+
-"r,meth:setTotalLoadHours,3600,4,1,1,0x602|"+
-"r,meth:setMaintCounters,3600,24,1,1,0x604"
+
+if (hasInverter) {
+  return "/dev/ttyS1:9600:8:N:1|"+
+    "g0:0,g1:3600,g2:60,g3:3,g4:5|"+
+    "r,meth:setAlarms,5,12,1,1,0x200|"+
+    "r,meth:setNonAckAlarms,5,12,1,1,0x206|"+
+    "r,meth:setControllerState,5,2,1,1,0x400|"+
+    "r,meth:setCompressorState,5,2,1,1,0x401|"+
+    "r,meth:setBlockingAlarm,5,2,1,1,0x402|"+
+    "r,meth:setScrewTemperature,3,2,0,1,0x406|"+
+    "r,meth:setWorkingPressure,3,2,0,1,0x407|"+
+    "r,meth:setSecondTemperature,3,2,0,1,0x408|"+
+    "r,meth:setSecondPressure,3,2,0,1,0x409|"+
+    "r,meth:setConfigSwitches,60,4,1,1,0x500|"+    
+    "r,meth:setControllerSupplyVoltage,60,2,1,1,0x40A|"+
+    "r,meth:setTotalHours,3600,4,1,1,0x600|"+
+    "r,meth:setTotalLoadHours,3600,4,1,1,0x602|"+
+    "r,meth:setMaintCounters,3600,24,1,1,0x604|"+
+    "r,meth:setDriveStatus,60,2,0,1,0xA00|"+
+    "r,meth:setDriveMeasures,5,20,0,1,0xA01";
+}
+else {
+  return "/dev/ttyS1:9600:8:N:1|"+
+    "g0:0,g1:3600,g2:60,g3:3,g4:5|"+
+    "r,meth:setAlarms,5,12,1,1,0x200|"+
+    "r,meth:setNonAckAlarms,5,12,1,1,0x206|"+
+    "r,meth:setControllerState,5,2,1,1,0x400|"+
+    "r,meth:setCompressorState,5,2,1,1,0x401|"+
+    "r,meth:setBlockingAlarm,5,2,1,1,0x402|"+
+    "r,meth:setScrewTemperature,3,2,0,1,0x406|"+
+    "r,meth:setWorkingPressure,3,2,0,1,0x407|"+
+    "r,meth:setSecondTemperature,3,2,0,1,0x408|"+
+    "r,meth:setSecondPressure,3,2,0,1,0x409|"+
+    "r,meth:setConfigSwitches,60,4,1,1,0x500|"+
+    "r,meth:setControllerSupplyVoltage,60,2,1,1,0x40A|"+
+    "r,meth:setTotalHours,3600,4,1,1,0x600|"+
+    "r,meth:setTotalLoadHours,3600,4,1,1,0x602|"+
+    "r,meth:setMaintCounters,3600,24,1,1,0x604";
+}
 """
 
 #
@@ -282,9 +295,24 @@ return { IDLE_RUNNING: [ 6 ],
 #
 def hasInverter_body():
     return"""/**
-* L33 has inverter
+@param value is the context
 */
-return { hasInverter: true };
+const INVERTER = 'DANFOSS FC'
+const CFG_DRIVE_PROTOCOL = 'configSwitches';
+
+async function fn() {
+    const context = value;
+
+    const { value: propValue = {} } = await Device.api.getProperty(CFG_DRIVE_PROTOCOL);
+    const hasInverter = propValue
+        ? propValue.D0 === INVERTER
+        : false;
+
+    return Object.assign(context, {
+        hasInverter,
+    });
+}
+return Promise.resolve(fn())
 """
 
 #
@@ -341,16 +369,129 @@ catch(e) {
     done(e);
 }"""
 
+#
+#
+#
+def setRelayOutputs_body():
+    return """/**
+Bit mapped allocation: 
+  0x0001 RL1
+  0x0002 RL1
+  0x0004 RL3
+  0x0008 RL4 
+  0x0010 RL5 
+  0x0020 RL6 
+  0x0040 RL7
+*/
+let outputMap = Device.convertToDec({ values: value, default: 0});
+
+let result = [];
+if (outputMap & 1) result.push("RL1");
+if (outputMap & 2) result.push("RL2");
+if (outputMap & 4) result.push("RL3");
+if (outputMap & 8) result.push("RL4");
+if (outputMap & 16) result.push("RL5");
+if (outputMap & 32) result.push("RL6");
+if (outputMap & 64) result.push("RL7");
+
+if (result.length == 0) result = ["-"];
+
+Device.api.setProperty("relayOutputs", {
+    value: result.toString(),
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
+#
+#
+#
+def setDigitalInputs_body():
+    return """/**
+Bit mapped allocation: 
+  0x0001 IN1
+  0x0002 IN2
+  0x0004 IN3
+  0x0008 IN4
+  0x0010 IN5
+  0x0020 IN6
+  0x0040 Phase R (Phase Check Unit Logika Control) 
+  0x0080 Phase S (Phase Check Unit Logika Control) 
+  0x0100 Phase T (Phase Check Unit Logika Control) 
+  0x0200 Input for drive fault
+  0x0400 PTC state
+  0x0800 Phases Sequence Correct (Phase Check Unit Logika Control)
+
+  Note that although the codes are same, meanings are different per controller. 
+  See controller manuel.
+*/
+
+let outputMap = Device.convertToDec({ values: value, default: 0});
+
+let result = [];
+if (outputMap & 1) result.push("IN1");
+if (outputMap & 2) result.push("IN2");
+if (outputMap & 4) result.push("IN3");
+if (outputMap & 8) result.push("IN4");
+if (outputMap & 16) result.push("IN5");
+if (outputMap & 32) result.push("IN6");
+if (outputMap & 64) result.push("Phase R");
+if (outputMap & 128) result.push("Phase S");
+if (outputMap & 256) result.push("Phase T");
+if (outputMap & 512) result.push("Input for drive fault");
+if (outputMap & 1024) result.push("PTC state");
+if (outputMap & 2048) result.push("Phases Sequence Correct");
+
+if (result.length == 0) result = ["-"];
+
+Device.api.setProperty("digitalInputs", {
+    value: result.toString(),
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
+
 #####################
 #
-#  DisplayedState
+#  WorkingFlags
 #
 #####################
 
-def setDisplayedState_body():
+def setWorkingFlags_body():
     return """/**
+Bit mapped allocation:
+0x0001 System Enable( ON state)
+0x0002 Fan active
+0x0004 Weekly timer bypassed by user forced start
+0x0008 Start/stop remote active
+0x0010 Master/slave role is master
+0x0100 Second pressure set selected
+0x2000 Load valve open
 */
-done(null, null);
+
+let outputMap = Device.convertToDec({ values: value, default: 0});
+
+let result = [];
+if (outputMap & 1) result.push("System Enable( ON state)");
+if (outputMap & 2) result.push("Fan active");
+if (outputMap & 4) result.push("Weekly timer bypassed by user forced start");
+if (outputMap & 8) result.push("Start/stop remote active");
+if (outputMap & 16) result.push("Master/slave role is master");
+if (outputMap & 256) result.push("Second pressure set selected");
+if (outputMap & 8192) result.push("Load valve open");
+
+Device.api.setProperty("workingFlags", {
+    value: { switches: result },
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
 """
 
 #####################
@@ -361,8 +502,15 @@ done(null, null);
 
 def setSecondTemperature_body():
     return """/**
+
 */
-done(null, null);
+Device.api.setProperty("secondTemperature", {
+    value: Device.convertToDec({ values: value, default: 0}) / 10.0,
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
 """
 
 #####################
@@ -373,8 +521,15 @@ done(null, null);
 
 def setSecondPressure_body():
     return """/**
+
 */
-done(null, null);
+Device.api.setProperty("secondPressure", {
+    value: Device.convertToDec({ values: value, default: 0}) / 10.0,
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
 """
 
 #####################
@@ -385,8 +540,15 @@ done(null, null);
 
 def setDrive24VSupply_body():
     return """/**
+
 */
-done(null, null);
+Device.api.setProperty("drive24VSupply", {
+    value: Device.convertToDec({ values: value, default: 0}) / 10.0,
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
 """
 
 #####################
@@ -397,8 +559,115 @@ done(null, null);
 
 def setDriveAnalogInput_body():
     return """/**
+
 */
-done(null, null);
+Device.api.setProperty("driveAnalogInput", {
+    value: Device.convertToDec({ values: value, default: 0}) / 10.0,
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
+#####################
+#
+#  ConfigSwitches
+#
+#####################
+
+def setConfigSwitches_body():
+    return """/**
+Bit mapped allocation (see menu Compressor Config): 0x0001 DST automatic adjust (menu 2 - Display Setup) 0x0002 P. S01 - Automatic Restart
+
+1st Word:
+0x0004 P. T01 - Start/stop by timer enabled
+0x0008 Pressure in PSI (menu 2 - Display Setup)
+0x0010 Temperature in Fahrenheit (menu 2 - Display Setup) 
+0x0020 P. S03 - Fixed Timer Wt4
+0x0040 P. S04 - Phase Check Active
+0x0080 P. S05 - Security Active
+0x0100 P. S06 - Low supply voltage check active
+0x0200 P. MA1 – Multiunit slave maintenance mode
+0x0400 P. D2 - Drive out4 current select
+0x0800 P. D4 - Drive stop at min frequency
+0x1000 P. S18 - Maintenance C_h blocking
+0x2000 P. S17 - Second pressure set enabled
+0x4000 P. S07-4 - M/S drive twin
+0x8000 P. D5 - Drive put temp on out3 and out4
+
+2nd Word:
+
+0x0001 P. M08 Multiunit working hours alignment
+0x0002 P. DF0 Enable PID for inverter driving fan motor
+0x0004 P. D0 Variable speed compressor (star/delta vs inverter) 
+0x0008 P. S19 RL1 ready function
+0x0010 P. S20 PNP2 fan function
+
+*/
+
+let outputMap = Device.convertToDec({ values: value, default: 0});
+
+let result = [];
+
+// 1st word
+if (outputMap & 4) result.push("T01 Start/stop by timer enabled");
+if (outputMap & 8) result.push("Pressure in PSI");
+if (outputMap & 16) result.push("Temperature in Fahrenheit");
+if (outputMap & 32) result.push("S03 Fixed Timer Wt4");
+if (outputMap & 64) result.push("S04 Phase Check Active");
+if (outputMap & 128) result.push("S05 Security Active");
+if (outputMap & 256) result.push("S06 Low supply voltage check active");
+if (outputMap & 512) result.push("MA1 Multiunit slave maintenance mode");
+if (outputMap & 1024) result.push("D2 Drive out4 current select");
+if (outputMap & 2048) result.push("D4 Drive stop at min frequency");
+if (outputMap & 4096) result.push("S18 Maintenance C_h blocking");
+if (outputMap & 8192) result.push("S17 Second pressure set enabled");
+if (outputMap & 16384) result.push("S07-4 M/S drive twin");
+if (outputMap & 32768) result.push("D5 Drive put temp on out3 and out4");
+
+let inverter = '';
+
+// 2nd word
+if (outputMap & 65536) result.push("M08 Multiunit working hours alignment");
+if (outputMap & 131072) result.push("DF0 Enable PID for inverter driving fan motor");
+if (outputMap & 262144) { 
+    result.push("D0 Variable speed compressor (star/delta vs inverter)");
+    // mark that this is a compressor with inverter
+    // this value will be used by hasInverter() method
+    inverter = 'DANFOSS FC';
+}
+if (outputMap & 524288) result.push("S19 RL1 ready function");
+if (outputMap & 1048576) result.push("S20 PNP2 fan function");
+
+//
+
+Device.api.setProperty("configSwitches", {
+    value: { 
+      switches: result, 
+      D0: inverter 
+    },
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
+def writeConfigSwitches_body():
+    return """/**
+*/
+let args = {
+  tagKey: "configSwitches",
+  x: value.x,
+  setValue: value.setPoint,
+  byteCount: value.byteCount || 2
+};
+
+let req = Device.makeWriteRequest(args);
+req.done = r => done(null, r);
+
+Device.writeAndReadTag(req);
 """
 
 #####################
@@ -409,8 +678,33 @@ done(null, null);
 
 def setDriveStatus_body():
     return """/**
+Bit mapped allocation:
+  0x0001 Ready 
+  0x0002 Running 
+  0x0004 LowSpeed 
+  0x0008 UnderFMin 
+  0x0080 Alarm
+  0x0100 Fault
 */
-done(null, null);
+let outputMap = Device.convertToDec({ values: value, default: 0});
+
+let result = [];
+if (outputMap & 1) result.push("Ready");
+if (outputMap & 2) result.push("Running");
+if (outputMap & 4) result.push("LowSpeed");
+if (outputMap & 8) result.push("UnderFMin");
+if (outputMap & 128) result.push("Alarm");
+if (outputMap & 256) result.push("Fault");
+
+if (result.length == 0) result = ["-"];
+
+Device.api.setProperty("driveStatus", {
+    value: result.toString(),
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
 """
 
 #####################
@@ -421,8 +715,50 @@ done(null, null);
 
 def setDriveMeasures_body():
     return """/**
+Elements contains (depends on drive selected):
+  0-FREQ [Hz*10]
+  1-POWER [kW*10 or %*10]
+  2-CURRENT [A*10 or %*10]
+  3-MOTOR_VOLTAGE [V or %] or for Emerson ENERGY METER L [KW*100] 
+  4-DRIVE_TEMP [°C or %] or for Emerson ENERGY METER H [MW*10] 
+  5-RPM [rpm]
+  6-ENERGY(less significant 16bit) [kWh] 
+  7-ENERGY(most significant 16bit) [kWh] 
+  8-FMIN [Hz*10]
+  9-FMAX [Hz*10]
 */
-done(null, null);
+
+let frequency = Device.convertToDec({ values: value.splice(0, 2), default: 0});
+let power = Device.convertToDec({ values: value.splice(2, 4), default: 0});
+let current = Device.convertToDec({ values: value.splice(4, 6), default: 0});
+let voltage = Device.convertToDec({ values: value.splice(6, 8), default: 0});
+let temp = Device.convertToDec({ values: value.splice(8, 10), default: 0});
+let rpm = Device.convertToDec({ values: value.splice(10, 12), default: 0});
+let energy = Device.convertToDec({ values: value.splice(12, 16), default: 0});
+let fmin = Device.convertToDec({ values: value.splice(16, 18), default: 0});
+let fmax = Device.convertToDec({ values: value.splice(18), default: 0});
+
+let drive = {
+  frequency: frequency / 10,
+  power: power / 10,
+  current: current / 10,
+  voltage: voltage,
+  temp: temp,
+  rpm: rpm,
+  energy: energy,
+  fmin: fmin / 10,
+  fmax: fmax / 10
+};
+
+//let msg = `${drive.frequency}, ${drive.power}, ${drive.current}, ${drive.voltage}, ${drive.temp}, ${drive.rpm}, ${drive.energy}, ${drive.fmin}, ${drive.fmax}`;
+//Device.api.log("info", msg).then(i => done(null, null));
+
+Device.api.setProperty("driveMeasures", {
+    value: drive,
+    time: new Date().toISOString()
+}).then(prop => {
+   done(null, null);
+});
 """
 
 #####################
@@ -433,8 +769,31 @@ done(null, null);
 
 def setDriveFaultString_body():
     return """/**
+ASCII string '\0' terminated
 */
-done(null, null);
+function toFaultString(fault) {
+    let flag = false;
+    let faultString = "";
+    
+    for (let i = 0; i < fault.length; i++) {
+      if ( fault[i] != 0 && !flag ) {
+          faultString += String.fromCharCode(fault[i]);
+      }
+      else if ( fault[i] == 0 ) {
+          flag = true;
+      }
+    }
+    return faultString;
+}
+(async function f(faultString) {
+    await Device.api.setProperty("driveFaultString", {
+        value: faultString,
+        time: new Date().toISOString()
+    });
+    
+    done(null, faultString);
+    
+})(toFaultString(value));
 """
 
 #####################
@@ -445,217 +804,31 @@ done(null, null);
 
 def setDriveCommands_body():
     return """/**
+Bit mapped allocation:
+  0x0001 Enable
+  0x0020 Run
+  0x0040 Fixed frequency (minimum frequency) 
+  0x0200 Force max speed
 */
-done(null, null);
+let outputMap = Device.convertToDec({ values: value, default: 0});
+
+let result = [];
+if (outputMap & 1) result.push("Enable");
+if (outputMap & 32) result.push("Run");
+if (outputMap & 64) result.push("Fixed frequency");
+if (outputMap & 512) result.push("Force max speed");
+
+if (result.length == 0) result = ["-"];
+
+Device.api.setProperty("driveCommands", {
+    value: result.toString(),
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
 """
 
-#####################
-#
-#  DaylightSavingTimeAdjustment
-#
-#####################
-
-def setDaylightSavingTimeAdjustment_body():
-    return """/**
-*/
-done(null, null);
-"""
-
-#####################
-#
-#  RelativeSpeed
-#
-#####################
-
-def setRelativeSpeed_body():
-    return """/**
-*/
-done(null, null);
-"""
-
-def writeRelativeSpeed_body():
-    return """/**
-*/
-let args = {
-  tagKey: "RelativeSpeed",
-  x: value.x,
-  setValue: value.setPoint,
-  byteCount: value.byteCount || 2
-};
-
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
-
-Device.writeAndReadTag(req);
-"""
-
-#####################
-#
-#  ConfigurationSwitches
-#
-#####################
-
-def setConfigurationSwitches_body():
-    return """/**
-*/
-done(null, null);
-"""
-
-def writeConfigurationSwitches_body():
-    return """/**
-*/
-let args = {
-  tagKey: "ConfigurationSwitches",
-  x: value.x,
-  setValue: value.setPoint,
-  byteCount: value.byteCount || 2
-};
-
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
-
-Device.writeAndReadTag(req);
-"""
-
-#####################
-#
-#  Language
-#
-#####################
-
-def setLanguage_body():
-    return """/**
-*/
-done(null, null);
-"""
-
-def writeLanguage_body():
-    return """/**
-*/
-let args = {
-  tagKey: "Language",
-  x: value.x,
-  setValue: value.setPoint,
-  byteCount: value.byteCount || 2
-};
-
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
-
-Device.writeAndReadTag(req);
-"""
-
-#####################
-#
-#  ClockTimers
-#
-#####################
-
-def setClockTimers_body():
-    return """/**
-*/
-done(null, null);
-"""
-
-def writeClockTimers_body():
-    return """/**
-*/
-let args = {
-  tagKey: "PTClockTimers",
-  x: value.x,
-  setValue: value.setPoint,
-  byteCount: value.byteCount || 2
-};
-
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
-
-Device.writeAndReadTag(req);
-"""
-
-#####################
-#
-#  PressureSelectionBits
-#
-#####################
-
-def setPressureSelectionBits_body():
-    return """/**
-*/
-done(null, null);
-"""
-
-def writePressureSelectionBits_body():
-    return """/**
-*/
-let args = {
-  tagKey: "PressureSelectionBits",
-  x: value.x,
-  setValue: value.setPoint,
-  byteCount: value.byteCount || 2
-};
-
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
-
-Device.writeAndReadTag(req);
-"""
-
-#####################
-#
-#  Indexes
-#
-#####################
-
-def setIndexes_body():
-    return """/**
-*/
-done(null, null);
-"""
-
-def writeIndexes_body():
-    return """/**
-*/
-let args = {
-  tagKey: "Indexes",
-  x: value.x,
-  setValue: value.setPoint,
-  byteCount: value.byteCount || 2
-};
-
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
-
-Device.writeAndReadTag(req);
-"""
-
-#####################
-#
-#  MaintenanceOperationRecords
-#
-#####################
-
-def setMaintenanceOperationRecords_body():
-    return """/**
-*/
-done(null, null);
-"""
-
-def writeMaintenanceOperationRecords_body():
-    return """/**
-*/
-let args = {
-  tagKey: "MaintenanceOperationRecords",
-  x: value.x,
-  setValue: value.setPoint,
-  byteCount: value.byteCount || 2
-};
-
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
-
-Device.writeAndReadTag(req);
-"""
 
 #####################
 #
@@ -665,8 +838,39 @@ Device.writeAndReadTag(req);
 
 def setWPx_body():
     return """/**
+WP1	RW	bar
+WP2	RW	bar*10 (must be divided by 10)
+WP3	RW	bar*10 (must be divided by 10)
+WP4	RW	bar*10 (must be divided by 10)
+WP5	RW	bar*10 (must be divided by 10)
+WP6	RW	bar*10 (must be divided by 10)
 */
-done(null, null);
+
+const itemCount = 6;
+const tagPropName = "WPx";
+
+let WPx = {};
+for (var x = 0; x < itemCount; x++) {
+    WPx['WP' + (x+1).toString()] = '-';
+}
+
+Device.api.log("debug", tagPropName + ": " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+        // Exception: WP1 is not x10 scale like other values
+        if (i > 0) itemValue = itemValue / 10;
+        WPx['WP' + ((i/2)+1).toString()] = itemValue.toString() + ' bar';
+    }
+    
+    Device.api.setProperty(tagPropName, {
+      value: WPx,
+      time: new Date().toISOString()
+      }).
+    then(property => {
+        done(null, property.value);
+    });
+ });
 """
 
 def writeWPx_body():
@@ -693,12 +897,48 @@ Device.writeAndReadTag(req);
 
 def setSPx_body():
     return """/**
+SP1	RW	bar
+SP2	RW	bar*10 (must be divided by 10)
+SP3	RW	bar*10 (must be divided by 10)
+SP4	RW	bar*10 (must be divided by 10)
 */
-done(null, null);
+const itemCount = 4;
+const tagPropName = "SPx";
+
+let SPx = {};
+for (var x = 0; x < itemCount; x++) {
+    SPx['SP' + (x+1).toString()] = '-';
+}
+
+Device.api.log("debug", tagPropName + ": " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+        // Exception: SP1 is not x10 scale like other values
+        if (i > 0) itemValue = itemValue / 10;
+        SPx['SP' + ((i/2)+1).toString()] = itemValue.toString() + ' bar';
+    }
+    
+    Device.api.setProperty(tagPropName, {
+      value: SPx,
+      time: new Date().toISOString()
+      }).
+    then(property => {
+        done(null, property.value);
+    });
+ });
 """
 
 def writeSPx_body():
     return """/**
+Writes given value into SPx tag.
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
+
+To write 8.7 into SP2:
+
+    {
+      "value": { "x": 2, "setValue": 8.7 }
+    }
 */
 let args = {
   tagKey: "SP",
@@ -721,8 +961,23 @@ Device.writeAndReadTag(req);
 
 def setSP5_body():
     return """/**
+SP5	RW	bar*10 (must be divided by 10)
 */
-done(null, null);
+const tagPropName = "SPx";
+
+let SP5 = Device.convertToDec({ values: value }, -1);
+
+Device.api.getProperty(tagPropName)
+  .then(property => {
+    property.value.SP5 = SP5;
+    Device.api.setProperty(tagPropName, {
+      value: property.value,
+      time: new Date().toISOString()
+    })
+    .then(property => {
+      done(null, property.value);
+    });
+  });
 """
 
 def writeSP5_body():
@@ -749,8 +1004,23 @@ Device.writeAndReadTag(req);
 
 def setSP6_body():
     return """/**
+SP6	RW	bar*10 (must be divided by 10)
 */
-done(null, null);
+const tagPropName = "SPx";
+
+let SP6 = Device.convertToDec({ values: value }, -1);
+
+Device.api.getProperty(tagPropName)
+  .then(property => {
+    property.value.SP6 = SP6;
+    Device.api.setProperty(tagPropName, {
+      value: property.value,
+      time: new Date().toISOString()
+    })
+    .then(property => {
+      done(null, property.value);
+    });
+  });
 """
 
 def writeSP6_body():
@@ -771,126 +1041,44 @@ Device.writeAndReadTag(req);
 
 #####################
 #
-#  ST3
-#
-#####################
-
-def setST3_body():
-    return """/**
-*/
-done(null, null);
-"""
-
-def writeST3_body():
-    return """/**
-*/
-let args = {
-  tagKey: "ST3",
-  x: value.x,
-  setValue: value.setPoint,
-  byteCount: value.byteCount || 2
-};
-
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
-
-Device.writeAndReadTag(req);
-"""
-
-#####################
-#
-#  WPs
-#
-#####################
-
-def setWPs_body():
-    return """/**
-*/
-done(null, null);
-"""
-
-def writeWPs_body():
-    return """/**
-*/
-let args = {
-  tagKey: "WPs",
-  x: value.x,
-  setValue: value.setPoint,
-  byteCount: value.byteCount || 2
-};
-
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
-
-Device.writeAndReadTag(req);
-"""
-
-#####################
-#
-#  WPS2Px
-#
-#####################
-
-def setWPS2Px_body():
-    return """/**
-*/
-done(null, null);
-"""
-
-def writeWPS2Px_body():
-    return """/**
-*/
-let args = {
-  tagKey: "WPS2P",
-  x: value.x,
-  setValue: value.setPoint,
-  byteCount: value.byteCount || 2
-};
-
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
-
-Device.writeAndReadTag(req);
-"""
-
-#####################
-#
-#  WPS2Ps
-#
-#####################
-
-def setWPS2Ps_body():
-    return """/**
-*/
-done(null, null);
-"""
-
-def writeWPS2Ps_body():
-    return """/**
-*/
-let args = {
-  tagKey: "WPS2Ps",
-  x: value.x,
-  setValue: value.setPoint,
-  byteCount: value.byteCount || 2
-};
-
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
-
-Device.writeAndReadTag(req);
-"""
-
-#####################
-#
 #  WTx
 #
 #####################
 
 def setWTx_body():
     return """/**
+WT1	R		°C x 10
+WT2	R		°C x 10
+WT3	R		°C x 10
+WT4	R		°C x 10 
+WT5	R		°C x 10
+WT6	R		°C x 10
+WT7	R		°C x 10
 */
-done(null, null);
+
+const itemCount = 7;
+
+let WTx = {};
+for (var x = 0; x < itemCount; x++) {
+    WTx['WT' + (x+1).toString()] = '-';
+}
+
+Device.api.log("info", "WTx: " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+        itemValue = itemValue / 10;
+        WTx['WT' + ((i/2)+1).toString()] = itemValue.toString() + ' °C';
+    }
+    
+    Device.api.setProperty("WTx", {
+      value: WTx,
+      time: new Date().toISOString()
+      }).
+    then(property => {
+        done(null, property.value);
+    });
+ });
 """
 
 def writeWTx_body():
@@ -917,8 +1105,34 @@ Device.writeAndReadTag(req);
 
 def setSTAx_body():
     return """/**
+STA1	R		°C x 10
+STA2	R		°C x 10
+STA3	R		°C x 10
 */
-done(null, null);
+
+const itemCount = 3;
+
+let WTx = {};
+for (var x = 0; x < itemCount; x++) {
+    STAx['STA' + (x+1).toString()] = '-';
+}
+
+Device.api.log("info", "STAx: " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+        itemValue = itemValue / 10;
+        STAx['STA' + ((i/2)+1).toString()] = itemValue.toString() + ' °C';
+    }
+    
+    Device.api.setProperty("STAx", {
+      value: WTx,
+      time: new Date().toISOString()
+      }).
+    then(property => {
+        done(null, property.value);
+    });
+ });
 """
 
 def writeSTAx_body():
@@ -945,8 +1159,19 @@ Device.writeAndReadTag(req);
 
 def setSTT1_body():
     return """/**
+STT1 or DF8 if S09=4
 */
-done(null, null);
+const tagPropName = "STT1";
+
+let STT1 = Device.convertToDec({ values: value }, -1);
+
+Device.api.setProperty(tagPropName, {
+  value: STT1,
+  time: new Date().toISOString()
+})
+.then(property => {
+  done(null, property.value);
+});
 """
 
 def writeSTT1_body():
@@ -973,8 +1198,19 @@ Device.writeAndReadTag(req);
 
 def setSTD1_body():
     return """/**
+STD1 or DF9 if S09=4
 */
-done(null, null);
+const tagPropName = "STT1";
+
+let STD1 = Device.convertToDec({ values: value }, -1);
+
+Device.api.setProperty(tagPropName, {
+  value: STD1,
+  time: new Date().toISOString()
+})
+.then(property => {
+  done(null, property.value);
+});
 """
 
 def writeSTD1_body():
@@ -1001,8 +1237,52 @@ Device.writeAndReadTag(req);
 
 def setWtx_body():
     return """/**
+Wt1	R		second
+Wt2	R		millisecond
+Wt3	R		second
+Wt4	R		minutes
+Wt5	R		second
+Wt6	R		second
+Wt7	R		minutes
+Wt8 R   second
+Wt9 R   second
+Wt10 R  min / 10
 */
-done(null, null);
+
+const itemCount = 10;
+
+let Wtx = {};
+for (var x = 0; x < itemCount; x++) {
+    Wtx['Wt' + (x+1).toString()] = '-';
+}
+
+Device.api.log("debug", "Wtx: " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+        if (i == 18) {
+          itemValue = itemValue * 10;
+        }
+        
+        let unit = ' seconds';
+        if (i == 2) {
+            unit = ' milliseconds';
+        }
+        else if (i == 6 || i == 12 || i == 18) {
+            unit = ' minutes';
+        }
+        
+        Wtx['Wt' + ((i/2) + 1).toString()] = itemValue.toString() + unit;
+    }
+    
+    Device.api.setProperty("Wtx_", {
+      value: Wtx,
+      time: new Date().toISOString()
+      }).
+    then(property => {
+        done(null, property.value);
+    });
+ });
 """
 
 def writeWtx_body():
@@ -1085,8 +1365,45 @@ Device.writeAndReadTag(req);
 
 def setDSx_body():
     return """/**
+DS1	R		Hz
+DS2	R		Hz
+DS3	R		0.1 second
+DS4	R		0.1 second
+DS5	R		0.1 second
+DS6	R		0.1 second
 */
-done(null, null);
+
+const itemCount = 6;
+
+let DSx = {};
+for (var x = 0; x < itemCount; x++) {
+    DSx['DS' + (x+1).toString()] = '-';
+}
+
+Device.api.log("debug", "DSx: " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+
+        let unit = " Second";
+        if (i == 0 || i == 2) {
+          unit = " Hz";
+        }
+        else {
+          itemValue = itemValue * 10;
+        }
+        
+        DSx['DS' + ((i/2) + 1).toString()] = itemValue.toString() + unit;
+    }
+    
+    Device.api.setProperty("DSx", {
+      value: DSx,
+      time: new Date().toISOString()
+      }).
+    then(property => {
+        done(null, property.value);
+    });
+ });
 """
 
 def writeDSx_body():
