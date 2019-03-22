@@ -1,20 +1,18 @@
+# ~~ SET methods ~~
+#
+# setSerialNumber()
 # setLogikaModel()
 # setLogikaFwVersion()
-# setSerialNumber()
-# setLevel1Pwd()
-# setLevel2Pwd()
-# setLevel3Pwd()
+# setLevelXPwd() -> where X is password level
 # setAlarms()
 # setNonAckAlarms()
 # setControllerState()
 # setCompressorState()
 # setBlockingAlarm()
-# setRelayOutputs()
-# setDigitalInputs()
 # setScrewTemperature()
 # setWorkingPressure()
 # setControllerSupplyVoltage()
-# setMainSchedule()
+# setMaintCycles()
 # setTotalHours()
 # setTotalLoadHours()
 # setMaintCounters()
@@ -120,17 +118,17 @@ function toPassword(pwd) {
 }
 
 (async function f(password) {
-    await Device.api.setProperty("cfgLevel" + x.toString() + "Pwd", {
+    await Device.api.setProperty("cfgLevel%sPwd", {
         value: password,
         time: new Date().toISOString()
     });
     
-    await Device.api.log("info", "Level " + x.toString() + "password: " + password);
+    //await Device.api.log("info", "Level %s password: " + password);
 
     done(null, password);
     
 })(toPassword(value));
-"""
+""" % (str(x), str(x))
 
 #
 #

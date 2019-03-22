@@ -133,7 +133,7 @@ const requests = {
   R0:                               { request: "r,meth:setR0x,-,4,-,1,0x53D" },
   R03:                              { request: "r,meth:setR03,-,2,-,1,0x502" },
   DS:                               { request: "r,meth:setDSx,-,12,-,1,0xA1B" },
-  DA:                               { request: "r,meth:setDAx,-,26,-,1,0xA22" },
+  DA:                               { request: "r,meth:setDAx,-,28,-,1,0xA21" },
   DF:                               { request: "r,meth:setDFx,-,12,-,1,0xA2E" },
   DF7:                              { request: "r,meth:setDF7,-,2,-,1,0x541" },
 };
@@ -164,7 +164,7 @@ const requests = {
     R0:      { rprob: "R0x", rcmd: "r,meth:setR0x,-,4,-,1,0x53D", min: 1, max: 2, offset:"0x53D" },
     R03:     { rprob: "R03", rcmd: "r,meth:setR03,-,2,-,1,0x502", min: 3, max: 3, offset:"0x502" },
     DS:      { rprob: "DSx", rcmd: "r,meth:setDSx,-,12,-,1,0xA1B", min: 1, max: 6, offset:"0xA1B" },
-    DA:      { rprob: "DAx", rcmd: "r,meth:setDAx,-,26,-,1,0xA22", min: 0, max: 12, offset:"0xA22" },
+    DA:      { rprob: "DAx", rcmd: "r,meth:setDAx,-,28,-,1,0xA21", min: 0, max: 13, offset:"0xA21" },
     DF:      { rprob: "DFx", rcmd: "r,meth:setDFx,-,12,-,1,0xA2E", min: 1, max: 6, offset:"0xA2E" },
     DF7:     { rprob: "DF7", rcmd: "r,meth:setDF7,-,2,-,1,0x541", min: 7, max: 7, offset:"0x541" },
     
@@ -175,11 +175,11 @@ return requests[value];
 #
 #
 #
-def fetchModbusSettings_body(hasInverter):
+def fetchModbusSettings_body():
     return """/**
 */
 
-if (hasInverter) {
+if (value) {
   return "/dev/ttyS1:9600:8:N:1|"+
     "g0:0,g1:3600,g2:60,g3:3,g4:5|"+
     "r,meth:setAlarms,5,12,1,1,0x200|"+
@@ -308,11 +308,9 @@ async function fn() {
         ? propValue.D0 === INVERTER
         : false;
 
-    return Object.assign(context, {
-        hasInverter,
-    });
+    done(null, hasInverter);
 }
-return Promise.resolve(fn())
+fn();
 """
 
 #
@@ -660,14 +658,19 @@ def writeConfigSwitches_body():
 let args = {
   tagKey: "configSwitches",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
@@ -879,14 +882,19 @@ def writeWPx_body():
 let args = {
   tagKey: "WP",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
@@ -943,14 +951,19 @@ To write 8.7 into SP2:
 let args = {
   tagKey: "SP",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
@@ -986,14 +999,19 @@ def writeSP5_body():
 let args = {
   tagKey: "SP5",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
@@ -1029,14 +1047,19 @@ def writeSP6_body():
 let args = {
   tagKey: "SP6",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
@@ -1087,14 +1110,19 @@ def writeWTx_body():
 let args = {
   tagKey: "WT",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
@@ -1141,14 +1169,19 @@ def writeSTAx_body():
 let args = {
   tagKey: "STA",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
@@ -1180,14 +1213,19 @@ def writeSTT1_body():
 let args = {
   tagKey: "STT1",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
@@ -1219,14 +1257,19 @@ def writeSTD1_body():
 let args = {
   tagKey: "STD1",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
@@ -1291,19 +1334,24 @@ def writeWtx_body():
 let args = {
   tagKey: "Wt",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
 #
-#  R0x
+#  R0x [NOT IMPLEMENTED]
 #
 #####################
 
@@ -1319,19 +1367,24 @@ def writeR0x_body():
 let args = {
   tagKey: "R0",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
 #
-#  R03
+#  R03 [NOT IMPLEMENTED]
 #
 #####################
 
@@ -1347,14 +1400,19 @@ def writeR03_body():
 let args = {
   tagKey: "R03",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
@@ -1369,8 +1427,8 @@ DS1	R		Hz
 DS2	R		Hz
 DS3	R		0.1 second
 DS4	R		0.1 second
-DS5	R		0.1 second
-DS6	R		0.1 second
+DS5	R		0.01 second
+DS6	R		0.01 second
 */
 
 const itemCount = 6;
@@ -1388,6 +1446,9 @@ Device.api.log("debug", "DSx: " + value.toString())
         let unit = " Second";
         if (i == 0 || i == 2) {
           unit = " Hz";
+        }
+        else if (i == 8 || i == 10) {
+          itemValue = itemValue * 100;
         }
         else {
           itemValue = itemValue * 10;
@@ -1412,19 +1473,24 @@ def writeDSx_body():
 let args = {
   tagKey: "DS",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
 #
-#  DAx
+#  DAx [NOT IMPLEMENTED]
 #
 #####################
 
@@ -1440,19 +1506,24 @@ def writeDAx_body():
 let args = {
   tagKey: "DA",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
 #
-#  DFx
+#  DFx [NOT IMPLEMENTED]
 #
 #####################
 
@@ -1468,19 +1539,24 @@ def writeDFx_body():
 let args = {
   tagKey: "DF",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
 #
-#  DF7
+#  DF7 [NOT IMPLEMENTED]
 #
 #####################
 
@@ -1496,12 +1572,17 @@ def writeDF7_body():
 let args = {
   tagKey: "DF7",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """

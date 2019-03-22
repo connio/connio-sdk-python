@@ -183,7 +183,7 @@ def hasInverter_body():
     return"""/**
 * L9 doesn't have inverter
 */
-return { hasInverter: false };
+done(null, false);
 """
 
 #
@@ -357,14 +357,19 @@ def writeP0x_body():
 let args = {
   tagKey: "P0",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
@@ -416,14 +421,19 @@ def writeH0x_body():
 let args = {
   tagKey: "H0",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
@@ -475,14 +485,19 @@ def writet0x_body():
 let args = {
   tagKey: "t0",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
@@ -506,12 +521,17 @@ def writePAx_body():
 let args = {
   tagKey: "PA",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """

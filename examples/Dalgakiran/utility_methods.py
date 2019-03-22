@@ -1,11 +1,14 @@
-
-# init(hasInverter)
-# getInitialState()
+# ~~ Utility/Helper methods ~~
+#
+# init(inverterModel)
+# getEmptyState()
 # convertToHours()
 # convertToDecimal()    
 # makeWriteRequest()
 # makeWriteValue()
-# fetchWriteRequestList()
+# getCompressorInfo()
+# getDashboard()
+# getLatestValues()
 
 # getHistOEE
 # getHistMttr
@@ -16,16 +19,26 @@
 #
 #
 #
-def getInit_body(hasInverter):
+def getInit_body():
     return """/**
   Initialize device `state` property with default values
-  @value {{ value, unit }} cost of electricity KWh
+
+  @value:
+  { 
+    "hasInverter": true, 
+    "warrantyInMonth": 12,
+    "elecCost": {
+        "value": 0,     //cost of electricity KWh
+        "unit": "USD"
+    }
+   }
 */
+
 const defaultWarrantyInMonth = 12;
 
-let settings = Device.fetchModbusSettings(hasInverter);
-let state = Device.getEmptyState(value || { 'value': 0, 'unit': 'USD' });
-let defaultMaintCosts = { 
+const defaultElecCost = { value: 0, unit: 'USD' };
+
+const defaultMaintCosts = { 
     currencySymbol: "$",
     currency: "USD",
     airFilterChange: 0.0,
@@ -36,30 +49,40 @@ let defaultMaintCosts = {
     bearingLubrication: 0.0     
 };
 
+let warrantyInMonth, hasInverter, elecCost;
+
+({hasInverter, warrantyInMonth, elecCost} = value);
+
+let settings = Device.fetchModbusSettings(hasInverter);
+
+let state = Device.getEmptyState(elecCost || defaultElecCost);
+state.hasInverter = hasInverter || false;
+
 let now = new Date();
-let warrantyExpiry = new Date(now.setMonth(now.getMonth() + defaultWarrantyInMonth));
+let warrantyExpiry = new Date(now.setMonth(now.getMonth() + (warrantyInMonth || defaultWarrantyInMonth)));
 
 Device.api.setProperty("modbus_settings", {
   value: settings,
   time: new Date().toISOString()
 }).
-then(p => Device.api.setProperty('warrantyExpiryDate', {
+then(() => Device.api.setProperty('warrantyExpiryDate', {
     value: warrantyExpiry.toISOString(),
     time: new Date().toISOString()
 })).
-then(p => Device.api.setProperty('maintenanceCostList', {
+then(() => Device.api.setProperty('maintenanceCostList', {
         value: defaultMaintCosts,
         time: new Date().toISOString()
 })).
-then(p => Device.getCompressorInfo()).
-then(d => {
+then(() => Device.getCompressorInfo()).
+then(st => {
     // Merge device info into state
-    Object.assign(state, d);
+    Object.assign(state, st);
     
     Device.api.setProperty('state', {
         value: state,
         time: new Date().toISOString()
-    }).then(property => done(null, property.value));
+    }).
+    then(property => done(null, property.value));
 });
 """
 
@@ -168,6 +191,9 @@ def makeWriteRequest_body():
     @param value.setValue (e.g. 26.8)
     @param value.byteCount(default 2)
 */
+
+if (!value.x || !value.setValue) throw `Given parameters are not correct. x: ${value.x}, setValue: ${value.setValue}`;
+
 let params = Device.fetchWriteRequest(value.tagKey);
 let byteCount = value.byteCount || 2;
 
@@ -298,6 +324,9 @@ const PRESSURE_PROPERTY = 'workingPressure';
 const TEMPERATURE_PROPERTY = 'screwTemperature';
 /** @desc Logika-Base */
 const COMPRESSOR_STATE_PROPERTY = 'compressorState';
+/** @desc Logika-Base */
+const DRIVE_PROPERTY = 'driveMeasures';
+
 
 /** @desc Logika-Base */
 const STATE_PROPERTY = 'state';
@@ -310,11 +339,12 @@ async function main(context) {
     });
     
     // Acquire temperature and pressure values in parallel
-    let [pressureProp, temperatureProp, compressorStateProp, periods] = await Promise.all([
+    let [pressureProp, temperatureProp, compressorStateProp, driveProp, periods] = await Promise.all([
        Device.api.getProperty(PRESSURE_PROPERTY),
        Device.api.getProperty(TEMPERATURE_PROPERTY),
        Device.api.getProperty(COMPRESSOR_STATE_PROPERTY),
-       Device.processCompressorStates()
+       context.hasInverter ? Device.api.getProperty(DRIVE_PROPERTY) : Promise.resolve(undefined),
+       Device.processCompressorStates(),
     ]);
     
     context.periods = periods;
@@ -345,12 +375,18 @@ async function main(context) {
         };
     }
 
+    // Inverter motor information
+    if (driveProp && driveProp.value) {
+        context.motorSpeed.current = driveProp.value.rpm || 0;
+        context.motorFrequency.current = driveProp.value.frequency || 0;
+        context.motorCurrent.current = driveProp.value.current || 0;
+    }
+
     // Call the methods below in parallel.
     // These methods do not have any dependence on other method output.
     let results = await Promise.all([
         Device.getCompressorInfo(),
-        Device.queryWarningAlarmSummary(context),        
-        Device.hasInverter(context)
+        Device.queryWarningAlarmSummary(context),
     ]);
     
     // Clean all periods
@@ -377,8 +413,7 @@ async function main(context) {
 Device.api.getProperty(STATE_PROPERTY)
  .then(property => property.value || Device.getEmptyView())
  .then(context => main(context))
- .then(context => Device.api.setProperty(STATE_PROPERTY, { value: context, time: new Date().toISOString() }))
- .then(property => done(null, property.value));
+ .then(context => done(null, context));
 """
 
 #
@@ -481,19 +516,30 @@ def getLatestValues_body():
     return """/**
 *  Returns the most recent values of compressor pressure and temperature.
 */
-const PRESSURE_PROPERTY = 'workingPressure';
-const TEMPERATURE_PROPERTY = 'screwTemperature';
+const PRESSURE_PROPERTY     = 'workingPressure';
+const TEMPERATURE_PROPERTY  = 'screwTemperature';
+const DRIVE_PROPERTY        = 'driveMeasures';
+
 
 async function getValues() {
-    let [pressureProp, temperatureProp] = await Promise.all([
+    let [pressureProp, temperatureProp, driveProp] = await Promise.all([
       Device.api.getProperty(PRESSURE_PROPERTY),
-      Device.api.getProperty(TEMPERATURE_PROPERTY)
+      Device.api.getProperty(TEMPERATURE_PROPERTY),
+      Device.api.getProperty(DRIVE_PROPERTY)
     ]);
     
     const result = {
         pressure: pressureProp.value || 0,
         temperature: temperatureProp.value || 0,
     };
+
+    // Inverter motor information - if any
+    if (driveProp && driveProp.value) {
+        result.motorSpeed = { current: driveProp.value.rpm || 0 };
+        result.motorFrequency = { current: driveProp.value.frequency || 0 };
+        result.motorCurrent = { current: driveProp.value.current || 0 };
+    }
+
     return done(null, result);
 };
 

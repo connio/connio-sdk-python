@@ -1,4 +1,4 @@
-# Query methods
+# ~~ Query methods ~~
 #
 # buildAggregateQueries
 # queryAggregates
@@ -9,9 +9,9 @@
 # queryLoadRatio
 #
 # preaggregate
+# processCompressorStates
 # calculateAll
 # showOEE 
-# processCompressorStates
 # 
 # queryEstimEnergyConsumption   - OBSOLETED
 # queryEstimPowerConsumption    - OBSOLETED
@@ -90,6 +90,7 @@ async function f() {
 
     let result = {
         value: prop.value,
+        current: prop.value, // to fix the discrepency between pressure/temp  and inverter values
         unit: value.unit
     };
     
@@ -304,15 +305,28 @@ def preaggregate_body():
 */
 async function f(context) {
     
+    let getInverterData = Promise.resolve(undefined);
+    if (context.hasInverter) {
+        getInverterData = Promise.all([
+            Device.queryPropertySummary({ pname: "motorSpeed", agg: "avg", unit: "rpm", asContextMember: 'motorSpeed' }),
+            Device.queryPropertySummary({ pname: "motorCurrent", agg: "avg", unit: "A", asContextMember: 'motorCurrent' }),
+            Device.queryPropertySummary({ pname: "motorFrequency", agg: "avg", unit: "Hz", asContextMember: 'motorFrequency' }),
+        ]);
+    }
+    
     // Call the methods below in parallel.
     // These methods do not have any dependence on other method output.
     let results = await Promise.all([
         Device.queryPropertySummary({ pname: "workingPressure", agg: "avg", unit: "bar", asContextMember: 'pressure' }),
         Device.queryPropertySummary({ pname: "screwTemperature", agg: "avg", unit: "°C", asContextMember: 'temperature' }),
+        getInverterData,
         Device.queryLoadRatio(context),
         // Calculates average OEE, MTtr, MTbf, Energy Consumption, Power Consumption, Cost of Running 
         // and stoppages for 24hr, 7 days, 30 days and 1 year
-        Device.calculateAll(context),
+        Device.processCompressorStates().then(periods => { 
+            context.periods = periods; 
+            Device.calculateAll(context)
+        }),
         Device.queryTimeToMaintenance(context),
     ]);
     
@@ -327,7 +341,6 @@ Device.api.getProperty("state")
  .then( context => f(context) )
  .then( context => Device.api.setProperty("state", { value: context, time: new Date().toISOString() }) )
  .then( property => done(null, null) );
-
 """
 
 def processCompressorStates_body():
@@ -748,6 +761,14 @@ Device.processCompressorStates().then(periods => {
     done(null, resultSet.slice(0, days + 6));
 });
 """
+
+##############################
+###
+###
+### OBSOLETED FUNCTIONS ######
+###
+###
+##############################
 
 #
 #

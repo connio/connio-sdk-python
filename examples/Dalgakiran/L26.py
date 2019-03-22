@@ -138,7 +138,7 @@ const requests = {
     WT:  { rprop: "WTx", rcmd: "r,meth:setWTx,-,16,-,1,0x50F", min: 0, max: 7, offset: "0x50F", multiplier: 1 },
     Wt:  { rprop: "Wtx_", rcmd: "r,meth:setWtx_,-,14,-,1,0x517", min: 1, max: 7, offset: "0x517", multiplier: 1 },
     C07: { rprop: "C07_x", rcmd: "r,meth:setC07_x,-,4,-,1,0x51E", min: 1, max: 2, offset: "0x51E", multiplier: 1 },
-    //C02
+    C02: { rprop: "C02", rcmd: "r,meth:setC02,-,2,-,1,0x527", min: 1, max: 1, offset: "0x527" },
     C10: { rprop: "C10", rcmd: "r,meth:setNominalAirFlow,-,2,-,1,0x528", min: 1, max: 1, offset: "0x528", multiplier: 0.1 },
     AP:  { rprop: "APx", rcmd: "r,meth:setAPx,-,10,-,1,0x529", min: 1, max: 3, offset: "0x529" },
     AP4: { rprop: "APx", rcmd: "r,meth:setAPx,-,10,-,1,0x529", min: 4, max: 4, offset: "0x52D" },
@@ -159,10 +159,10 @@ return requests[value];
 #
 #
 #
-def fetchModbusSettings_body(hasInverter):
+def fetchModbusSettings_body():
     return """/**
 */
-if (hasInverter) {
+if (value) {
   return "/dev/ttyS1:9600:8:N:1|"+
     "g0:0,g1:3600,g2:60,g3:3,g4:5|"+
     "r,meth:setAlarms,5,8,1,1,0x200|"+
@@ -286,11 +286,9 @@ async function fn() {
         ? propValue.DR0 === INVERTER
         : false;
 
-    return Object.assign(context, {
-        hasInverter,
-    });
+    done(null, hasInverter);
 }
-return Promise.resolve(fn())
+fn();
 """
 
 #
@@ -531,10 +529,129 @@ Device.api.setProperty("configSwitches", {
 #
 def setConfigSelections_body():
     return """/**
+Bit mapped allocation (see menu Compressor Config):
+
+1st WORD
+
+Bit0..Bit2: C19 – AUX PRESS INPUT
+0 disabled, 1 delta pressure, 2 power from drive, 3 current from drive, 4 temperature from drive
+
+Bit3..Bit4: C07 – MULTIUNIT
+0 no multiunit or master/slave, 1 master/slave, 2 master/slave new, 3 multiunit slave
+
+Bit5..Bit6: C18 – ANALOG OUTPUT MODE 
+0 not used, 1 regulate on pressure, 2 regulate on temperature
+
+Bit7..Bit9: C12 – IN7 CONFIGURATION
+0 disabled, 1 door, 2 control phase relay, 3 generic alarm, 4 bearing high temp alarm
+
+Bit10..Bit11: C21 – INVERTER FAULT INPUT
+0 disabled, 1 normally open, 2 normally closed
+
+2nd WORD
+
+Bit0..Bit3: C13 - RL2 mode:
+Bit4..Bit7: C14 - RL5 mode:
+Bit8..Bit11: C15 - RL6 mode
+Bit12..Bit15: C16 - RL7 mode
+
+0 default, 1 fan, 2 drain, 3 state, 4 alarm, 5 motor, 6 load,
+7 lubricate, 8 null, 9 PORO, 10 PORO + Alarm, 11 Enabled
 */
-// TODO: Implement this
+
+function getC19Mode(v) {
+  let result = 'disabled';
+  switch (v) {
+    case 1: result = 'delta pressure';break;
+    case 2: result = 'power from drive';break;
+    case 3: result = 'current from drive';break;
+    case 4: result = 'temperature from drive';break;
+    default: result = 'Unknown';break;
+  }
+  return result;
+}
+
+function getC07Mode(v) {
+  let result = 'no multiunit or master/slave';
+  switch (v) {
+    case 1: result = 'master/slave';break;
+    case 2: result = 'master/slave new';break;
+    case 3: result = 'multiunit slave';break;
+    default: result = 'Unknown';break;
+  }
+  return result;
+}
+
+function getC18Mode(v) {
+  let result = 'not used';
+  switch (v) {
+    case 1: result = 'regulate on pressure';break;
+    case 2: result = 'regulate on temperature';break;
+    default: result = 'Unknown';break;
+  }
+  return result;
+}
+
+function getC12Mode(v) {
+  let result = 'disabled';
+  switch (v) {
+    case 1: result = 'door';break;
+    case 2: result = 'control phase relay';break;
+    case 3: result = 'generic alarm';break;
+    case 4: result = 'bearing high temp alarm';break;
+    default: result = 'Unknown';break;
+  }
+  return result;
+}
+
+function getC21Mode(v) {
+  let result = 'disabled';
+  switch (v) {
+    case 1: result = 'normally open';break;
+    case 2: result = 'normally closed';break;
+    default: result = 'Unknown';break;
+  }
+  return result;
+}
+
+function get2ndWordMode(v) {
+  let result = 'default';
+  switch (v) {
+    case 1: result = 'fan';break;
+    case 2: result = 'drain';break;
+    case 3: result = 'state';break;
+    case 4: result = 'alarm';break;
+    case 5: result = 'motor';break;
+    case 6: result = 'load';break;
+    case 7: result = 'lubricate';break;
+    case 8: result = 'null';break;
+    case 9: result = 'PORO';break;
+    case 10: result = 'PORO + Alarm';break;
+    case 11: result = 'enabled';break;
+    default: result = 'Unknown';break;
+  }
+  return result;
+}
+
+let outputMap = Device.convertToDec({ values: value, default: 0});
+
+let result = [];
+
+// 1st word
+if (outputMap & 7) result.push(`C19 – AUX PRESS INPUT: ${getC19Mode(outputMap & 7)}`);
+if (outputMap & (3 << 3)) result.push(`C07 – MULTIUNIT: ${getC07Mode(outputMap & (3 << 3))}`);
+if (outputMap & (3 << 5)) result.push(`C18 – ANALOG OUTPUT MODE : ${getC18Mode(outputMap & (3 << 5))}`);
+if (outputMap & (7 << 7)) result.push(`C12 – IN7 CONFIGURATION: ${getC12Mode(outputMap & (7 << 7))}`);
+if (outputMap & (3 << 10)) result.push(`C21 – INVERTER FAULT INPUT: ${getC21Mode(outputMap & (3 << 10))}`);
+
+// 2nd word
+if (outputMap & (31 << 16)) result.push(`C13 - RL2 mode: ${get2ndWordMode(outputMap & (31 << 16))}`);
+if (outputMap & (31 << 20)) result.push(`C14 - RL5 mode: ${get2ndWordMode(outputMap & (31 << 20))}`);
+if (outputMap & (31 << 24)) result.push(`C15 - RL6 mode: ${get2ndWordMode(outputMap & (31 << 24))}`);
+if (outputMap & (31 << 28)) result.push(`C16 - RL7 mode: ${get2ndWordMode(outputMap & (31 << 28))}`);
+
 Device.api.setProperty("configSelections", {
-    value: { selections: "Not Implemented" },
+    value: { selections: result },
     time: new Date().toISOString()
  })
  .then(property => {
@@ -598,14 +715,19 @@ To write 8.7 into WP2:
 let args = {
   tagKey: "WP",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
@@ -663,18 +785,30 @@ Device.api.log("info", "WTx: " + value.toString())
 
 def writeWTx_body():
      return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
+
+To write 8.7 into WT2:
+
+    {
+      "value": { "x": 2, "setValue": 8.7 }
+    }
 */
 let args = {
   tagKey: "WT",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
@@ -729,18 +863,24 @@ Device.api.log("debug", "Wtx: " + value.toString())
 
 def writeWtx_body():
      return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
 */
 let args = {
   tagKey: "Wt",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
@@ -783,18 +923,24 @@ Device.api.log("debug", "C07_x: " + value.toString())
 
 def writeC07x_body():
      return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
 */
 let args = {
   tagKey: "C07",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
@@ -805,14 +951,37 @@ Device.writeAndReadTag(req);
 
 def setC02_body():
     return """/**
+Max starts per hour
 */
-done(null, null);
+Device.api.setProperty("C02", {
+    value: Device.convertToDec({ values: value, default: 0}),
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
 """
 
 def writeC02_body():
      return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
 */
-done(null, "NOT IMPLEMENTED");
+let args = {
+  tagKey: "C02",
+  x: value.x,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
@@ -836,18 +1005,24 @@ Device.api.setProperty("C10", {
 
 def writeC10_body():
      return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
 */
 let args = {
   tagKey: "C10",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
@@ -900,18 +1075,24 @@ Device.api.log("debug", "APx: " + value.toString())
 
 def writeAPx_body():
      return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
 */
 let args = {
   tagKey: "AP",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
@@ -922,18 +1103,24 @@ Device.writeAndReadTag(req);
 
 def writeAP4_body():
      return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
 */
 let args = {
   tagKey: "AP4",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
@@ -988,18 +1175,24 @@ Device.api.log("debug", "C19_x: " + value.toString())
 
 def writeC19_1_body():
      return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
 */
 let args = {
   tagKey: "C19_1",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
@@ -1010,18 +1203,24 @@ Device.writeAndReadTag(req);
 
 def writeC19_2_body():
      return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
 */
 let args = {
   tagKey: "C19_2",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
@@ -1060,18 +1259,24 @@ Device.api.log("debug", "PIx: " + value.toString())
 
 def writePIx_body():
      return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
 */
 let args = {
   tagKey: "PI",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
@@ -1112,18 +1317,24 @@ Device.api.log("debug", "FRx: " + value.toString())
 
 def writeFRx_body():
      return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
 */
 let args = {
   tagKey: "FR",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
@@ -1164,18 +1375,24 @@ Device.api.log("info", "PTx: " + value.toString())
 
 def writePTx_body():
      return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
 */
 let args = {
   tagKey: "PT",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
@@ -1186,24 +1403,37 @@ Device.writeAndReadTag(req);
 
 def setPM1_body():
     return """/**
+0.01
 */
-done(null, null);
+Device.api.setProperty("PM1", {
+    value: Device.convertToDec({ values: value, default: 0}) * 100,
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
 """
 
 def writePM1_body():
      return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
 */
 let args = {
   tagKey: "PM1",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
@@ -1249,18 +1479,24 @@ Device.api.log("debug", "AOx: " + value.toString())
 
 def writeAOx_body():
      return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
 */
 let args = {
   tagKey: "AO",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
@@ -1301,18 +1537,24 @@ Device.api.log("debug", "C20_x: " + value.toString())
 
 def writeC20x_body():
      return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
 */
 let args = {
   tagKey: "C20",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
@@ -1358,18 +1600,24 @@ Device.api.log("debug", "C22: " + value.toString())
 
 def writeC22_body():
      return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
 */
 let args = {
   tagKey: "C22",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
@@ -1419,18 +1667,24 @@ Device.api.log("debug", "DRx: " + value.toString())
 
 def writeDRx_body():
      return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
 */
 let args = {
   tagKey: "DR",
   x: value.x,
-  setValue: value.setPoint,
+  setValue: value.setValue,
   byteCount: value.byteCount || 2
 };
 
-let req = Device.makeWriteRequest(args);
-req.done = r => done(null, r);
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
 
-Device.writeAndReadTag(req);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
 
 #####################
@@ -1519,9 +1773,19 @@ let drive = {
 Device.api.setProperty("driveMeasures", {
     value: drive,
     time: new Date().toISOString()
-}).then(prop => {
-   done(null, null);
-});
+}).then(prop =>
+   Device.api.setProperty("motorSpeed", {
+    value: drive.rpm,
+    time: new Date().toISOString()
+})).then(prop =>
+   Device.api.setProperty("motorFrequency", {
+    value: drive.frequency,
+    time: new Date().toISOString()
+})).then(prop =>
+   Device.api.setProperty("motorCurrent", {
+    value: drive.current,
+    time: new Date().toISOString()
+})).then(prop => done(null, null));
 """
 
 #####################

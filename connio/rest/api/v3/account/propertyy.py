@@ -361,6 +361,11 @@ class PropertyInstance(InstanceResource):
             self.type = type
 
     class Condition(object):
+        class ConditionType:
+            ALWAYS = "always"
+            CHANGED = "changed"
+            CHANGED_BY_X = "changedx"
+
         def __init__(self, when=None, value=None):
             self.when = when
             self.value = value

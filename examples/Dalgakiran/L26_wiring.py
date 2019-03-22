@@ -5,11 +5,11 @@ from connio.rest.api.v3.account.method import MethodInstance
 from readwrite_methods import *
 from L26 import *
 
-def wire(client):
+def wire(client, name="LogikaL26", friendly="Logika L26 Controller", base="BaseLogikaProfile"):
     # Create Logika L26 profile
-    compressor = client.account.deviceprofiles.create(name='LogikaL26', 
-                                                  friendly_name='Logika L26 Controller',
-                                                  base_profile='BaseLogikaProfile',
+    compressor = client.account.deviceprofiles.create(name=name, 
+                                                  friendly_name=friendly,
+                                                  base_profile=base,
                                                   description='Logika L26 controller',
                                                   tags=['logika', 'L26'],
                                                   device_class='controller',
@@ -34,6 +34,24 @@ def wire(client):
   
     client.account.properties(compressor.id).create(name='configSwitches', data_type='object', access_type='protected', publish_type='never')
     client.account.properties(compressor.id).create(name='configSelections', data_type='object', access_type='protected', publish_type='never')
+
+    condition = PropertyInstance.Condition(when=PropertyInstance.Condition.ConditionType.CHANGED)
+    retention = PropertyInstance.Retention(context=PropertyInstance.Context(type='default'), capacity='0', condition=condition)
+    client.account.properties(compressor.id).create(name="driveStatus", data_type='string', access_type='protected', publish_type='never', retention=retention)
+    #
+    client.account.properties(compressor.id).create(name="driveMeasures", data_type='object', access_type='protected', publish_type='never')
+    client.account.properties(compressor.id).create(name="driveFaultString", data_type='string', access_type='protected', publish_type='never')
+
+    # Inverter properties
+    unit = PropertyInstance.MeasurementUnit('RPM', 'rpm')
+    measurement = PropertyInstance.Measurement('custom', unit)
+    client.account.properties(compressor.id).create(name='motorSpeed', data_type='number', access_type='protected', publish_type='never', measurement=measurement)
+    unit = PropertyInstance.MeasurementUnit('Frequence', 'Hz')
+    measurement = PropertyInstance.Measurement('custom', unit)
+    client.account.properties(compressor.id).create(name='motorFrequency', data_type='number', access_type='protected', publish_type='never', measurement=measurement)
+    unit = PropertyInstance.MeasurementUnit('Current', 'A')
+    measurement = PropertyInstance.Measurement('electricity', unit)
+    client.account.properties(compressor.id).create(name='motorCurrent', data_type='number', access_type='protected', publish_type='never', measurement=measurement)
 
     client.account.properties(compressor.id).create(name='WPx', data_type='object', access_type='protected', publish_type='never')
     client.account.properties(compressor.id).create(name='WTx', data_type='object', access_type='protected', publish_type='never')
@@ -64,8 +82,7 @@ def wire(client):
     client.account.methods(compressor.id).create(name='fetchControllerStates', method_impl= MethodInstance.MethodImplementation(fetchControllerStates_body()), access_type=accessLevel2)
     client.account.methods(compressor.id).create(name='fetchCompressorStates', method_impl= MethodInstance.MethodImplementation(fetchCompressorStates_body()), access_type=accessLevel2)
     client.account.methods(compressor.id).create(name='fetchCompressorStateTypes', method_impl= MethodInstance.MethodImplementation(fetchCompressorStateTypes_body()), access_type=accessLevel2)
-    client.account.methods(compressor.id).create(name='hasInverter', method_impl= MethodInstance.MethodImplementation(hasInverter_body()), access_type=accessLevel2)
-
+    
     accessLevel3 = 'private'
 
     # Controller specific SET methods (private)
@@ -76,6 +93,9 @@ def wire(client):
     client.account.methods(compressor.id).create(name='setAnalogueOutFreq', method_impl= MethodInstance.MethodImplementation(setAnalogueOutFreq_body()), access_type=accessLevel3)
     client.account.methods(compressor.id).create(name='setConfigSwitches', method_impl= MethodInstance.MethodImplementation(setConfigSwitches_body()), access_type=accessLevel3)
     client.account.methods(compressor.id).create(name='setConfigSelections', method_impl= MethodInstance.MethodImplementation(setConfigSelections_body()), access_type=accessLevel3)
+    client.account.methods(compressor.id).create(name='setDriveStatus', method_impl= MethodInstance.MethodImplementation(setDriveStatus_body()), access_type=accessLevel3)
+    client.account.methods(compressor.id).create(name='setDriveMeasures', method_impl= MethodInstance.MethodImplementation(setDriveMeasures_body()), access_type=accessLevel3)
+    client.account.methods(compressor.id).create(name='setDriveFaultString', method_impl= MethodInstance.MethodImplementation(setDriveFaultString_body()), access_type=accessLevel3)
 
     client.account.methods(compressor.id).create(name='setWPx', method_impl= MethodInstance.MethodImplementation(setWPx_body()), access_type=accessLevel3)
     client.account.methods(compressor.id).create(name='setWTx', method_impl= MethodInstance.MethodImplementation(setWTx_body()), access_type=accessLevel3)
@@ -97,6 +117,7 @@ def wire(client):
     accessLevel4 = 'public'
        
     # Controller specific public methods
+    client.account.methods(compressor.id).create(name='hasInverter', method_impl= MethodInstance.MethodImplementation(hasInverter_body()), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='sendCommand', method_impl= MethodInstance.MethodImplementation(sendCommand_body()), access_type=accessLevel4)
     
     # Controller specific tag R/W operations - Read-only tags first

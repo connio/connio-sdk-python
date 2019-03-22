@@ -5,11 +5,11 @@ from connio.rest.api.v3.account.method import MethodInstance
 from readwrite_methods import *
 from L9 import *
 
-def wire(client):
+def wire(client, name="LogikaL9", friendly="Logika L9 Controller", base="BaseLogikaProfile"):
     # Create Logika L9 profile
-    compressor = client.account.deviceprofiles.create(name='LogikaL9', 
-                                                  friendly_name='Logika L9 Controller',
-                                                  base_profile='BaseLogikaProfile',
+    compressor = client.account.deviceprofiles.create(name=name, 
+                                                  friendly_name=friendly,
+                                                  base_profile=base,
                                                   description='Logika L9 controller',
                                                   tags=['logika', 'L9'],
                                                   device_class='controller',
@@ -34,7 +34,6 @@ def wire(client):
     client.account.methods(compressor.id).create(name='fetchControllerStates', method_impl= MethodInstance.MethodImplementation(fetchControllerStates_body()), access_type=accessLevel2)
     client.account.methods(compressor.id).create(name='fetchCompressorStates', method_impl= MethodInstance.MethodImplementation(fetchCompressorStates_body()), access_type=accessLevel2)
     client.account.methods(compressor.id).create(name='fetchCompressorStateTypes', method_impl= MethodInstance.MethodImplementation(fetchCompressorStateTypes_body()), access_type=accessLevel2)
-    client.account.methods(compressor.id).create(name='hasInverter', method_impl= MethodInstance.MethodImplementation(hasInverter_body()), access_type=accessLevel2)
     
     # Controller specific SET methods (private)
 
@@ -51,6 +50,7 @@ def wire(client):
 
     accessLevel4 = 'public'
 
+    client.account.methods(compressor.id).create(name='hasInverter', method_impl= MethodInstance.MethodImplementation(hasInverter_body()), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='sendCommand', method_impl= MethodInstance.MethodImplementation(sendCommand_body()), access_type=accessLevel4)
     #
     client.account.methods(compressor.id).create(name='readP0x', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('P0')), access_type=accessLevel4)
