@@ -22,86 +22,74 @@ import L33_wiring as L33c
 from gateway_wiring import *
 import app_wiring as app
 
-def wire(keyID, keySecret):
-    start = time.time()
+ ######
+#      #
+ ######
+def wireApp(client):
+  # Create compressor app profile
+  compressorManager = client.account.appprofiles.create(name='CompressorManager',
+                                                friendly_name='Compressor Manager',
+                                                description='Dalgakıran Compressor Management App',
+                                                version='1.0',
+                                                vendor_name='Dalgakıran'
+                                              )
 
-    client = Client(username=keyID, 
-                    password=keySecret)
+    #------ Add profile properties
 
-    # Get master account details
-    # master = client.accounts.get().fetch()    
-    # print('Master account: ' + master.name)
+  unit = PropertyInstance.MeasurementUnit('', 'TL')
+  measurement = PropertyInstance.Measurement('currency', unit)    
+  client.account.properties(compressorManager.id).create(name='electric_cost_per_kWh', data_type='number', access_type='public', publish_type='never', measurement=measurement)
 
-    print('Creating the system.....')
+  #------ Add profile methods
 
-    # Create compressor app profile
-    compressorManager = client.account.appprofiles.create(name='CompressorManager',
-                                                  friendly_name='Compressor Manager',
-                                                  description='Dalgakıran Compressor Management App',
-                                                  version='1.0',
-                                                  vendor_name='Dalgakıran'
-                                                )
+  client.account.methods(compressorManager.id).create(name='getDashboard', method_impl= MethodInstance.MethodImplementation(app.getDashboard_body()), access_type='public')
+  client.account.methods(compressorManager.id).create(name='getElectricCostPerkWh', method_impl= MethodInstance.MethodImplementation(app.getElectricCostPerkWh_body()), access_type='public')
 
-     #------ Add profile properties
-    
-    unit = PropertyInstance.MeasurementUnit('', 'TL')
-    measurement = PropertyInstance.Measurement('currency', unit)    
-    client.account.properties(compressorManager.id).create(name='electric_cost_per_kWh', data_type='number', access_type='public', publish_type='never', measurement=measurement)
-    
-    #------ Add profile methods
+  # Create compressor app profile
+  compressorManagerApp = client.account.apps.create(name='CompressorManager',
+                                                friendly_name='Compressor Manager',
+                                                profile='CompressorManager',
+                                                tags=['icon:cogs:#0077c3']
+                                              )
 
-    client.account.methods(compressorManager.id).create(name='getDashboard', method_impl= MethodInstance.MethodImplementation(app.getDashboard_body()), access_type='public')
-    client.account.methods(compressorManager.id).create(name='getElectricCostPerkWh', method_impl= MethodInstance.MethodImplementation(app.getElectricCostPerkWh_body()), access_type='public')
-    
+ ######
+#      #
+ ######
+def wireGw(client):
+  # Create new Minova Gateway profile
+  compressor = client.account.deviceprofiles.create(name='ModbusGateway', 
+                                                friendly_name='Generic Modbus Gateway',
+                                                base_profile='Gateway',
+                                                description='Modbus gateway',
+                                                tags=['gw'],
+                                                device_class='gateway',
+                                                product_name='MiTrack-Q',
+                                                vendor_name='Minova'
+                                              )
 
-    #---
+    #------ Add profile properties
+  
+  client.account.properties(compressor.id).create(name='gateway_info', data_type='object', access_type='protected', publish_type='never')
+  client.account.properties(compressor.id).create(name='modbus_errors', data_type='string', access_type='protected', publish_type='never')
+  client.account.properties(compressor.id).create(name='modbus_readrequest', data_type='string', access_type='public', publish_type='never')    
+  client.account.properties(compressor.id).create(name='modbus_settings', data_type='string', access_type='public', publish_type='never')
+  client.account.properties(compressor.id).create(name='modbus_writerequest', data_type='string', access_type='public', publish_type='never')
+  
+  #------ Add profile methods
 
+  client.account.methods(compressor.id).create(name='readTag', method_impl= MethodInstance.MethodImplementation(readTag_body()), access_type='protected')
+  client.account.methods(compressor.id).create(name='writeAndReadTag', method_impl= MethodInstance.MethodImplementation(writeAndReadTag_body()), access_type='protected')
+  client.account.methods(compressor.id).create(name='writeTag', method_impl= MethodInstance.MethodImplementation(writeTag_body()), access_type='protected')
+  client.account.methods(compressor.id).create(name='restart', method_impl= MethodInstance.MethodImplementation(restart_body()), access_type='public')
+  client.account.methods(compressor.id).create(name='setModbusSettings', method_impl= MethodInstance.MethodImplementation(setModbusSettings_body()), access_type='public')
 
-    # Create compressor app profile
-    compressorManagerApp = client.account.apps.create(name='CompressorManager',
-                                                  friendly_name='Compressor Manager',
-                                                  profile='CompressorManager',
-                                                  tags=['icon:cogs:#0077c3']
-                                                )
-
-
-    #---
-
-
-    # Create new Minova Gateway profile
-    compressor = client.account.deviceprofiles.create(name='ModbusGateway', 
-                                                  friendly_name='Generic Modbus Gateway',
-                                                  base_profile='Gateway',
-                                                  description='Modbus gateway',
-                                                  tags=['gw'],
-                                                  device_class='gateway',
-                                                  product_name='MiTrack-Q',
-                                                  vendor_name='Minova'
-                                                )
-
-     #------ Add profile properties
-    
-    client.account.properties(compressor.id).create(name='gateway_info', data_type='object', access_type='protected', publish_type='never')
-    client.account.properties(compressor.id).create(name='modbus_errors', data_type='string', access_type='protected', publish_type='never')
-    client.account.properties(compressor.id).create(name='modbus_readrequest', data_type='string', access_type='public', publish_type='never')    
-    client.account.properties(compressor.id).create(name='modbus_settings', data_type='string', access_type='public', publish_type='never')
-    client.account.properties(compressor.id).create(name='modbus_writerequest', data_type='string', access_type='public', publish_type='never')
-    
-    #------ Add profile methods
-
-    client.account.methods(compressor.id).create(name='readTag', method_impl= MethodInstance.MethodImplementation(readTag_body()), access_type='protected')
-    client.account.methods(compressor.id).create(name='writeAndReadTag', method_impl= MethodInstance.MethodImplementation(writeAndReadTag_body()), access_type='protected')
-    client.account.methods(compressor.id).create(name='writeTag', method_impl= MethodInstance.MethodImplementation(writeTag_body()), access_type='protected')
-    client.account.methods(compressor.id).create(name='restart', method_impl= MethodInstance.MethodImplementation(restart_body()), access_type='public')
-    client.account.methods(compressor.id).create(name='setModbusSettings', method_impl= MethodInstance.MethodImplementation(setModbusSettings_body()), access_type='public')
-
-
-    #---
-
-
+ ######
+#      #
+ ######
+def wireBase(client, name="BaseLogikaProfile", friendly="Logika Base"):
     # Create new Logika base profile
-    compressor = client.account.deviceprofiles.create(name='BaseLogikaProfile', 
-                                                  friendly_name='Logika Base',
+    compressor = client.account.deviceprofiles.create(name=name, 
+                                                  friendly_name=friendly,
                                                   base_profile='ModbusGateway',
                                                   description='Logika controller base profile',
                                                   tags=['logika', 'base'],
@@ -187,8 +175,6 @@ def wire(keyID, keySecret):
 
     client.account.properties(compressor.id).create(name='warrantyExpiryDate', data_type='string', access_type='public', publish_type='never')
     
-
-
     # This can go to app maybe?
     description = """
 Asagidaki sekilde bakim ucretlerini girebilirsiniz:
@@ -207,11 +193,26 @@ Asagidaki sekilde bakim ucretlerini girebilirsiniz:
       description=description)
 
     # Views
-    client.account.properties(compressor.id).create(name='state', data_type='object', access_type='protected', publish_type='never')
+    condition = PropertyInstance.Condition(when=PropertyInstance.Condition.ConditionType.ALWAYS)
+    retention = PropertyInstance.Retention(type=PropertyInstance.Retention.RetentionType.MOSTRECENT, context=PropertyInstance.Context(type='default'), capacity='0', condition=condition)
+    client.account.properties(compressor.id).create(name='state', data_type='object', access_type='protected', publish_type='never', retention=retention)
    
     #------ Add base profile methods
     
-    client.account.methods(compressor.id).create(name='init', method_impl= MethodInstance.MethodImplementation(getInit_body()), access_type='public', description="e.g. { 'value': 0, 'unit': '$' }")
+    client.account.methods(compressor.id).create(name='init', method_impl= MethodInstance.MethodImplementation(getInit_body()), access_type='public', description="""e.g. 
+    { 
+	    "hasInverter": true, 
+	    "warrantyInMonth": 12,
+	    "elecCost": {
+	        "value": 0, 
+	        "unit": "USD"
+	    }
+	  }
+    
+    hasInverter: kompresorun inverter'u varsa 'true' yoksa 'false' olmalidir - default deger 'false'
+    warrantyInMonth: kompresorun garanti suresini belirtir - default deger 12
+    elecCost: kompresorun kullanildigi bolgedeki elektrik birim fiyati ve para birimi
+    """)
     #client.account.methods(compressor.id).create(name='getDashboardParallel', method_impl= MethodInstance.MethodImplementation(getDashboard_body()), access_type='public')
     client.account.methods(compressor.id).create(name='getDashboard', method_impl= MethodInstance.MethodImplementation(getDashboard_body()), access_type='public')
     client.account.methods(compressor.id).create(name='getLatestValues', method_impl= MethodInstance.MethodImplementation(getLatestValues_body()), access_type='public')
@@ -295,8 +296,8 @@ Asagidaki sekilde bakim ucretlerini girebilirsiniz:
     client.account.methods(compressor.id).create(name='setCompressorState', method_impl= MethodInstance.MethodImplementation(setCompressorState_body()), access_type=accessLevel1_1)
     client.account.methods(compressor.id).create(name='setBlockingAlarm', method_impl= MethodInstance.MethodImplementation(setBlockingAlarm_body()), access_type=accessLevel1_1)
 
-    client.account.methods(compressor.id).create(name='setRelayOutputs', method_impl= MethodInstance.MethodImplementation(setRelayOutputs_body()), access_type=accessLevel1_1)
-    client.account.methods(compressor.id).create(name='setDigitalInputs', method_impl= MethodInstance.MethodImplementation(setDigitalInputs_body()), access_type=accessLevel1_1)
+    # client.account.methods(compressor.id).create(name='setRelayOutputs', method_impl= MethodInstance.MethodImplementation(setRelayOutputs_body()), access_type=accessLevel1_1)
+    # client.account.methods(compressor.id).create(name='setDigitalInputs', method_impl= MethodInstance.MethodImplementation(setDigitalInputs_body()), access_type=accessLevel1_1)
     client.account.methods(compressor.id).create(name='setScrewTemperature', method_impl= MethodInstance.MethodImplementation(setScrewTemperature_body()), access_type=accessLevel1_1)
     client.account.methods(compressor.id).create(name='setWorkingPressure', method_impl= MethodInstance.MethodImplementation(setWorkingPressure_body()), access_type=accessLevel1_1)
     client.account.methods(compressor.id).create(name='setControllerSupplyVoltage', method_impl= MethodInstance.MethodImplementation(setControllerSupplyVoltage_body()), access_type=accessLevel1_1)
@@ -326,17 +327,39 @@ Asagidaki sekilde bakim ucretlerini girebilirsiniz:
     client.account.methods(compressor.id).create(name='readNbrOfStartsInLastHour', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('nbrOfStartsInLastHour')), access_type=accessLevel2)
     client.account.methods(compressor.id).create(name='readControllerTime', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('controllerTime')), access_type=accessLevel2)
 
+
+def wire(keyID, keySecret):
+    start = time.time()
+
+    client = Client(username=keyID, 
+                    password=keySecret)
+
+    # Get master account details
+    # master = client.accounts.get().fetch()    
+    # print('Master account: ' + master.name)
+
+    print('Creating the system.....')
+
+    #wireApp(client)
+    #wireGw(client)
+    
     # Wire different controller types
+    wireBase(client)
     L9c.wire(client)
     L26c.wire(client)
     L33c.wire(client)
+
+    #wireBase(client, 'BaseLogikaProfileXX', 'Logika Base XX')
+    #L9c.wire(client, 'LogikaL9XX', 'Logika L9 XX', 'BaseLogikaProfileXX')
+    #L26c.wire(client, 'LogikaL26XX', 'Logika L26 XX', 'BaseLogikaProfileXX')
+    #L33c.wire(client, 'LogikaL33XX', 'Logika L33 XX', 'BaseLogikaProfileXX')
 
     print('System is created successfully in %.2f seconds' % (time.time() - start))
 
 if __name__ == '__main__':
 
-    keyID = os.environ.get('DK_ACCOUNT_KEYID', '_key_570946869128168926')
-    keySecret = os.environ.get('DK_ACCOUNT_KEYSECRET', '249d7cd1bde84549a76b30e4eafeac54')
+    keyID = os.environ.get('DK_ACCOUNT_KEYID', '_key_500600814475760930') #'_key_570946869128168926')
+    keySecret = os.environ.get('DK_ACCOUNT_KEYSECRET', '0b51ab06dc554165bda3db495eb00737') #'249d7cd1bde84549a76b30e4eafeac54')
 
     if len(sys.argv) == 3:
         keyID = sys.argv[1]
@@ -346,8 +369,29 @@ if __name__ == '__main__':
 
 
 
+#DK TEST 1
+#  IMEI: 869867035753377
+
+#test26s
+#  IMEI: 869867036043836
+
+#DK TEST 3
+#  MAC: 00:1e:c0:91:97:f3
+
+#L33S TEST
+#  MAC: 00:1e:c0:91:aa:b2
+
+#test33
+#  SN: 987654321
+
+# ---
+
 # Some sample device info
 #Mac 16:b4:12:7d:5d:da
+
+# IMEI: 869867036043836
+# IMEI: 869867035753377
+# MAC 00:1e:c0:91:97:f3
 
 #Device IMEI: 861359035276375
 #Device name: DK.Test.Cihaz.1
