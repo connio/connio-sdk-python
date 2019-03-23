@@ -143,7 +143,7 @@ def wire(client, name='LogikaL33', friendly="Logika L33 Controller", base="BaseL
     #client.account.methods(compressor.id).create(name='readWPS2Px', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('WPS2P')), access_type=accessLevel4)
     #client.account.methods(compressor.id).create(name='readWPS2Ps', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('WPS2Ps')), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='readWTx', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('WT')), access_type=accessLevel4)
-    client.account.methods(compressor.id).create(name='readWtx_', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('Wt_')), access_type=accessLevel4)
+    client.account.methods(compressor.id).create(name='readWtx_', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('Wt')), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='readSTAx', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('STA')), access_type=accessLevel4)
     #client.account.methods(compressor.id).create(name='readST3', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('ST3')), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='readSTT1', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('STT1')), access_type=accessLevel4)
