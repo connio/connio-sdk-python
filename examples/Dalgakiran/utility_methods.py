@@ -1,11 +1,15 @@
 # ~~ Utility/Helper methods ~~
 #
+# startStop(start or stop)
+# sendCommand()
 # init(inverterModel)
 # getEmptyState()
 # convertToHours()
 # convertToDecimal()    
 # makeWriteRequest()
 # makeWriteValue()
+# writeTagByAddress()
+# readTagByAddress()
 # getCompressorInfo()
 # getDashboard()
 # getLatestValues()
@@ -19,6 +23,54 @@
 #
 #
 #
+def startStop_body(startOrStop):
+  if startOrStop == 0:
+    return """
+try {    
+    let command = Device.makeCompressorCommand("STOP");
+    
+    let request = { cmd: command, done: r => done(null, r) };
+    Device.writeTag(request);
+}
+catch(e) {
+    done(e);
+}
+    """
+  else:
+    return """
+try {    
+    let command = Device.makeCompressorCommand("START");
+    
+    let request = { cmd: command, done: r => done(null, r) };
+    Device.writeTag(request);
+}
+catch(e) {
+    done(e);
+}
+    """
+
+#
+#
+#
+def sendCommand_body():
+    return """/*
+    Send compressor command to the gateway
+*/
+
+try {    
+    let command = Device.makeCompressorCommand(value);
+     
+    let request = { cmd: command, done: r => done(null, r) };
+    Device.writeTag(request);
+}
+catch(e) {
+    done(e);
+}
+"""
+
+#
+#
+#
 def getInit_body():
     return """/**
   Initialize device `state` property with default values
@@ -27,6 +79,7 @@ def getInit_body():
   { 
     "hasInverter": true, 
     "warrantyInMonth": 12,
+    "icon": "inversys-15-plus-depolu.png",
     "elecCost": {
         "value": 0,     //cost of electricity KWh
         "unit": "USD"
@@ -65,6 +118,10 @@ Device.api.setProperty("modbus_settings", {
   value: settings,
   time: new Date().toISOString()
 }).
+then(() => Device.api.setProperty('icon', {
+    value: value.icon || "dk-default.png",
+    time: new Date().toISOString()
+})).
 then(() => Device.api.setProperty('warrantyExpiryDate', {
     value: warrantyExpiry.toISOString(),
     time: new Date().toISOString()
@@ -205,7 +262,9 @@ else {
     tag_address = parseInt(params.offset, 16) + (value.x - params.min);
 }
 
-let multip = params.multiplier || 10;
+// If multiplier is not specified default multiplier is 1;
+// if multiplier is specified but no value specified for given index value (value.x), then default is 1
+let multip = params.multiplier ? params.multiplier[value.x - params.min] || 1 : 1;
 
 let tagValue = Device.makeWriteValue({ value: (value.setValue * multip), byteCount: byteCount });
 
@@ -233,6 +292,48 @@ function convert(v, byteCount) {
     return hexArr.map(x => x.split('').reduce((result, ch) => result * 16 + '0123456789abcdefgh'.indexOf(ch), 0));
 }
 return convert(value.value, value.byteCount);"""
+
+#
+#
+#
+def writeAnyTag_body():
+    return """/**
+@value {{ setValue, addr, size }}
+
+e.g
+{ 
+  setValue: 13, 
+  addr: "0x504", 
+  size: 2 
+}
+*/
+
+let tagValue = Device.makeWriteValue({ value: value.setValue, byteCount: value.size });
+let req = { cmd: `w,${tagValue.join(':')},${value.size},0,1,${value.addr}`, done: r => done(null, r) };
+
+Device.writeTag(req);
+"""
+
+#
+#
+#
+def readAnyTag_body():
+    return """/**
+@value {{ addr, size }}
+
+e.g
+{ 
+  addr: "0x504", 
+  size: 2 
+}
+
+Writes result into the `tag` property.
+*/
+
+let req = { cmd: `r,meth:setAny,-,${value.size},-,1,${value.addr}`, done: r => done(null, r + " You can read the value in `tagValue` property") };
+Device.readTag(req);
+"""
+
 
 #
 #

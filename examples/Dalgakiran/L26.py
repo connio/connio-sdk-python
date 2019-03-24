@@ -134,24 +134,24 @@ def fetchWriteRequest_body():
 
 */
 const requests = {
-    WP:  { rprop: "WPx", rcmd: "r,meth:setWPx,-,12,-,1,0x509", min: 1, max: 6, offset: "0x509" },
-    WT:  { rprop: "WTx", rcmd: "r,meth:setWTx,-,16,-,1,0x50F", min: 0, max: 7, offset: "0x50F", multiplier: 1 },
-    Wt:  { rprop: "Wtx_", rcmd: "r,meth:setWtx_,-,14,-,1,0x517", min: 1, max: 7, offset: "0x517", multiplier: 1 },
-    C07: { rprop: "C07_x", rcmd: "r,meth:setC07_x,-,4,-,1,0x51E", min: 1, max: 2, offset: "0x51E", multiplier: 1 },
+    WP:  { rprop: "WPx", rcmd: "r,meth:setWPx,-,12,-,1,0x509", min: 1, max: 6, offset: "0x509", multiplier: [,10,10,10,10,10] },
+    WT:  { rprop: "WTx", rcmd: "r,meth:setWTx,-,16,-,1,0x50F", min: 0, max: 7, offset: "0x50F" },
+    Wt:  { rprop: "Wtx_", rcmd: "r,meth:setWtx_,-,14,-,1,0x517", min: 1, max: 7, offset: "0x517" },
+    C07: { rprop: "C07_x", rcmd: "r,meth:setC07_x,-,4,-,1,0x51E", min: 1, max: 2, offset: "0x51E" },
     C02: { rprop: "C02", rcmd: "r,meth:setC02,-,2,-,1,0x527", min: 1, max: 1, offset: "0x527" },
-    C10: { rprop: "C10", rcmd: "r,meth:setNominalAirFlow,-,2,-,1,0x528", min: 1, max: 1, offset: "0x528", multiplier: 0.1 },
-    AP:  { rprop: "APx", rcmd: "r,meth:setAPx,-,10,-,1,0x529", min: 1, max: 3, offset: "0x529" },
-    AP4: { rprop: "APx", rcmd: "r,meth:setAPx,-,10,-,1,0x529", min: 4, max: 4, offset: "0x52D" },
-    C19_1:{ rprop:"C19_x", rcmd: "r,meth:setC19_x,-,6,-,1,0x52C", min: 1, max: 1, offset: "0x52C", multiplier: 1 },
-    C19_2:{ rprop:"C19_x", rcmd: "r,meth:setC19_x,-,6,-,1,0x52C", min: 2, max: 2, offset: "0x52E", multiplier: 1 },
-    PI:  { rprop: "PIx", rcmd: "r,meth:setPIx,-,14,-,1,0x52F", min: 1, max: 7, offset: "0x52F" , multiplier: .01 }, 
-    FR:  { rprop: "FRx", rcmd: "r,meth:setFRx,-,4,-,1,0x536", min: 1, max: 2, offset: "0x536", multiplier: 1 },
-    PT:  { rprop: "PTx", rcmd: "r,meth:setPTx,-,6,-,1,0x538", min: 1, max: 3, offset: "0x538" },
-    PM1: { rprop: "PM1", rcmd: "r,meth:setPM1,-,2,-,1,0x53B", min: 1, max: 1, offset: "0x53B", multiplier: .01  },
-    AO:  { rprop: "AOx", rcmd: "r,meth:setAOx,-,8,-,1,0x53C", min: 1, max: 4, offset: "0x53C" },
-    C20: { rprop:"C20_x", rcmd: "r,meth:setC20_x,-,4,-,1,0x540", min: 1, max: 2, offset: "0x540", multiplier: 1 },
-    C22: { rprop: "C22", rcmd: "r,meth:setC2x,-,4,-,1,0x542", min: 2, max: 3, offset: "0x542", multiplier: 1 },
-    DR:  { rprop: "DRx", rcmd: "r,meth:setDriveProtocol,-,14,-,1,0x544", min: 0, max: 6, offset: "0x544", multiplier: 1 },
+    C10: { rprop: "C10", rcmd: "r,meth:setNominalAirFlow,-,2,-,1,0x528", min: 1, max: 1, offset: "0x528", multiplier: [0.1] },
+    AP:  { rprop: "APx", rcmd: "r,meth:setAPx,-,10,-,1,0x529", min: 1, max: 3, offset: "0x529", multiplier: [10,10,10] },
+    AP4: { rprop: "APx", rcmd: "r,meth:setAPx,-,10,-,1,0x529", min: 4, max: 4, offset: "0x52D", multiplier: [10] },
+    C19_1:{ rprop:"C19_x", rcmd: "r,meth:setC19_x,-,6,-,1,0x52C", min: 1, max: 1, offset: "0x52C" },
+    C19_2:{ rprop:"C19_x", rcmd: "r,meth:setC19_x,-,6,-,1,0x52C", min: 2, max: 2, offset: "0x52E" },
+    PI:  { rprop: "PIx", rcmd: "r,meth:setPIx,-,14,-,1,0x52F", min: 1, max: 7, offset: "0x52F", multiplier: [0.01,0.01,0.01,0.01,0.01,0.01,0.01] }, 
+    FR:  { rprop: "FRx", rcmd: "r,meth:setFRx,-,4,-,1,0x536", min: 1, max: 2, offset: "0x536" },
+    PT:  { rprop: "PTx", rcmd: "r,meth:setPTx,-,6,-,1,0x538", min: 1, max: 3, offset: "0x538", multiplier: [10,10,10] },
+    PM1: { rprop: "PM1", rcmd: "r,meth:setPM1,-,2,-,1,0x53B", min: 1, max: 1, offset: "0x53B", multiplier: [.01]  },
+    AO:  { rprop: "AOx", rcmd: "r,meth:setAOx,-,8,-,1,0x53C", min: 1, max: 4, offset: "0x53C", multiplier: [10,10,10,10] },
+    C20: { rprop:"C20_x", rcmd: "r,meth:setC20_x,-,4,-,1,0x540", min: 1, max: 2, offset: "0x540" },
+    C22: { rprop: "C22", rcmd: "r,meth:setC2x,-,4,-,1,0x542", min: 2, max: 3, offset: "0x542" },
+    DR:  { rprop: "DRx", rcmd: "r,meth:setDriveProtocol,-,14,-,1,0x544", min: 0, max: 6, offset: "0x544", multiplier: [,,,0.1,0.1,0.01,0.01] },
 };
 return requests[value];
 """
@@ -294,7 +294,7 @@ fn();
 #
 #
 #
-def sendCommand_body():
+def makeCompressorCommand_body():
     return """/*
     Send compressor command to the gateway
 
@@ -332,18 +332,11 @@ const cmd = {
     RESET_BEAR_MAINT_COUNTER: Math.pow(2,13),
 }
 
-try {    
-    if (!cmd[value]) throw value + " is not a valid command. See method description for valid commands.";
-     
-    let tagValue = Device.makeWriteValue({ value: cmd[value], byteCount: 2 });
-    let command = "w," + tagValue.join(':') + ",2,0,1,0x40C";
-    
-    let request = { cmd: command, done: r => done(null, r) };
-    Device.writeTag(request);
-}
-catch(e) {
-    done(e);
-}"""
+if (!cmd[value]) throw value + " is not a valid command. See method description for valid commands.";
+
+let tagValue = Device.makeWriteValue({ value: cmd[value], byteCount: 2 });
+return "w," + tagValue.join(':') + ",2,0,1,0x40C";
+"""
 
 #
 #

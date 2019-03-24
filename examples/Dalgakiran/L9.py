@@ -7,6 +7,7 @@
 # ~fetchCompressorStates()
 # ~fetchCompressorStateTypes()
 
+
 #
 #
 #
@@ -85,10 +86,10 @@ def fetchWriteRequest_body():
 
 */
 const requests = {
-    P0:  { rprop: "P0x", rcmd: "r,meth:setP0x,-,16,-,1,0x500", min: 0, max: 7, offset: "0x500", multiplier: 0.1 },
-    H0:  { rprop: "H0x", rcmd: "r,meth:setH0x,-,16,-,1,0x508", min: 0, max: 7, offset: "0x508", multiplier: 1 },
-    t0:  { rprop: "t0x", rcmd: "r,meth:sett0x,-,16,-,1,0x510", min: 1, max: 8, offset: "0x510", multiplier: 1 },
-    //PA:  { rprop: "PAx", rcmd: "r,meth:setPAx,-,4,-,1,0x52A", min: 1, max: 2, offset: "0x52A", multiplier: 1 },
+    P0:  { rprop: "P0x", rcmd: "r,meth:setP0x,-,16,-,1,0x500", min: 0, max: 7, offset: "0x500", multiplier: [,,10,10,10,10,,] },
+    H0:  { rprop: "H0x", rcmd: "r,meth:setH0x,-,16,-,1,0x508", min: 0, max: 7, offset: "0x508" },
+    t0:  { rprop: "t0x", rcmd: "r,meth:sett0x,-,16,-,1,0x510", min: 1, max: 8, offset: "0x510" },
+    //PA:  { rprop: "PAx", rcmd: "r,meth:setPAx,-,4,-,1,0x52A", min: 1, max: 2, offset: "0x52A" },
 
 };
 return requests[value];
@@ -189,7 +190,7 @@ done(null, false);
 #
 #
 #
-def sendCommand_body():
+def makeCompressorCommand_body():
     return """/*
     Send compressor command to the gateway
 
@@ -225,18 +226,11 @@ const cmd = {
     RESET_BEAR_MAINT_COUNTER: Math.pow(2,13),
 }
 
-try {    
-    if (!cmd[value]) throw value + " is not a valid command. See method description for valid commands.";
-     
-    let tagValue = Device.makeWriteValue({ value: cmd[value], byteCount: 2 });
-    let command = "w," + tagValue.join(':') + ",2,0,1,0x408";
-    
-    let request = { cmd: command, done: r => done(null, r) };
-    Device.writeTag(request);
-}
-catch(e) {
-    done(e);
-}"""
+if (!cmd[value]) throw value + " is not a valid command. See method description for valid commands.";
+
+let tagValue = Device.makeWriteValue({ value: cmd[value], byteCount: 2 });
+return "w," + tagValue.join(':') + ",2,0,1,0x408";
+"""
 
 #
 #

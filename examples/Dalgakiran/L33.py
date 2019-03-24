@@ -148,26 +148,24 @@ def fetchWriteRequest_body():
 
 */
 const requests = {
-    WP:      { rprob: "WPx", rcmd: "r,meth:setWPx,-,12,-,1,0x504", min: 1, max: 6, offset:"0x504" },
-    SP:      { rprob: "SPx", rcmd: "r,meth:setSPx,-,8,-,1,0x50A", min: 1, max: 4, offset:"0x50A" },
-    SP5:     { rprob: "SP5", rcmd: "r,meth:setSP5,-,2,-,1,0x542", min: 5, max: 5, offset:"0x542" },
-    SP6:     { rprob: "SP6", rcmd: "r,meth:setSP6,-,2,-,1,0x548", min: 6, max: 6, offset:"0x548" },
+    WP:      { rprob: "WPx", rcmd: "r,meth:setWPx,-,12,-,1,0x504", min: 1, max: 6, offset:"0x504", multiplier: [,10,10,10,10,10] },
+    SP:      { rprob: "SPx", rcmd: "r,meth:setSPx,-,8,-,1,0x50A", min: 1, max: 4, offset:"0x50A", multiplier: [,10,10,10] },
+    SP5:     { rprob: "SP5", rcmd: "r,meth:setSP5,-,2,-,1,0x542", min: 5, max: 5, offset:"0x542", multiplier: [10] },
+    SP6:     { rprob: "SP6", rcmd: "r,meth:setSP6,-,2,-,1,0x548", min: 6, max: 6, offset:"0x548", multiplier: [10] },
     //WPs:     { rprob: "WPs", rcmd: "r,meth:setWPs,-,2,-,1,0x50E", min: 1, max: 1, offset:"0x50E" },
     //WPS2P:   { rprob: "WPS2Px", rcmd: "r,meth:setWPS2Px,-,6,-,1,0x50F", min: 3, max: 5, offset:"0x50F" },
     //WPS2Ps:  { rprob: "WPS2Ps", rcmd: "r,meth:setWPS2Ps,-,2,-,1,0x512", min: 1, max: 1, offset:"0x512" },
-    WT:      { rprob: "WTx", rcmd: "r,meth:setWTx,-,14,-,1,0x513", min: 1, max: 7, offset:"0x513" },
-    STA:     { rprob: "STAx", rcmd: "r,meth:setSTAx,-,6,-,1,0x51A", min: 1, max: 3, offset:"0x51A" },
+    WT:      { rprob: "WTx", rcmd: "r,meth:setWTx,-,14,-,1,0x513", min: 1, max: 7, offset:"0x513", multiplier: [10,10,10,10,10,10,10] },
+    STA:     { rprob: "STAx", rcmd: "r,meth:setSTAx,-,6,-,1,0x51A", min: 1, max: 3, offset:"0x51A", multiplier: [10,10,10] },
     //ST3:     { rprob: "ST3", rcmd: "r,meth:setST3,-,2,-,1,0x51C", min: 3, max: 3, offset:"0x51C" },
-    STT1:    { rprob: "STT1", rcmd: "r,meth:setSTT1,-,2,-,1,0x51D", min: 1, max: 1, offset:"0x51D" },
-    STD1:    { rprob: "STD1", rcmd: "r,meth:setSTD1,-,2,-,1,0x51E", min: 1, max: 1, offset:"0x51E" },
-    Wt:      { rprob: "Wtx_", rcmd: "r,meth:setWtx_,-,20,-,1,0x522", min: 1, max: 10, offset:"0x522" },
-    R0:      { rprob: "R0x", rcmd: "r,meth:setR0x,-,4,-,1,0x53D", min: 1, max: 2, offset:"0x53D" },
-    R03:     { rprob: "R03", rcmd: "r,meth:setR03,-,2,-,1,0x502", min: 3, max: 3, offset:"0x502" },
-    DS:      { rprob: "DSx", rcmd: "r,meth:setDSx,-,12,-,1,0xA1B", min: 1, max: 6, offset:"0xA1B" },
+    STT1:    { rprob: "STT1", rcmd: "r,meth:setSTT1,-,2,-,1,0x51D", min: 1, max: 1, offset:"0x51D", multiplier: [10] },
+    STD1:    { rprob: "STD1", rcmd: "r,meth:setSTD1,-,2,-,1,0x51E", min: 1, max: 1, offset:"0x51E", multiplier: [10] },
+    Wt:      { rprob: "Wtx_", rcmd: "r,meth:setWtx_,-,20,-,1,0x522", min: 1, max: 10, offset:"0x522", multiplier: [,,,,,,,,,0.1] },
+    R0:      { rprob: "R0x", rcmd: "r,meth:setR0x,-,4,-,1,0x53D", min: 1, max: 2, offset:"0x53D", multiplier: [10,0.1] },
+    DS:      { rprob: "DSx", rcmd: "r,meth:setDSx,-,12,-,1,0xA1B", min: 1, max: 6, offset:"0xA1B", multiplier: [,,0.1,0.1,0.1,0.1] },
     DA:      { rprob: "DAx", rcmd: "r,meth:setDAx,-,28,-,1,0xA21", min: 0, max: 13, offset:"0xA21" },
-    DF:      { rprob: "DFx", rcmd: "r,meth:setDFx,-,12,-,1,0xA2E", min: 1, max: 6, offset:"0xA2E" },
-    DF7:     { rprob: "DF7", rcmd: "r,meth:setDF7,-,2,-,1,0x541", min: 7, max: 7, offset:"0x541" },
-    
+    DF:      { rprob: "DFx", rcmd: "r,meth:setDFx,-,12,-,1,0xA2E", min: 1, max: 6, offset:"0xA2E", multiplier: [0.01,0.01,0.01,0.01,0.01,0.01] },
+    //DF7:     { rprob: "DF7", rcmd: "r,meth:setDF7,-,2,-,1,0x541", min: 7, max: 7, offset:"0x541" },
 };
 return requests[value];
 """
@@ -316,7 +314,7 @@ fn();
 #
 #
 #
-def sendCommand_body():
+def makeCompressorCommand_body():
     return """/*
     Send compressor command to the gateway
 
@@ -354,18 +352,11 @@ const cmd = {
     RESET_BEAR_MAINT_COUNTER: Math.pow(2,13),
 }
 
-try {    
-    if (!cmd[value]) throw value + " is not a valid command. See method description for valid commands.";
-     
-    let tagValue = Device.makeWriteValue({ value: cmd[value], byteCount: 2 });
-    let command = "w," + tagValue.join(':') + ",2,0,1,0x40D";
-    
-    let request = { cmd: command, done: r => done(null, r) };
-    Device.writeTag(request);
-}
-catch(e) {
-    done(e);
-}"""
+if (!cmd[value]) throw value + " is not a valid command. See method description for valid commands.";
+
+let tagValue = Device.makeWriteValue({ value: cmd[value], byteCount: 2 });
+return "w," + tagValue.join(':') + ",2,0,1,0x40D";
+"""
 
 #
 #
@@ -1358,7 +1349,39 @@ catch(e) {
 def setR0x_body():
     return """/**
 */
-done(null, null);
+const itemCount = 2;
+
+let R0x = {};
+for (var x = 0; x < itemCount; x++) {
+    R0x['R0' + (x+1).toString()] = '-';
+}
+
+Device.api.log("debug", "R0x: " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+
+        let unit;
+        if (i == 2) {
+          itemValue = itemValue / 10;
+          unit = "Power";
+        }
+        else {
+          itemValue = itemValue * 10;
+          unit = "L/min";
+        }
+        
+        R0x['R0' + ((i/2) + 1).toString()] = itemValue.toString() + unit;
+    }
+    
+    Device.api.setProperty("R0x", {
+      value: R0x,
+      time: new Date().toISOString()
+      }).
+    then(property => {
+        done(null, property.value);
+    });
+ });
 """
 
 def writeR0x_body():
@@ -1366,39 +1389,6 @@ def writeR0x_body():
 */
 let args = {
   tagKey: "R0",
-  x: value.x,
-  setValue: value.setValue,
-  byteCount: value.byteCount || 2
-};
-
-try {
-  let req = Device.makeWriteRequest(args);
-  req.done = r => done(null, r);
-
-  Device.writeAndReadTag(req);
-}
-catch(e) {
-  done(e);
-}
-"""
-
-#####################
-#
-#  R03 [NOT IMPLEMENTED]
-#
-#####################
-
-def setR03_body():
-    return """/**
-*/
-done(null, null);
-"""
-
-def writeR03_body():
-    return """/**
-*/
-let args = {
-  tagKey: "R03",
   x: value.x,
   setValue: value.setValue,
   byteCount: value.byteCount || 2
@@ -1490,14 +1480,36 @@ catch(e) {
 
 #####################
 #
-#  DAx [NOT IMPLEMENTED]
+#  DAx
 #
 #####################
 
 def setDAx_body():
     return """/**
 */
-done(null, null);
+const itemCount = 14;
+
+let DAx = {};
+for (var x = 0; x < itemCount; x++) {
+    DAx['DA' + x.toString()] = '-';
+}
+
+Device.api.log("info", "DAx: " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+
+        DAx['DA' + (i/2).toString()] = itemValue.toString();
+    }
+    
+    Device.api.setProperty("DAx", {
+      value: DAx,
+      time: new Date().toISOString()
+      }).
+    then(property => {
+        done(null, property.value);
+    });
+ });
 """
 
 def writeDAx_body():
@@ -1523,14 +1535,48 @@ catch(e) {
 
 #####################
 #
-#  DFx [NOT IMPLEMENTED]
+#  DFx
 #
 #####################
 
 def setDFx_body():
     return """/**
+Temperature PID proportional factor [0.01]
+Temperature PID integration time [0.01s]
+Temperature PID derivative time [0.01s]
+Temperature PID scaling [0.01]
+Temperature PID adder multiplier [0.01]
+Temperature PID adder offset [0.01]
 */
-done(null, null);
+
+const itemCount = 6;
+
+let DFx = {};
+for (var x = 0; x < itemCount; x++) {
+    DFx['DF' + (x+1).toString()] = '-';
+}
+
+Device.api.log("debug", "DFx: " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+
+        let unit = "";
+        if (i == 2 || i == 4) {
+          unit = " seconds";
+        }
+
+        DFx['DF' + ((i/2) + 1).toString()] = itemValue.toString() + unit;
+    }
+    
+    Device.api.setProperty("DFx", {
+      value: DFx,
+      time: new Date().toISOString()
+      }).
+    then(property => {
+        done(null, property.value);
+    });
+ });
 """
 
 def writeDFx_body():
@@ -1556,7 +1602,7 @@ catch(e) {
 
 #####################
 #
-#  DF7 [NOT IMPLEMENTED]
+#  DF7 [NOT USED]
 #
 #####################
 

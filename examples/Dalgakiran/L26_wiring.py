@@ -114,11 +114,12 @@ def wire(client, name="LogikaL26", friendly="Logika L26 Controller", base="BaseL
     client.account.methods(compressor.id).create(name='setC22', method_impl= MethodInstance.MethodImplementation(setC22_body()), access_type=accessLevel3)
     client.account.methods(compressor.id).create(name='setDRx', method_impl= MethodInstance.MethodImplementation(setDRx_body()), access_type=accessLevel3)
 
+    client.account.methods(compressor.id).create(name='makeCompressorCommand', method_impl= MethodInstance.MethodImplementation(makeCompressorCommand_body()), access_type='protected')
+
     accessLevel4 = 'public'
        
     # Controller specific public methods
     client.account.methods(compressor.id).create(name='hasInverter', method_impl= MethodInstance.MethodImplementation(hasInverter_body()), access_type=accessLevel4)
-    client.account.methods(compressor.id).create(name='sendCommand', method_impl= MethodInstance.MethodImplementation(sendCommand_body()), access_type=accessLevel4)
     
     # Controller specific tag R/W operations - Read-only tags first
     client.account.methods(compressor.id).create(name='readAuxPressure', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('auxPressure')), access_type=accessLevel4)

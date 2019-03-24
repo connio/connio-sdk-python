@@ -1,4 +1,4 @@
-# Read methods
+# ~~ Read methods ~~
 #
 # readSerialNumber / cfgSerialNumber
 # readLogikaModel / cfgLogikaModel
@@ -23,7 +23,7 @@ def readTagIntoProperty_body(pname):
     return """/**
 
 */
-Device.readTag(
+Device.readTagByPropKey(
     { requestKey: '""" + pname + """',
       done: r => done(null, r)
 });

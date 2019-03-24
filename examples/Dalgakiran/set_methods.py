@@ -1,5 +1,6 @@
-# ~~ SET methods ~~
+# ~~ Common SET methods ~~
 #
+# setAny()
 # setSerialNumber()
 # setLogikaModel()
 # setLogikaFwVersion()
@@ -19,6 +20,26 @@
 # setLoadPercInLast100h()
 # setNbrOfStartsInLastHour()
 # setControllerTime()
+
+#
+#
+#
+def setAny_body():
+    return """/**
+Used with readAnyTag() method to read any type of tag. 
+The result is written into the 'tagValue' property.
+*/
+
+let readValue = Device.convertToDec({ values: value, default: 0 });
+
+Device.api.setProperty("tagValue", {
+    value: readValue.toString(),
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
 
 #
 #

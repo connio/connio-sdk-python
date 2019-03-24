@@ -46,12 +46,13 @@ def wire(client, name="LogikaL9", friendly="Logika L9 Controller", base="BaseLog
     client.account.methods(compressor.id).create(name='sett0x', method_impl= MethodInstance.MethodImplementation(sett0x_body()), access_type=accessLevel3)
     # client.account.methods(compressor.id).create(name='setPAx', method_impl= MethodInstance.MethodImplementation(setPAx_body()), access_type=accessLevel3)
 
+    client.account.methods(compressor.id).create(name='makeCompressorCommand', method_impl= MethodInstance.MethodImplementation(makeCompressorCommand_body()), access_type='protected')
+
     # Controller specific tag R/W operations
 
     accessLevel4 = 'public'
 
     client.account.methods(compressor.id).create(name='hasInverter', method_impl= MethodInstance.MethodImplementation(hasInverter_body()), access_type=accessLevel4)
-    client.account.methods(compressor.id).create(name='sendCommand', method_impl= MethodInstance.MethodImplementation(sendCommand_body()), access_type=accessLevel4)
     #
     client.account.methods(compressor.id).create(name='readP0x', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('P0')), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='readH0x', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('H0')), access_type=accessLevel4)

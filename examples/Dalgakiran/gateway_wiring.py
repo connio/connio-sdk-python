@@ -1,4 +1,5 @@
 
+# ~readTagByPropKey()
 # ~readTag()
 # ~writeAndReadTag()
 # ~writeTag()
@@ -8,7 +9,7 @@
 #
 #
 #
-def readTag_body():
+def readTagByPropKey_body():
     return """/**
   Sends gateway a read tag request if gateway is connected.
 */
@@ -23,6 +24,31 @@ try {
           time: new Date().toISOString()
         }).then(prop => {
             value.done("Read request [" + request  + "] sent successfully; check " + value.requestKey  + " property shortly for gateway response");
+        });
+    });
+}
+catch(e) {
+    done(e);
+}
+"""
+
+#
+#
+#
+def readTag_body():
+    return """/**
+  Sends gateway a read tag request if gateway is connected.
+*/
+try {
+    return Device.api.getProperty("connectionStatus").then(prop =>{
+        if (prop.value !== "online") {
+           throw Device.name + " is not online";
+        }
+        Device.api.setProperty("modbus_readrequest", {
+          value: value.cmd,
+          time: new Date().toISOString()
+        }).then(prop => {
+            value.done("Read request [" + value.cmd  + "] sent successfully.");
         });
     });
 }
@@ -90,7 +116,7 @@ try {
             value: value.cmd,
             time: new Date().toISOString()
         }).then(property => {
-            value.done("Write request [" + value.cmd  +"] sent successfully");
+            value.done("Write request [" + value.cmd  +"] sent successfully. Send a READ request to see updated value.");
         });
     });
 }
