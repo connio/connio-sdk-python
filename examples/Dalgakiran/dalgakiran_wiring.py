@@ -55,10 +55,10 @@ def wireApp(client):
  ######
 #      #
  ######
-def wireGw(client):
+def wireGw(client, name="ModbusGateway", friendly="Generic Modbus Gateway"):
   # Create new Minova Gateway profile
-  compressor = client.account.deviceprofiles.create(name='ModbusGateway', 
-                                                friendly_name='Generic Modbus Gateway',
+  compressor = client.account.deviceprofiles.create(name=name, 
+                                                friendly_name=friendly,
                                                 base_profile='Gateway',
                                                 description='Modbus gateway',
                                                 tags=['gw'],
@@ -77,6 +77,7 @@ def wireGw(client):
   
   #------ Add profile methods
 
+  client.account.methods(compressor.id).create(name='readTagByPropKey', method_impl= MethodInstance.MethodImplementation(readTagByPropKey_body()), access_type='protected')
   client.account.methods(compressor.id).create(name='readTag', method_impl= MethodInstance.MethodImplementation(readTag_body()), access_type='protected')
   client.account.methods(compressor.id).create(name='writeAndReadTag', method_impl= MethodInstance.MethodImplementation(writeAndReadTag_body()), access_type='protected')
   client.account.methods(compressor.id).create(name='writeTag', method_impl= MethodInstance.MethodImplementation(writeTag_body()), access_type='protected')
@@ -86,11 +87,11 @@ def wireGw(client):
  ######
 #      #
  ######
-def wireBase(client, name="BaseLogikaProfile", friendly="Logika Base"):
+def wireBase(client, name="BaseLogikaProfile", friendly="Logika Base", base='ModbusGateway'):
     # Create new Logika base profile
     compressor = client.account.deviceprofiles.create(name=name, 
                                                   friendly_name=friendly,
-                                                  base_profile='ModbusGateway',
+                                                  base_profile=base,
                                                   description='Logika controller base profile',
                                                   tags=['logika', 'base'],
                                                   device_class='controller',
@@ -100,6 +101,8 @@ def wireBase(client, name="BaseLogikaProfile", friendly="Logika Base"):
 
     #------ Add base profile properties
     
+    client.account.properties(compressor.id).create(name='tagValue', data_type='string', access_type='protected', publish_type='never')
+
     client.account.properties(compressor.id).create(name='cfgSerialNumber', data_type='string', access_type='protected', publish_type='never')
     client.account.properties(compressor.id).create(name='cfgLogikaModel', data_type='string', access_type='protected', publish_type='never')
     client.account.properties(compressor.id).create(name='cfgLogikaFwVersion', data_type='string', access_type='protected', publish_type='never')    
@@ -174,6 +177,7 @@ def wireBase(client, name="BaseLogikaProfile", friendly="Logika Base"):
     # client.account.properties(compressor.id).create(name='warrantyExpiresIn', data_type='number', access_type='public', publish_type='never', measurement=measurement)
 
     client.account.properties(compressor.id).create(name='warrantyExpiryDate', data_type='string', access_type='public', publish_type='never')
+    client.account.properties(compressor.id).create(name='icon', data_type='string', access_type='public', publish_type='never')
     
     # This can go to app maybe?
     description = """
@@ -200,17 +204,19 @@ Asagidaki sekilde bakim ucretlerini girebilirsiniz:
     #------ Add base profile methods
     
     client.account.methods(compressor.id).create(name='init', method_impl= MethodInstance.MethodImplementation(getInit_body()), access_type='public', description="""e.g. 
-    { 
-	    "hasInverter": true, 
-	    "warrantyInMonth": 12,
-	    "elecCost": {
-	        "value": 0, 
-	        "unit": "USD"
-	    }
-	  }
+{ 
+  "hasInverter": true, 
+  "warrantyInMonth": 12,
+  "icon": "inversys-15-plus-depolu.png",
+  "elecCost": {
+    "value": 0, 
+    "unit": "USD"
+  }
+}
     
     hasInverter: kompresorun inverter'u varsa 'true' yoksa 'false' olmalidir - default deger 'false'
     warrantyInMonth: kompresorun garanti suresini belirtir - default deger 12
+    icon: kompresor resim dosyasinin adi
     elecCost: kompresorun kullanildigi bolgedeki elektrik birim fiyati ve para birimi
     """)
     #client.account.methods(compressor.id).create(name='getDashboardParallel', method_impl= MethodInstance.MethodImplementation(getDashboard_body()), access_type='public')
@@ -282,6 +288,8 @@ Asagidaki sekilde bakim ucretlerini girebilirsiniz:
     client.account.methods(compressor.id).create(name='makeWriteRequest', method_impl= MethodInstance.MethodImplementation(makeWriteRequest_body()), access_type=accessLevel1_1)
     client.account.methods(compressor.id).create(name='makeWriteValue', method_impl= MethodInstance.MethodImplementation(makeWriteValue_body()), access_type=accessLevel1_1)
 
+    client.account.methods(compressor.id).create(name='setAny', method_impl= MethodInstance.MethodImplementation(setAny_body()), access_type=accessLevel1_1)
+
     client.account.methods(compressor.id).create(name='setSerialNumber', method_impl= MethodInstance.MethodImplementation(setSerialNumber_body()), access_type=accessLevel1_1)
     client.account.methods(compressor.id).create(name='setLogikaModel', method_impl= MethodInstance.MethodImplementation(setLogikaModel_body()), access_type=accessLevel1_1)
     client.account.methods(compressor.id).create(name='setLogikaFwVersion', method_impl= MethodInstance.MethodImplementation(setLogikaFwVersion_body()), access_type=accessLevel1_1)
@@ -310,6 +318,33 @@ Asagidaki sekilde bakim ucretlerini girebilirsiniz:
     client.account.methods(compressor.id).create(name='setControllerTime', method_impl= MethodInstance.MethodImplementation(setControllerTime_body()), access_type=accessLevel1_1)
 
     accessLevel2 = 'public'
+
+    client.account.methods(compressor.id).create(name='sendCommand', method_impl= MethodInstance.MethodImplementation(sendCommand_body()), access_type=accessLevel2)
+    client.account.methods(compressor.id).create(name='start', method_impl= MethodInstance.MethodImplementation(startStop_body(1)), access_type=accessLevel2)
+    client.account.methods(compressor.id).create(name='stop', method_impl= MethodInstance.MethodImplementation(startStop_body(0)), access_type=accessLevel2)
+
+    client.account.methods(compressor.id).create(name='writeAnyTag', method_impl= MethodInstance.MethodImplementation(writeAnyTag_body()), access_type=accessLevel2, description="""
+Bu method ile herhangi bir tag'i yazabilirsiniz. Gereken parametreler sunlar:
+
+- setValue: Yazilacak deger
+- addr: Tag'in modbus adresi
+- size: Yazilacak tag'in uzunlugu - default 2 (word)
+
+Ornegin:
+
+{ "setValue": 13, "addr": "0x401", "size": 2 } 
+""")
+    client.account.methods(compressor.id).create(name='readAnyTag', method_impl= MethodInstance.MethodImplementation(readAnyTag_body()), access_type=accessLevel2, description="""
+ Bu method ile herhangi bir tag'i okumak icin gateway'e komut gonderebilirsiniz. Okunan deger tagValue isimli property icine yailir. 
+ Gereken parametreler sunlar:
+
+- addr: Tag'in modbus adresi
+- size: Okunacak tag'in uzunlugu - default 2 (word)
+
+Ornegin:
+
+{ "addr": "0x401", "size": 2 } 
+""")
 
     client.account.methods(compressor.id).create(name='readSerialNumber', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('cfgSerialNumber')), access_type=accessLevel2)
     client.account.methods(compressor.id).create(name='readLogikaModel', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('cfgLogikaModel')), access_type=accessLevel2)
@@ -341,18 +376,19 @@ def wire(keyID, keySecret):
     print('Creating the system.....')
 
     #wireApp(client)
-    #wireGw(client)
+    wireGw(client)
+    wireBase(client)
     
     # Wire different controller types
-    wireBase(client)
     L9c.wire(client)
     L26c.wire(client)
     L33c.wire(client)
 
-    #wireBase(client, 'BaseLogikaProfileXX', 'Logika Base XX')
-    #L9c.wire(client, 'LogikaL9XX', 'Logika L9 XX', 'BaseLogikaProfileXX')
-    #L26c.wire(client, 'LogikaL26XX', 'Logika L26 XX', 'BaseLogikaProfileXX')
-    #L33c.wire(client, 'LogikaL33XX', 'Logika L33 XX', 'BaseLogikaProfileXX')
+    # wireGw(client, 'ModbusGatewayXX', 'Modbus Gateway XX')
+    # wireBase(client, 'BaseLogikaProfileXX', 'Logika Base XX', 'ModbusGatewayXX')
+    # L9c.wire(client, 'LogikaL9XX', 'Logika L9 XX', 'BaseLogikaProfileXX')
+    # L26c.wire(client, 'LogikaL26XX', 'Logika L26 XX', 'BaseLogikaProfileXX')
+    # L33c.wire(client, 'LogikaL33XX', 'Logika L33 XX', 'BaseLogikaProfileXX')
 
     print('System is created successfully in %.2f seconds' % (time.time() - start))
 
