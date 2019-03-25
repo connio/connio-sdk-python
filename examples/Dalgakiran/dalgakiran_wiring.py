@@ -18,6 +18,7 @@ from query_methods import *
 import L9_wiring as L9c
 import L26_wiring as L26c
 import L33_wiring as L33c
+import L200_wiring as L200c
 
 from gateway_wiring import *
 import app_wiring as app
@@ -67,7 +68,7 @@ def wireGw(client, name="ModbusGateway", friendly="Generic Modbus Gateway"):
                                                 vendor_name='Minova'
                                               )
 
-    #------ Add profile properties
+  #------ Add profile properties
   
   client.account.properties(compressor.id).create(name='gateway_info', data_type='object', access_type='protected', publish_type='never')
   client.account.properties(compressor.id).create(name='modbus_errors', data_type='string', access_type='protected', publish_type='never')
@@ -376,13 +377,14 @@ def wire(keyID, keySecret):
     print('Creating the system.....')
 
     #wireApp(client)
-    wireGw(client)
-    wireBase(client)
+    # wireGw(client)
+    # wireBase(client)
     
     # Wire different controller types
-    L9c.wire(client)
-    L26c.wire(client)
-    L33c.wire(client)
+    # L9c.wire(client)
+    # L26c.wire(client)
+    # L33c.wire(client)
+    L200c.wire(client)
 
     # wireGw(client, 'ModbusGatewayXX', 'Modbus Gateway XX')
     # wireBase(client, 'BaseLogikaProfileXX', 'Logika Base XX', 'ModbusGatewayXX')
