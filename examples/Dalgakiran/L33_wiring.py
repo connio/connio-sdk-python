@@ -10,8 +10,8 @@ def wire(client, name='LogikaL33', friendly="Logika L33 Controller", base="BaseL
     compressor = client.account.deviceprofiles.create(name=name, 
                                                   friendly_name=friendly,
                                                   base_profile=base,
-                                                  description='Logika L3 controller',
-                                                  tags=['logika', 'L3'],
+                                                  description='Logika L33 controller',
+                                                  tags=['logika', 'L33'],
                                                   device_class='controller',
                                                   product_name='L33',
                                                   vendor_name='Logika'
