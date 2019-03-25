@@ -72,9 +72,9 @@ def wireGw(client, name="ModbusGateway", friendly="Generic Modbus Gateway"):
   
   client.account.properties(compressor.id).create(name='gateway_info', data_type='object', access_type='protected', publish_type='never')
   client.account.properties(compressor.id).create(name='modbus_errors', data_type='string', access_type='protected', publish_type='never')
-  client.account.properties(compressor.id).create(name='modbus_readrequest', data_type='string', access_type='public', publish_type='never')    
-  client.account.properties(compressor.id).create(name='modbus_settings', data_type='string', access_type='public', publish_type='never')
-  client.account.properties(compressor.id).create(name='modbus_writerequest', data_type='string', access_type='public', publish_type='never')
+  client.account.properties(compressor.id).create(name='modbus_readrequest', data_type='string', access_type='public', publish_type='always')    
+  client.account.properties(compressor.id).create(name='modbus_settings', data_type='string', access_type='public', publish_type='always')
+  client.account.properties(compressor.id).create(name='modbus_writerequest', data_type='string', access_type='public', publish_type='always')
   
   #------ Add profile methods
 
