@@ -249,7 +249,7 @@ def makeWriteRequest_body():
     @param value.byteCount(default 2)
 */
 
-if (!value.x || !value.setValue) throw `Given parameters are not correct. x: ${value.x}, setValue: ${value.setValue}`;
+if (value.x == null || value.setValue == null) throw `Given parameters are not correct. x: ${value.x}, setValue: ${value.setValue}`;
 
 let params = Device.fetchWriteRequest(value.tagKey);
 let byteCount = value.byteCount || 2;

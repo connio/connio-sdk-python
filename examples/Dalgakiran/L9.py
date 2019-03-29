@@ -62,6 +62,8 @@ const requests = {
   cfgLogikaFwVersion:   { request: "r,meth:setLogikaFwVersion,-,2,-,1,0x0B" },
   cfgLevel1Pwd:         { request: "r,meth:setLevel1Pwd,-,4,-,1,0x100" },
   cfgLevel2Pwd:         { request: "r,meth:setLevel2Pwd,-,4,-,1,0x102" },
+  nonAckAlarms:         { request: "r,meth:setNonAckAlarms, -, 4,-, 0x202"},
+  blockingAlarm:        { request: "r,meth:setBlockingAlarm,-,2,-,1-0x402"},
   relayOutputs:         { request: "r,meth:setRelayOutputs,-,2,-,1,0x403" },
   digitalInputs:        { request: "r,meth:setDigitalInputs,-,2,-,1,0x404" },
   cfgMaintCycles:       { request: "r,meth:setMaintCycles,-,12,-,1,0x518" },
@@ -86,7 +88,13 @@ def fetchWriteRequest_body():
 
 */
 const requests = {
-    P0:  { rprop: "P0x", rcmd: "r,meth:setP0x,-,16,-,1,0x500", min: 0, max: 7, offset: "0x500", multiplier: [,,10,10,10,10,,] },
+    ChangeAirFilter: { rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x518", min: 1, max: 1, offset: "0x518" },
+    ChangeOilFilter:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x518", min: 1, max: 1, offset: "0x519" },
+    ChangeSeperatorFilter:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x518", min: 1, max: 1, offset: "0x51A" },
+    ChangeOil:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x518", min: 1, max: 1, offset: "0x51B" },
+    CheckCompressor:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x518", min: 1, max: 1, offset: "0x51C" },
+    BearingLubrication:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x518", min: 1, max: 1, offset: "0x51D" },
+    P0:  { rprop: "P0x", rcmd: "r,meth:setP0x,-,16,-,1,0x500", min: 0, max: 7, offset: "0x500", multiplier: [,,10,10,10,10,10,] },
     H0:  { rprop: "H0x", rcmd: "r,meth:setH0x,-,16,-,1,0x508", min: 0, max: 7, offset: "0x508" },
     t0:  { rprop: "t0x", rcmd: "r,meth:sett0x,-,16,-,1,0x510", min: 1, max: 8, offset: "0x510" },
     //PA:  { rprop: "PAx", rcmd: "r,meth:setPAx,-,4,-,1,0x52A", min: 1, max: 2, offset: "0x52A" },
@@ -309,13 +317,13 @@ Device.api.setProperty("digitalInputs", {
 def setP0x_body():
     return """/**
     P00	RW 	bar
-    P01	RW	bar*10 (must be divided by 10)
+    P01	RW	bar
     P02	RW	bar*10 (must be divided by 10)
     P03	RW	bar*10 (must be divided by 10)
     P04	RW	bar*10 (must be divided by 10)
     P05	RW	bar*10 (must be divided by 10)
     P06	RW	bar*10 (must be divided by 10)
-    P07	RW	bar*10 (must be divided by 10)
+    P07	RW	
 */
 
 const itemCount = 8;
@@ -330,8 +338,8 @@ Device.api.log("debug", tagPropName + ": " + value.toString())
  .then(p => {
     for (var i = 0; i < itemCount * 2; i+=2) {
         let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
-        // Exception: P0x is not x10 scale like other values
-        if (i > 0) itemValue = itemValue / 10;
+        // Exception: P00, P01, P07 are not x10 scale like other values
+        if (i != 0 && i != 2 && i != 14) itemValue = itemValue / 10;
         P0x['P0' + (i/2).toString()] = itemValue.toString() + ' bar';
     }
     

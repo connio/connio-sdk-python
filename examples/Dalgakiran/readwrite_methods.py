@@ -28,3 +28,140 @@ Device.readTagByPropKey(
       done: r => done(null, r)
 });
 """
+def writeChangeAirFilter_body():
+    return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
+*/
+let args = {
+  tagKey: "ChangeAirFilter",
+  x: value.x || 1,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}"""
+
+def writeChangeOilFilter_body():
+    return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
+*/
+let args = {
+  tagKey: "ChangeOilFilter",
+  x: value.x || 1,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
+
+  
+  """
+
+def writeChangeOil_body():
+    return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
+*/
+let args = {
+  tagKey: "ChangeOil",
+  x: value.x || 1,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
+
+  
+  """
+
+def writeChangeSeperatorFilter_body():
+    return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
+*/
+let args = {
+  tagKey: "ChangeSeperatorFilter",
+  x: value.x || 1,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
+
+  
+  """
+
+def writeCheckCompressor_body():
+    return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
+*/
+let args = {
+  tagKey: "CheckCompressor",
+  x: value.x || 1,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
+
+  
+  """
+
+def writeBearingLubrication_body():
+    return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
+*/
+let args = {
+  tagKey: "BearingLubrication",
+  x: value.x || 1,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}"""

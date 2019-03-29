@@ -69,7 +69,7 @@ def wire(client, name="LogikaL26", friendly="Logika L26 Controller", base="BaseL
     client.account.properties(compressor.id).create(name='C20_x', data_type='object', access_type='protected', publish_type='never')
     client.account.properties(compressor.id).create(name='C22', data_type='object', access_type='protected', publish_type='never')
     client.account.properties(compressor.id).create(name='DRx', data_type='object', access_type='protected', publish_type='never')
-
+    client.account.properties(compressor.id).create(name='DAx', data_type='object', access_type='protected', publish_type='never')
     #------ Add profile methods
 
     accessLevel2 = 'private'
@@ -113,6 +113,7 @@ def wire(client, name="LogikaL26", friendly="Logika L26 Controller", base="BaseL
     client.account.methods(compressor.id).create(name='setC20_x', method_impl= MethodInstance.MethodImplementation(setC20x_body()), access_type=accessLevel3)
     client.account.methods(compressor.id).create(name='setC22', method_impl= MethodInstance.MethodImplementation(setC22_body()), access_type=accessLevel3)
     client.account.methods(compressor.id).create(name='setDRx', method_impl= MethodInstance.MethodImplementation(setDRx_body()), access_type=accessLevel3)
+    client.account.methods(compressor.id).create(name='setDAx', method_impl= MethodInstance.MethodImplementation(setDAx_body()), access_type=accessLevel3)
 
     client.account.methods(compressor.id).create(name='makeCompressorCommand', method_impl= MethodInstance.MethodImplementation(makeCompressorCommand_body()), access_type='protected')
 
@@ -148,6 +149,7 @@ def wire(client, name="LogikaL26", friendly="Logika L26 Controller", base="BaseL
     client.account.methods(compressor.id).create(name='readC20_x', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('C20')), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='readC22', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('C22')), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='readDRx', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('DR')), access_type=accessLevel4)
+    client.account.methods(compressor.id).create(name='readDAx', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('DA')), access_type=accessLevel4)
     #
     client.account.methods(compressor.id).create(name='writeWPx', method_impl= MethodInstance.MethodImplementation(writeWPx_body()), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='writeWTx', method_impl= MethodInstance.MethodImplementation(writeWTx_body()), access_type=accessLevel4)
@@ -167,5 +169,6 @@ def wire(client, name="LogikaL26", friendly="Logika L26 Controller", base="BaseL
     client.account.methods(compressor.id).create(name='writeC20_x', method_impl= MethodInstance.MethodImplementation(writeC20x_body()), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='writeC2x', method_impl= MethodInstance.MethodImplementation(writeC22_body()), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='writeDRx', method_impl= MethodInstance.MethodImplementation(writeDRx_body()), access_type=accessLevel4)
+    client.account.methods(compressor.id).create(name='writeDAx', method_impl= MethodInstance.MethodImplementation(writeDAx_body()), access_type=accessLevel4)
 
     

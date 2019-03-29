@@ -90,9 +90,9 @@ def fetchReadRequest_body():
 
 */
 const requests = {
-  cfgSerialNumber:                  { request: "r,meth:setSerialNumber,-,20,-,1,0x00" },
-  cfgLogikaModel:                   { request: "r,meth:setLogikaModel,-,2,-,1,0x0A" },
-  cfgLogikaFwVersion:               { request: "r,meth:setLogikaFwVersion,-,2,-,1,0x0B" },
+  cfgSerialNumber:                  { request: "r,meth:setSerialNumber,-,20,-,1,0x000" },
+  cfgLogikaModel:                   { request: "r,meth:setLogikaModel,-,2,-,1,0x00A" },
+  cfgLogikaFwVersion:               { request: "r,meth:setLogikaFwVersion,-,2,-,1,0x00B" },
   cfgLevel1Pwd:                     { request: "r,meth:setLevel1Pwd,-,6,-,1,0x100" },
   cfgLevel2Pwd:                     { request: "r,meth:setLevel2Pwd,-,6,-,1,0x103" },
   cfgLevel3Pwd:                     { request: "r,meth:setLevel3Pwd,-,6,-,1,0x106" },
@@ -133,11 +133,12 @@ const requests = {
   R0:                               { request: "r,meth:setR0x,-,4,-,1,0x53D" },
   R03:                              { request: "r,meth:setR03,-,2,-,1,0x502" },
   DS:                               { request: "r,meth:setDSx,-,12,-,1,0xA1B" },
-  DA:                               { request: "r,meth:setDAx,-,28,-,1,0xA21" },
+  DA:                               { request: "r,meth:setDAx,-,26,-,1,0xA21" },
   DF:                               { request: "r,meth:setDFx,-,12,-,1,0xA2E" },
   DF7:                              { request: "r,meth:setDF7,-,2,-,1,0x541" },
 };
 return requests[value].request;
+
 """
 
 #
@@ -148,6 +149,12 @@ def fetchWriteRequest_body():
 
 */
 const requests = {
+    ChangeAirFilter: { rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x520", min: 1, max: 1, offset: "0x52C" },
+    ChangeOilFilter:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x520", min: 1, max: 1, offset: "0x52D" },
+    ChangeSeperatorFilter:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x520", min: 1, max: 1, offset: "0x52E" },
+    ChangeOil:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x520", min: 1, max: 1, offset: "0x52F" },
+    CheckCompressor:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x520", min: 1, max: 1, offset: "0x530" },
+    BearingLubrication:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x520", min: 1, max: 1, offset: "0x531" },
     WP:      { rprob: "WPx", rcmd: "r,meth:setWPx,-,12,-,1,0x504", min: 1, max: 6, offset:"0x504", multiplier: [,10,10,10,10,10] },
     SP:      { rprob: "SPx", rcmd: "r,meth:setSPx,-,8,-,1,0x50A", min: 1, max: 4, offset:"0x50A", multiplier: [,10,10,10] },
     SP5:     { rprob: "SP5", rcmd: "r,meth:setSP5,-,2,-,1,0x542", min: 5, max: 5, offset:"0x542", multiplier: [10] },
@@ -162,12 +169,13 @@ const requests = {
     STD1:    { rprob: "STD1", rcmd: "r,meth:setSTD1,-,2,-,1,0x51E", min: 1, max: 1, offset:"0x51E", multiplier: [10] },
     Wt:      { rprob: "Wtx_", rcmd: "r,meth:setWtx_,-,20,-,1,0x522", min: 1, max: 10, offset:"0x522", multiplier: [,,,,,,,,,0.1] },
     R0:      { rprob: "R0x", rcmd: "r,meth:setR0x,-,4,-,1,0x53D", min: 1, max: 2, offset:"0x53D", multiplier: [10,0.1] },
-    DS:      { rprob: "DSx", rcmd: "r,meth:setDSx,-,12,-,1,0xA1B", min: 1, max: 6, offset:"0xA1B", multiplier: [,,0.1,0.1,0.1,0.1] },
-    DA:      { rprob: "DAx", rcmd: "r,meth:setDAx,-,28,-,1,0xA21", min: 0, max: 13, offset:"0xA21" },
+    DS:      { rprob: "DSx", rcmd: "r,meth:setDSx,-,12,-,1,0xA1B", min: 1, max: 6, offset:"0xA1B", multiplier: [,,0.1,0.1,0.01,0.01] },
+    DA:      { rprob: "DAx", rcmd: "r,meth:setDAx,-,26,-,1,0xA21", min: 0, max: 13, offset:"0xA21" },
     DF:      { rprob: "DFx", rcmd: "r,meth:setDFx,-,12,-,1,0xA2E", min: 1, max: 6, offset:"0xA2E", multiplier: [0.01,0.01,0.01,0.01,0.01,0.01] },
     //DF7:     { rprob: "DF7", rcmd: "r,meth:setDF7,-,2,-,1,0x541", min: 7, max: 7, offset:"0x541" },
 };
 return requests[value];
+
 """
 
 #
@@ -722,15 +730,15 @@ Elements contains (depends on drive selected):
   9-FMAX [Hz*10]
 */
 
-let frequency = Device.convertToDec({ values: value.splice(0, 2), default: 0});
-let power = Device.convertToDec({ values: value.splice(2, 4), default: 0});
-let current = Device.convertToDec({ values: value.splice(4, 6), default: 0});
-let voltage = Device.convertToDec({ values: value.splice(6, 8), default: 0});
-let temp = Device.convertToDec({ values: value.splice(8, 10), default: 0});
-let rpm = Device.convertToDec({ values: value.splice(10, 12), default: 0});
-let energy = Device.convertToDec({ values: value.splice(12, 16), default: 0});
-let fmin = Device.convertToDec({ values: value.splice(16, 18), default: 0});
-let fmax = Device.convertToDec({ values: value.splice(18), default: 0});
+let frequency = Device.convertToDec({ values: value.split(0, 2), default: 0});
+let power = Device.convertToDec({ values: value.split(2, 4), default: 0});
+let current = Device.convertToDec({ values: value.split(4, 6), default: 0});
+let voltage = Device.convertToDec({ values: value.split(6, 8), default: 0});
+let temp = Device.convertToDec({ values: value.split(8, 10), default: 0});
+let rpm = Device.convertToDec({ values: value.split(10, 12), default: 0});
+let energy = Device.convertToDec({ values: value.split(12, 16), default: 0});
+let fmin = Device.convertToDec({ values: value.split(16, 18), default: 0});
+let fmax = Device.convertToDec({ values: value.split(18), default: 0});
 
 let drive = {
   frequency: frequency / 10,
@@ -970,7 +978,7 @@ SP5	RW	bar*10 (must be divided by 10)
 const tagPropName = "SPx";
 
 let SP5 = Device.convertToDec({ values: value }, -1);
-
+SP5 = (SP5/10).toFixed(1)
 Device.api.getProperty(tagPropName)
   .then(property => {
     property.value.SP5 = SP5;
@@ -1018,7 +1026,7 @@ SP6	RW	bar*10 (must be divided by 10)
 const tagPropName = "SPx";
 
 let SP6 = Device.convertToDec({ values: value }, -1);
-
+SP6 = (SP6/10).toFixed(1);
 Device.api.getProperty(tagPropName)
   .then(property => {
     property.value.SP6 = SP6;
@@ -1030,6 +1038,7 @@ Device.api.getProperty(tagPropName)
       done(null, property.value);
     });
   });
+
 """
 
 def writeSP6_body():
@@ -1131,7 +1140,7 @@ STA3	R		°C x 10
 
 const itemCount = 3;
 
-let WTx = {};
+let STAx = {};
 for (var x = 0; x < itemCount; x++) {
     STAx['STA' + (x+1).toString()] = '-';
 }
@@ -1140,18 +1149,19 @@ Device.api.log("info", "STAx: " + value.toString())
  .then(p => {
     for (var i = 0; i < itemCount * 2; i+=2) {
         let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
-        itemValue = itemValue / 10;
+        itemValue = (itemValue / 10).toFixed(1);
         STAx['STA' + ((i/2)+1).toString()] = itemValue.toString() + ' °C';
     }
     
     Device.api.setProperty("STAx", {
-      value: WTx,
+      value: STAx,
       time: new Date().toISOString()
       }).
     then(property => {
         done(null, property.value);
     });
  });
+
 """
 
 def writeSTAx_body():
@@ -1363,12 +1373,12 @@ Device.api.log("debug", "R0x: " + value.toString())
 
         let unit;
         if (i == 2) {
-          itemValue = itemValue / 10;
-          unit = "Power";
-        }
-        else {
           itemValue = itemValue * 10;
           unit = "L/min";
+        }
+        else {
+          itemValue = itemValue / 10;
+          unit = "kW";
         }
         
         R0x['R0' + ((i/2) + 1).toString()] = itemValue.toString() + unit;
@@ -1382,6 +1392,7 @@ Device.api.log("debug", "R0x: " + value.toString())
         done(null, property.value);
     });
  });
+
 """
 
 def writeR0x_body():
@@ -1437,11 +1448,9 @@ Device.api.log("debug", "DSx: " + value.toString())
         if (i == 0 || i == 2) {
           unit = " Hz";
         }
-        else if (i == 8 || i == 10) {
-          itemValue = itemValue * 100;
-        }
+        else if (i == 4 || i == 6) itemValue = (itemValue/10).toFixed(1);
         else {
-          itemValue = itemValue * 10;
+          itemValue = (itemValue/100).toFixed(2)
         }
         
         DSx['DS' + ((i/2) + 1).toString()] = itemValue.toString() + unit;
@@ -1455,6 +1464,7 @@ Device.api.log("debug", "DSx: " + value.toString())
         done(null, property.value);
     });
  });
+
 """
 
 def writeDSx_body():
@@ -1487,7 +1497,7 @@ catch(e) {
 def setDAx_body():
     return """/**
 */
-const itemCount = 14;
+const itemCount = 13;
 
 let DAx = {};
 for (var x = 0; x < itemCount; x++) {
@@ -1498,7 +1508,8 @@ Device.api.log("info", "DAx: " + value.toString())
  .then(p => {
     for (var i = 0; i < itemCount * 2; i+=2) {
         let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
-
+        if(i== 0 || i == 6 || i == 10 || i == 16 ) itemValue = (itemValue/10).toFixed(1);
+        if(i == 12 || i == 18) itemValue = (itemValue/100).toFixed(2);
         DAx['DA' + (i/2).toString()] = itemValue.toString();
     }
     

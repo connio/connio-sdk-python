@@ -362,6 +362,8 @@ Ornegin:
     client.account.methods(compressor.id).create(name='readLoadPercInLast100h', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('loadPercInLast100h')), access_type=accessLevel2)
     client.account.methods(compressor.id).create(name='readNbrOfStartsInLastHour', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('nbrOfStartsInLastHour')), access_type=accessLevel2)
     client.account.methods(compressor.id).create(name='readControllerTime', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('controllerTime')), access_type=accessLevel2)
+    client.account.methods(compressor.id).create(name='readNonAckAlarms', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('nonAckAlarms')), access_type=accessLevel2)
+    client.account.methods(compressor.id).create(name='readBlockingAlarm', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('blockingAlarm')), access_type=accessLevel2)
 
 
 def wire(keyID, keySecret):
