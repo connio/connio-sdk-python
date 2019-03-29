@@ -136,12 +136,12 @@ def fetchWriteRequest_body():
 
 */
 const requests = {
-    ChangeAirFilter: { rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x520", min: 1, max: 1, offset: "0x520" },
-    ChangeOilFilter:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x520", min: 1, max: 1, offset: "0x521" },
-    ChangeSeperatorFilter:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x520", min: 1, max: 1, offset: "0x522" },
-    ChangeOil:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x520", min: 1, max: 1, offset: "0x523" },
-    CheckCompressor:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x520", min: 1, max: 1, offset: "0x524" },
-    BearingLubrication:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x520", min: 1, max: 1, offset: "0x525" },
+    changeAirFilter: { rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x520", min: 1, max: 1, offset: "0x520" },
+    changeOilFilter:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x520", min: 1, max: 1, offset: "0x521" },
+    changeSeperatorFilter:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x520", min: 1, max: 1, offset: "0x522" },
+    changeOil:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x520", min: 1, max: 1, offset: "0x523" },
+    checkCompressor:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x520", min: 1, max: 1, offset: "0x524" },
+    bearingLubrication:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x520", min: 1, max: 1, offset: "0x525" },
     WP:  { rprop: "WPx", rcmd: "r,meth:setWPx,-,12,-,1,0x509", min: 1, max: 6, offset: "0x509", multiplier: [,10,10,10,10,10] },
     WT:  { rprop: "WTx", rcmd: "r,meth:setWTx,-,16,-,1,0x50F", min: 0, max: 7, offset: "0x50F" },
     Wt:  { rprop: "Wtx_", rcmd: "r,meth:setWtx_,-,14,-,1,0x517", min: 1, max: 7, offset: "0x517" },

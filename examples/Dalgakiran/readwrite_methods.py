@@ -33,7 +33,7 @@ def writeChangeAirFilter_body():
 @value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
 */
 let args = {
-  tagKey: "ChangeAirFilter",
+  tagKey: "changeAirFilter",
   x: value.x || 1,
   setValue: value.setValue,
   byteCount: value.byteCount || 2
@@ -54,7 +54,7 @@ def writeChangeOilFilter_body():
 @value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
 */
 let args = {
-  tagKey: "ChangeOilFilter",
+  tagKey: "changeOilFilter",
   x: value.x || 1,
   setValue: value.setValue,
   byteCount: value.byteCount || 2
@@ -78,7 +78,7 @@ def writeChangeOil_body():
 @value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
 */
 let args = {
-  tagKey: "ChangeOil",
+  tagKey: "changeOil",
   x: value.x || 1,
   setValue: value.setValue,
   byteCount: value.byteCount || 2
@@ -102,7 +102,7 @@ def writeChangeSeperatorFilter_body():
 @value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
 */
 let args = {
-  tagKey: "ChangeSeperatorFilter",
+  tagKey: "changeSeperatorFilter",
   x: value.x || 1,
   setValue: value.setValue,
   byteCount: value.byteCount || 2
@@ -126,7 +126,7 @@ def writeCheckCompressor_body():
 @value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
 */
 let args = {
-  tagKey: "CheckCompressor",
+  tagKey: "checkCompressor",
   x: value.x || 1,
   setValue: value.setValue,
   byteCount: value.byteCount || 2
@@ -150,7 +150,7 @@ def writeBearingLubrication_body():
 @value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
 */
 let args = {
-  tagKey: "BearingLubrication",
+  tagKey: "bearingLubrication",
   x: value.x || 1,
   setValue: value.setValue,
   byteCount: value.byteCount || 2
