@@ -125,14 +125,14 @@ def wire(client, name='LogikaL33', friendly="Logika L33 Controller", base="BaseL
     client.account.methods(compressor.id).create(name='setD7', method_impl= MethodInstance.MethodImplementation(setD7_body()), access_type=accessLevel3)
     client.account.methods(compressor.id).create(name='setD1', method_impl= MethodInstance.MethodImplementation(setD1_body()), access_type=accessLevel3)
     client.account.methods(compressor.id).create(name='setD3', method_impl= MethodInstance.MethodImplementation(setD3_body()), access_type=accessLevel3)
-    client.account.methods(compressor.id).create(name='setS12', method_impl= MethodInstance.MethodImplementation(setS12_S13_S14_body()), access_type=accessLevel3)
+    client.account.methods(compressor.id).create(name='setS12_S13_S14', method_impl= MethodInstance.MethodImplementation(setS12_S13_S14_body()), access_type=accessLevel3)
     client.account.methods(compressor.id).create(name='setS02', method_impl= MethodInstance.MethodImplementation(setS02_body()), access_type=accessLevel3)
     client.account.methods(compressor.id).create(name='setS07', method_impl= MethodInstance.MethodImplementation(setS07_body()), access_type=accessLevel3)
-    client.account.methods(compressor.id).create(name='setS08', method_impl= MethodInstance.MethodImplementation(setS08_S09_body()), access_type=accessLevel3)
+    client.account.methods(compressor.id).create(name='setS08_S09', method_impl= MethodInstance.MethodImplementation(setS08_S09_body()), access_type=accessLevel3)
     client.account.methods(compressor.id).create(name='setS11', method_impl= MethodInstance.MethodImplementation(setS11_body()), access_type=accessLevel3)
     client.account.methods(compressor.id).create(name='setS16', method_impl= MethodInstance.MethodImplementation(setS16_body()), access_type=accessLevel3)
     client.account.methods(compressor.id).create(name='setS15', method_impl= MethodInstance.MethodImplementation(setS15_body()), access_type=accessLevel3)
-    client.account.methods(compressor.id).create(name='setS21', method_impl= MethodInstance.MethodImplementation(setS21_S22_body()), access_type=accessLevel3)
+    client.account.methods(compressor.id).create(name='setS21_S22', method_impl= MethodInstance.MethodImplementation(setS21_S22_body()), access_type=accessLevel3)
 
     #client.account.methods(compressor.id).create(name='setDF7', method_impl= MethodInstance.MethodImplementation(setDF7_body()), access_type=accessLevel3)
 
