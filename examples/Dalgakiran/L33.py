@@ -134,7 +134,7 @@ const requests = {
   R0:                               { request: "r,meth:setR0x,-,4,-,1,0x53D" },
   R03:                              { request: "r,meth:setR03,-,2,-,1,0x502" },
   DS:                               { request: "r,meth:setDSx,-,12,-,1,0xA1B" },
-  DA:                               { request: "r,meth:setDAx,-,26,-,1,0xA21" },
+  DA:                               { request: "r,meth:setDAx,-,28,-,1,0xA21" },
   DF:                               { request: "r,meth:setDFx,-,12,-,1,0xA2E" },
   DF7:                              { request: "r,meth:setDF7,-,2,-,1,0x541" },
   V0:                              { request: "r,meth:setV0x,-,10,-,1,0x549" },
@@ -190,7 +190,7 @@ const requests = {
     Wt11:    { rprop: "Wt11", rcmd: "r,meth:setWt11,-,2,-,1,0x54F", min: 11, max: 11, offset: "0x54F"},
     R0:      { rprob: "R0x", rcmd: "r,meth:setR0x,-,4,-,1,0x53D", min: 1, max: 2, offset:"0x53D", multiplier: [10,0.1] },
     DS:      { rprob: "DSx", rcmd: "r,meth:setDSx,-,12,-,1,0xA1B", min: 1, max: 6, offset:"0xA1B", multiplier: [,,0.1,0.1,0.01,0.01] },
-    DA:      { rprob: "DAx", rcmd: "r,meth:setDAx,-,26,-,1,0xA21", min: 0, max: 13, offset:"0xA21" },
+    DA:      { rprob: "DAx", rcmd: "r,meth:setDAx,-,28,-,1,0xA21", min: 0, max: 13, offset:"0xA21" },
     DF:      { rprob: "DFx", rcmd: "r,meth:setDFx,-,12,-,1,0xA2E", min: 1, max: 6, offset:"0xA2E", multiplier: [0.01,0.01,0.01,0.01,0.01,0.01] },
     V0:      {rprob: "V0x", rcmd: "r,meth:setV0x,-,10,-,1,0x549", min: 1, max: 5, offset:"0x549"},
     D1:      {rprob: "D1", rcmd: "r,meth:setD1,-,2,-,1,0xA19", min: 1, max: 1, offset:"0xA19"},
@@ -1667,7 +1667,7 @@ catch(e) {
 def setDAx_body():
     return """/**
 */
-const itemCount = 13;
+const itemCount = 14;
 
 let DAx = {};
 for (var x = 0; x < itemCount; x++) {

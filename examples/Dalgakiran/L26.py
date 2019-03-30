@@ -82,7 +82,7 @@ def fetchReadRequest_body():
 */
 const requests = {
   cfgSerialNumber:      { request: "r,meth:setSerialNumber,-,20,-,1,0x000" },
-  cfgLogikaModel :      { request: "r,meth:setLogikaModel,-,2,-,1,0x0A" },
+  cfgLogikaModel :      { request: "r,meth:setLogikaModel,-,2,-,1,0x00A" },
   cfgLogikaFwVersion:   { request: "r,meth:setLogikaFwVersion,-,2,-,1,0x0B" },
   cfgLevel1Pwd:         { request: "r,meth:setLevel1Pwd,-,6,-,1,0x100" },
   cfgLevel2Pwd:         { request: "r,meth:setLevel2Pwd,-,6,-,1,0x103" },
@@ -1135,9 +1135,8 @@ def setC10_body():
     return """/**
 NominalAirFlow	R	Capacity (Nominal Air Flow) L/min *0.1 (C10)	Lt/min
 */
-let setValue = Device.convertToDec({ values: value, default: 0}) * 10.0;
 Device.api.setProperty("C10", {
-    value: setValue,
+    value: Device.convertToDec({ values: value, default: 0}) * 10.0,
     time: new Date().toISOString()
  })
  .then(property => {
@@ -1547,9 +1546,8 @@ def setPM1_body():
     return """/**
 0.01
 */
-let setValue = Device.convertToDec({ values: value, default: 0}) * 100;
 Device.api.setProperty("PM1", {
-    value: setValue,
+    value: Device.convertToDec({ values: value, default: 0}) * 100,
     time: new Date().toISOString()
  })
  .then(property => {
