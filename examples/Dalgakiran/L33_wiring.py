@@ -190,6 +190,10 @@ def wire(client, name='LogikaL33', friendly="Logika L33 Controller", base="BaseL
     # Write Only Tags
     client.account.methods(compressor.id).create(name='writeRelativeSpeed', method_impl= MethodInstance.MethodImplementation(writeRelativeSpeed_body()), access_type=accessLevel4)
     # 
+    client.account.methods(compressor.id).create(name='writeLevel1Password', method_impl= MethodInstance.MethodImplementation(writeLevel1Password_body()), access_type=accessLevel4)
+    client.account.methods(compressor.id).create(name='writeLevel2Password', method_impl= MethodInstance.MethodImplementation(writeLevel2Password_body()), access_type=accessLevel4)
+    client.account.methods(compressor.id).create(name='writeLevel3Password', method_impl= MethodInstance.MethodImplementation(writeLevel3Password_body()), access_type=accessLevel4)
+
     client.account.methods(compressor.id).create(name='writeConfigSwitches', method_impl= MethodInstance.MethodImplementation(writeConfigSwitches_body()), access_type=accessLevel4)    
     client.account.methods(compressor.id).create(name='writeWPx', method_impl= MethodInstance.MethodImplementation(writeWPx_body()), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='writeSPx', method_impl= MethodInstance.MethodImplementation(writeSPx_body()), access_type=accessLevel4)

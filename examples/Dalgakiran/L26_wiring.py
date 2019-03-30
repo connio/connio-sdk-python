@@ -160,6 +160,10 @@ def wire(client, name="LogikaL26", friendly="Logika L26 Controller", base="BaseL
     client.account.methods(compressor.id).create(name='readDRx', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('DR')), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='readDAx', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('DA')), access_type=accessLevel4)
     #
+    client.account.methods(compressor.id).create(name='writeLevel1Password', method_impl= MethodInstance.MethodImplementation(writeLevel1Password_body()), access_type=accessLevel4)
+    client.account.methods(compressor.id).create(name='writeLevel2Password', method_impl= MethodInstance.MethodImplementation(writeLevel2Password_body()), access_type=accessLevel4)
+    client.account.methods(compressor.id).create(name='writeLevel3Password', method_impl= MethodInstance.MethodImplementation(writeLevel3Password_body()), access_type=accessLevel4)
+
     client.account.methods(compressor.id).create(name='writeWPx', method_impl= MethodInstance.MethodImplementation(writeWPx_body()), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='writeWTx', method_impl= MethodInstance.MethodImplementation(writeWTx_body()), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='writeWtx_', method_impl= MethodInstance.MethodImplementation(writeWtx_body()), access_type=accessLevel4)

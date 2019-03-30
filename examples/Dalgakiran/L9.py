@@ -100,6 +100,8 @@ def fetchWriteRequest_body():
 
 */
 const requests = {
+    cfgLevel1Pwd:         { rprop:"cfgLevel1Pwd", rcmd: "r,meth:setLevel1Pwd,-,4,-,1,0x100", min: 1, max: 1, offset: "0x100"},
+    cfgLevel2Pwd:         { rprop:"cfgLevel2Pwd", rcmd: "r,meth:setLevel2Pwd,-,4,-,1,0x102", min: 1, max: 1, offset: "0x102"},
     ChangeAirFilter: { rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x518", min: 1, max: 1, offset: "0x518" },
     ChangeOilFilter:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x518", min: 1, max: 1, offset: "0x519" },
     ChangeSeperatorFilter:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x518", min: 1, max: 1, offset: "0x51A" },
@@ -331,7 +333,67 @@ Device.api.setProperty("digitalInputs", {
     done(null, property.value);
  });
 """
+#####################
+#
+#  Level1Password
+#
+#####################
+def writeLevel1Password_body():
+    return """/**
+@value {{ x: integer, setValue: int[], byteCount: integer = 2 }}
 
+Example:
+Called as {"value": {"x": 1, "setValue":[5,9]}} to set the level1Password to 59
+Accepts 0...9 for each digit
+*/
+let args = {
+  tagKey: "cfgLevel1Pwd",
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+
+try {
+  let params = Device.fetchWriteRequest(args.tagKey);
+  let tagValue = Device.makeWriteValue({ value: args.setValue, byteCount: args.byteCount });
+  let tag_address = (parseInt(params.offset, 16) + (value.x - params.min)).toString();
+  let req = { cmd: `w,${tagValue.join(':')},${args.byteCount},0,1,${tag_address}`, done: r => done(null, r) };
+  Device.writeTag(req);
+}
+catch(e) {
+  done(e);
+}
+"""
+#####################
+#
+#  Level2Password
+#
+#####################
+def writeLevel2Password_body():
+    return """/**
+@value {{ x: integer, setValue: int[], byteCount: integer = 3 }}
+
+Example:
+Called as {"value": {"x": 1, "setValue":[5,9,5]}} to set the level2Password to 595
+Accepts 0...9 for each digit
+*/
+let args = {
+  tagKey: "cfgLevel2Pwd",
+  x: value.x,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 3
+};
+
+try {
+  let params = Device.fetchWriteRequest(args.tagKey);
+  let tagValue = Device.makeWriteValue({ value: args.setValue, byteCount: args.byteCount });
+  let tag_address = (parseInt(params.offset, 16) + (value.x - params.min)).toString();
+  let req = { cmd: `w,${tagValue.join(':')},${args.byteCount},0,1,${tag_address}`, done: r => done(null, r) };
+  Device.writeTag(req);
+}
+catch(e) {
+  done(e);
+}
+"""
 #####################
 #
 #  P0x

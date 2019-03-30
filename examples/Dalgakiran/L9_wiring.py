@@ -95,6 +95,9 @@ def wire(client, name="LogikaL9", friendly="Logika L9 Controller", base="BaseLog
     client.account.methods(compressor.id).create(name='readSPd', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('SPd')), access_type=accessLevel4)
     # client.account.methods(compressor.id).create(name='readPAx', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('PA')), access_type=accessLevel4)
     #
+    client.account.methods(compressor.id).create(name='writeLevel1Password', method_impl= MethodInstance.MethodImplementation(writeLevel1Password_body()), access_type=accessLevel4)
+    client.account.methods(compressor.id).create(name='writeLevel2Password', method_impl= MethodInstance.MethodImplementation(writeLevel2Password_body()), access_type=accessLevel4)
+
     client.account.methods(compressor.id).create(name='writeP0x', method_impl= MethodInstance.MethodImplementation(writeP0x_body()), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='writeH0x', method_impl= MethodInstance.MethodImplementation(writeH0x_body()), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='writet0x', method_impl= MethodInstance.MethodImplementation(writet0x_body()), access_type=accessLevel4)
