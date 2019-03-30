@@ -86,6 +86,8 @@ const requests = {
   nc:                   { request: "r,meth:setnc,-,2,-,1,0x527" },
   OFL:                   { request: "r,meth:setOfl,-,2,-,1,0x528" },
   dry:                   { request: "r,meth:setdry,-,2,-,1,0x529" },
+  E_h:                   { request: "r,meth:setE_h,-,2,-,1,0x52A" },
+  SPd:                   { request: "r,meth:setSPd,-,2,-,1,0x52B" },
 };
 return requests[value].request;
 """
@@ -118,6 +120,8 @@ const requests = {
     nc:   { rprop: "nc", rcmd: "r,meth:setnc,-,2,-,1,0x527", min: 1, max: 1, offset: "0x527" },
     OFl:  { rprop: "OFl", rcmd: "r,meth:setOfl,-,2,-,1,0x528", min: 1, max: 1, offset: "0x528" },
     dry:  { rprop: "dry", rcmd: "r,meth:setdry,-,2,-,1,0x529", min: 1, max: 1, offset: "0x529" },
+    E_h:  { rprop: "E_h", rcmd: "r,meth:setE_h,-,2,-,1,0x52A", min: 1, max: 1, offset: "0x52A" },
+    SPd:  { rprop: "SPd", rcmd: "r,meth:setSPd,-,2,-,1,0x52B", min: 1, max: 1, offset: "0x52B" },
 
 };
 return requests[value];
@@ -957,6 +961,86 @@ def writeInx_body():
 */
 let args = {
   tagKey: "In",
+  x: value.x,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
+"""
+#####################
+#
+#  E_h
+#
+#####################
+
+def setE_h_body():
+    return """/**
+*/
+let setValue = Device.convertToDec({ values: value, default: 0});
+Device.api.setProperty("E_h", {
+    value: setValue,
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
+def writeE_h_body():
+     return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
+*/
+let args = {
+  tagKey: "E_h",
+  x: value.x,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
+"""
+#####################
+#
+#  SPd
+#
+#####################
+
+def setSPd_body():
+    return """/**
+*/
+let setValue = Device.convertToDec({ values: value, default: 0});
+Device.api.setProperty("SPd", {
+    value: setValue,
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
+def writeSPd_body():
+     return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
+*/
+let args = {
+  tagKey: "SPd",
   x: value.x,
   setValue: value.setValue,
   byteCount: value.byteCount || 2

@@ -31,6 +31,8 @@ def wire(client, name="LogikaL9", friendly="Logika L9 Controller", base="BaseLog
     client.account.properties(compressor.id).create(name='nc', data_type='number', access_type='protected', publish_type='never')
     client.account.properties(compressor.id).create(name='OFl', data_type='number', access_type='protected', publish_type='never')
     client.account.properties(compressor.id).create(name='dry', data_type='number', access_type='protected', publish_type='never')
+    client.account.properties(compressor.id).create(name='E_h', data_type='number', access_type='protected', publish_type='never')
+    client.account.properties(compressor.id).create(name='SPd', data_type='number', access_type='protected', publish_type='never')
     # client.account.properties(compressor.id).create(name='PAx', data_type='object', access_type='protected', publish_type='never')
 
     #------ Add profile methods
@@ -63,6 +65,8 @@ def wire(client, name="LogikaL9", friendly="Logika L9 Controller", base="BaseLog
     client.account.methods(compressor.id).create(name='setnc', method_impl= MethodInstance.MethodImplementation(setnc_body()), access_type=accessLevel3)
     client.account.methods(compressor.id).create(name='setOFl', method_impl= MethodInstance.MethodImplementation(setOFl_body()), access_type=accessLevel3)
     client.account.methods(compressor.id).create(name='setdry', method_impl= MethodInstance.MethodImplementation(setdry_body()), access_type=accessLevel3)
+    client.account.methods(compressor.id).create(name='setE_h', method_impl= MethodInstance.MethodImplementation(setE_h_body()), access_type=accessLevel3)
+    client.account.methods(compressor.id).create(name='setSPd', method_impl= MethodInstance.MethodImplementation(setSPd_body()), access_type=accessLevel3)
 
     # client.account.methods(compressor.id).create(name='setPAx', method_impl= MethodInstance.MethodImplementation(setPAx_body()), access_type=accessLevel3)
 
@@ -87,7 +91,8 @@ def wire(client, name="LogikaL9", friendly="Logika L9 Controller", base="BaseLog
     client.account.methods(compressor.id).create(name='readnc', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('nc')), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='readOFl', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('OFl')), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='readdry', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('dry')), access_type=accessLevel4)
-
+    client.account.methods(compressor.id).create(name='readE_h', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('E_h')), access_type=accessLevel4)
+    client.account.methods(compressor.id).create(name='readSPd', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('SPd')), access_type=accessLevel4)
     # client.account.methods(compressor.id).create(name='readPAx', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('PA')), access_type=accessLevel4)
     #
     client.account.methods(compressor.id).create(name='writeP0x', method_impl= MethodInstance.MethodImplementation(writeP0x_body()), access_type=accessLevel4)
@@ -103,6 +108,8 @@ def wire(client, name="LogikaL9", friendly="Logika L9 Controller", base="BaseLog
     client.account.methods(compressor.id).create(name='writenc', method_impl= MethodInstance.MethodImplementation(writenc_body()), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='writeOFl', method_impl= MethodInstance.MethodImplementation(writeOFl_body()), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='writedry', method_impl= MethodInstance.MethodImplementation(writedry_body()), access_type=accessLevel4)
+    client.account.methods(compressor.id).create(name='writeE_h', method_impl= MethodInstance.MethodImplementation(writeE_h_body()), access_type=accessLevel4)
+    client.account.methods(compressor.id).create(name='writeSPd', method_impl= MethodInstance.MethodImplementation(writeSPd_body()), access_type=accessLevel4)
 
 
     # client.account.methods(compressor.id).create(name='writePAx', method_impl= MethodInstance.MethodImplementation(writePAx_body()), access_type=accessLevel4)

@@ -110,8 +110,11 @@ const requests = {
   WT:                   { request: "r,meth:setWTx,-,16,-,1,0x50F" },
   Wt:                   { request: "r,meth:setWtx_,-,14,-,1,0x517" },
   C07:                  { request: "r,meth:setC07_x,-,4,-,1,0x51E" },
+  C07_25                { request: "r, meth:setC07_25,-,2,-,1,0x559" },
+  C08:                  { request: "r,meth:setC08,-,2,-,1,0x526" },
   C02:                  { request: "r,meth:setC02,-,2,-,1,0x527" },
   C10:                  { request: "r,meth:setC10,-,2,-,1,0x528" },
+  C25:                  { request: "r,meth:setC25,-,2,-,1,0x55A"},
   AP:                   { request: "r,meth:setAPx,-,10,-,1,0x529" },
   C19:                  { request: "r,meth:setC19_x,-,6,-,1,0x52C" },
   PI:                   { request: "r,meth:setPIx,-,14,-,1,0x52F" },
@@ -122,7 +125,7 @@ const requests = {
   C20:                  { request: "r,meth:setC20_x,-,4,-,1,0x540" },
   C22:                  { request: "r,meth:setC22,-,4,-,1,0x542" },
   DR:                   { request: "r,meth:setDRx,-,14,-,1,0x544" },
-  DA:                   { request: "r,meth:setDAx,-, 20,-,1,0x54B"}
+  DA:                   { request: "r,meth:setDAx,-, 28,-,1,0x54B"},
 };
 return requests[value].request;
 
@@ -146,7 +149,10 @@ const requests = {
     WT:  { rprop: "WTx", rcmd: "r,meth:setWTx,-,16,-,1,0x50F", min: 0, max: 7, offset: "0x50F" },
     Wt:  { rprop: "Wtx_", rcmd: "r,meth:setWtx_,-,14,-,1,0x517", min: 1, max: 7, offset: "0x517" },
     C07: { rprop: "C07_x", rcmd: "r,meth:setC07_x,-,4,-,1,0x51E", min: 1, max: 2, offset: "0x51E" },
+    C07_5: { rprop: "C07_5", rcmd: "r,meth:setC07_5,-,2,-,1,0x559", min: 5, max: 5, offset: "0x559" },
+    C25: { rprop: "C25", rcmd: "r,meth:setC25,-,2,-,1,0x55A", min: 25, max: 25, offset: "0x55A" },
     C02: { rprop: "C02", rcmd: "r,meth:setC02,-,2,-,1,0x527", min: 1, max: 1, offset: "0x527" },
+    C08: { rprop: "C08", rcmd: "r,meth:setC08,-,2,-,1,0x526", min: 1, max: 1, offset: "0x526" },
     C10: { rprop: "C10", rcmd: "r,meth:setC10,-,2,-,1,0x528", min: 1, max: 1, offset: "0x528", multiplier: [0.1] },
     AP:  { rprop: "APx", rcmd: "r,meth:setAPx,-,10,-,1,0x529", min: 1, max: 3, offset: "0x529", multiplier: [10,10,10] },
     AP4: { rprop: "APx", rcmd: "r,meth:setAPx,-,10,-,1,0x529", min: 4, max: 4, offset: "0x52D", multiplier: [10] },
@@ -160,7 +166,7 @@ const requests = {
     C20: { rprop:"C20_x", rcmd: "r,meth:setC20_x,-,4,-,1,0x540", min: 1, max: 2, offset: "0x540" },
     C22: { rprop: "C22", rcmd: "r,meth:setC2x,-,4,-,1,0x542", min: 2, max: 3, offset: "0x542" },
     DR:  { rprop: "DRx", rcmd: "r,meth:setDRx,-,14,-,1,0x544", min: 0, max: 6, offset: "0x544", multiplier: [,,,0.1,0.1,0.01,0.01] },
-    DA:  { rprop: "DAx", rcmd: "r,meth:setDAx,-,20,-,1,0x54B", min: 0, max: 9, offset: "0x54B", multiplier: [10,,,10,10,10,100,,10,100]},
+    DA:  { rprop: "DAx", rcmd: "r,meth:setDAx,-,28,-,1,0x54B", min: 0, max: 13, offset: "0x54B", multiplier: [10,,,10,10,10,100,,10,100]},
     
 };
 return requests[value];
@@ -986,7 +992,46 @@ catch(e) {
   done(e);
 }
 """
+#####################
+#
+#  C08
+#
+#####################
 
+def setC08_body():
+    return """/**
+Max starts per hour
+*/
+Device.api.setProperty("C08", {
+    value: Device.convertToDec({ values: value, default: 0}),
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
+def writeC08_body():
+     return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
+*/
+let args = {
+  tagKey: "C08",
+  x: value.x,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
+"""
 #####################
 #
 #  C10
@@ -1701,7 +1746,7 @@ catch(e) {
 def setDAx_body():
     return """/**
 */
-const itemCount = 10;
+const itemCount = 14;
 
 let DAx = {};
 for (var x = 0; x < itemCount; x++) {
@@ -1883,4 +1928,86 @@ function toFaultString(fault) {
     done(null, faultString);
     
 })(toFaultString(value));
+"""
+#####################
+#
+#  C07_5
+#
+#####################
+
+def setC07_5_body():
+    return """/**
+0.01
+*/
+let setValue = Device.convertToDec({ values: value, default: 0}) * 100;
+Device.api.setProperty("C07_5", {
+    value: setValue,
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
+def writeC07_5_body():
+     return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
+*/
+let args = {
+  tagKey: "C07_5",
+  x: value.x,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
+"""
+#####################
+#
+#  C25
+#
+#####################
+
+def setC25_body():
+    return """/**
+0.01
+*/
+let setValue = Device.convertToDec({ values: value, default: 0}) * 100;
+Device.api.setProperty("C25", {
+    value: setValue,
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
+def writeC25_body():
+     return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
+*/
+let args = {
+  tagKey: "C25",
+  x: value.x,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
 """
