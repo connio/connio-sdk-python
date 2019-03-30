@@ -999,7 +999,7 @@ NominalAirFlow	R	Capacity (Nominal Air Flow) L/min *0.1 (C10)	Lt/min
 */
 let setValue = Device.convertToDec({ values: value, default: 0}) * 10.0;
 Device.api.setProperty("C10", {
-    value: {C10: setValue},
+    value: setValue,
     time: new Date().toISOString()
  })
  .then(property => {
@@ -1411,7 +1411,7 @@ def setPM1_body():
 */
 let setValue = Device.convertToDec({ values: value, default: 0}) * 100;
 Device.api.setProperty("PM1", {
-    value: {PM1: setValue},
+    value: setValue,
     time: new Date().toISOString()
  })
  .then(property => {

@@ -130,6 +130,7 @@ const requests = {
   STT1:                             { request: "r,meth:setSTT1,-,2,-,1,0x51D" },
   STD1:                             { request: "r,meth:setSTD1,-,2,-,1,0x51E" },
   Wt:                               { request: "r,meth:setWtx_,-,20,-,1,0x522" },
+  Wt11:                             { request: "r,meth:setWt11,-,2,-,1,0x54F"},
   R0:                               { request: "r,meth:setR0x,-,4,-,1,0x53D" },
   R03:                              { request: "r,meth:setR03,-,2,-,1,0x502" },
   DS:                               { request: "r,meth:setDSx,-,12,-,1,0xA1B" },
@@ -182,6 +183,7 @@ const requests = {
     STT1:    { rprob: "STT1", rcmd: "r,meth:setSTT1,-,2,-,1,0x51D", min: 1, max: 1, offset:"0x51D", multiplier: [10] },
     STD1:    { rprob: "STD1", rcmd: "r,meth:setSTD1,-,2,-,1,0x51E", min: 1, max: 1, offset:"0x51E", multiplier: [10] },
     Wt:      { rprob: "Wtx_", rcmd: "r,meth:setWtx_,-,20,-,1,0x522", min: 1, max: 10, offset:"0x522", multiplier: [,,,,,,,,,0.1] },
+    Wt11:    { rprop: "Wt11", rcmd: "r,meth:setWt11,-,2,-,1,0x54F", min: 11, max: 11, offset: "0x54F"},
     R0:      { rprob: "R0x", rcmd: "r,meth:setR0x,-,4,-,1,0x53D", min: 1, max: 2, offset:"0x53D", multiplier: [10,0.1] },
     DS:      { rprob: "DSx", rcmd: "r,meth:setDSx,-,12,-,1,0xA1B", min: 1, max: 6, offset:"0xA1B", multiplier: [,,0.1,0.1,0.01,0.01] },
     DA:      { rprob: "DAx", rcmd: "r,meth:setDAx,-,26,-,1,0xA21", min: 0, max: 13, offset:"0xA21" },
@@ -1376,7 +1378,52 @@ catch(e) {
   done(e);
 }
 """
+#####################
+#
+#  Wt11
+#
+#####################
 
+def setWt11_body():
+    return """/**
+*/
+const tagPropName = "Wtx";
+
+let Wt11 = Device.convertToDec({ values: value }, -1);
+
+Device.api.getProperty(tagPropName)
+  .then(property => {
+    property.value.Wt11 = Wt11;
+    Device.api.setProperty(tagPropName, {
+      value: property.value,
+      time: new Date().toISOString()
+    })
+    .then(property => {
+      done(null, property.value);
+    });
+  });
+"""
+
+def writeWt11_body():
+    return """/**
+*/
+let args = {
+  tagKey: "Wt11",
+  x: value.x,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
+"""
 #####################
 #
 #  R0x [NOT IMPLEMENTED]
