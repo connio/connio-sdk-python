@@ -206,7 +206,7 @@ Asagidaki sekilde bakim ucretlerini girebilirsiniz:
     
     client.account.methods(compressor.id).create(name='init', method_impl= MethodInstance.MethodImplementation(getInit_body()), access_type='public', description="""e.g. 
 { 
-  "hasInverter": true, 
+  "hasInverter": false, 
   "warrantyInMonth": 12,
   "icon": "inversys-15-plus-depolu.png",
   "elecCost": {

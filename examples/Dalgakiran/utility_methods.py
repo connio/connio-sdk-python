@@ -623,11 +623,19 @@ const DRIVE_PROPERTY        = 'driveMeasures';
 
 
 async function getValues() {
-    let [pressureProp, temperatureProp, driveProp] = await Promise.all([
-      Device.api.getProperty(PRESSURE_PROPERTY),
-      Device.api.getProperty(TEMPERATURE_PROPERTY),
-      Device.api.getProperty(DRIVE_PROPERTY)
-    ]);
+    let state = await Device.api.getProperty("state").then(prop => prop.value);
+    
+    let calls = [
+        Device.api.getProperty(PRESSURE_PROPERTY), 
+        Device.api.getProperty(TEMPERATURE_PROPERTY)
+    ];
+    
+    // Get inverter info if compressor comes with inverter
+    if (state.hasInverter) {
+        req.push(Device.api.getProperty(DRIVE_PROPERTY));
+    }
+    
+    let [pressureProp, temperatureProp, driveProp] = await Promise.all(calls);
     
     const result = {
         pressure: pressureProp.value || 0,
