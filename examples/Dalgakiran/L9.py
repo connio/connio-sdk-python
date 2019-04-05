@@ -58,10 +58,12 @@ def fetchReadRequest_body():
 */
 const requests = {
   cfgSerialNumber:      { request: "r,meth:setSerialNumber,-,20,-,1,0x00" },
-  cfgLogikaModel :      { request: "r,meth:setLogikaModel,-,2,-,1,0x0A" },
+  cfgLogikaModel:       { request: "r,meth:setLogikaModel,-,2,-,1,0x0A" },
   cfgLogikaFwVersion:   { request: "r,meth:setLogikaFwVersion,-,2,-,1,0x0B" },
   cfgLevel1Pwd:         { request: "r,meth:setLevel1Pwd,-,4,-,1,0x100" },
   cfgLevel2Pwd:         { request: "r,meth:setLevel2Pwd,-,4,-,1,0x102" },
+  nonAckAlarms:         { request: "r,meth:setNonAckAlarms,-,4,-,0x202" },
+  blockingAlarm:        { request: "r,meth:setBlockingAlarm,-,2,-,1-0x402" },
   relayOutputs:         { request: "r,meth:setRelayOutputs,-,2,-,1,0x403" },
   digitalInputs:        { request: "r,meth:setDigitalInputs,-,2,-,1,0x404" },
   cfgMaintCycles:       { request: "r,meth:setMaintCycles,-,12,-,1,0x518" },
@@ -73,7 +75,19 @@ const requests = {
   P0:                   { request: "r,meth:setP0x,-,16,-,1,0x500" },
   H0:                   { request: "r,meth:setH0x,-,16,-,1,0x508" },
   t0:                   { request: "r,meth:sett0x,-,16,-,1,0x510" },
-  //PA:                   { request: "r,meth:setPAx,-,4,-,1,0x52A" },
+  //PA:                  { request: "r,meth:setPAx,-,4,-,1,0x52A" },
+  r__:                  { request: "r,meth:setr__,-,2,-,1,0x51E"  },
+  S_h:                  { request: "r,meth:setS_h,-,2,-,1,0x51F"  },
+  Fad:                  { request: "r,meth:setFad,-,2,-,1,0x520"  },
+  S__:                  { request: "r,meth:setS__,-,2,-,1,0x521"  },
+  In:                   { request: "r,meth:setInx,-,2,-,1,0x522"  },
+  rL5:                  { request: "r,meth:setrL5,-,2,-,1,0x525"  },
+  con:                  { request: "r,meth:setcon,-,2,-,1,0x526"  },
+  nc:                   { request: "r,meth:setnc,-,2,-,1,0x527"   },
+  OFL:                  { request: "r,meth:setOfl,-,2,-,1,0x528"  },
+  dry:                  { request: "r,meth:setdry,-,2,-,1,0x529"  },
+  E_h:                  { request: "r,meth:setE_h,-,2,-,1,0x52A"  },
+  SPd:                  { request: "r,meth:setSPd,-,2,-,1,0x52B"  },
 };
 return requests[value].request;
 """
@@ -86,11 +100,30 @@ def fetchWriteRequest_body():
 
 */
 const requests = {
-    P0:  { rprop: "P0x", rcmd: "r,meth:setP0x,-,16,-,1,0x500", min: 0, max: 7, offset: "0x500", multiplier: [,,10,10,10,10,,] },
+    cfgLevel1Pwd: { rprop:"cfgLevel1Pwd", rcmd: "r,meth:setLevel1Pwd,-,4,-,1,0x100", min: 1, max: 1, offset: "0x100"},
+    cfgLevel2Pwd: { rprop:"cfgLevel2Pwd", rcmd: "r,meth:setLevel2Pwd,-,4,-,1,0x102", min: 1, max: 1, offset: "0x102"},
+    ChangeAirFilter: { rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x518", min: 1, max: 1, offset: "0x518" },
+    ChangeOilFilter:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x518", min: 1, max: 1, offset: "0x519" },
+    ChangeSeperatorFilter:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x518", min: 1, max: 1, offset: "0x51A" },
+    ChangeOil:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x518", min: 1, max: 1, offset: "0x51B" },
+    CheckCompressor:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x518", min: 1, max: 1, offset: "0x51C" },
+    BearingLubrication:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x518", min: 1, max: 1, offset: "0x51D" },
+    P0:  { rprop: "P0x", rcmd: "r,meth:setP0x,-,16,-,1,0x500", min: 0, max: 7, offset: "0x500", multiplier: [,,10,10,10,10,10,] },
     H0:  { rprop: "H0x", rcmd: "r,meth:setH0x,-,16,-,1,0x508", min: 0, max: 7, offset: "0x508" },
     t0:  { rprop: "t0x", rcmd: "r,meth:sett0x,-,16,-,1,0x510", min: 1, max: 8, offset: "0x510" },
     //PA:  { rprop: "PAx", rcmd: "r,meth:setPAx,-,4,-,1,0x52A", min: 1, max: 2, offset: "0x52A" },
-
+    r__:  { rprop: "r__", rcmd: "r,meth:setr__,-,2,-,1,0x51E", min: 1, max: 1, offset: "0x51E" },
+    S_h:  { rprop: "S_h", rcmd: "r,meth:setS_h,-,2,-,1,0x51F", min: 1, max: 1, offset: "0x51F" },
+    Fad:  { rprop: "Fad", rcmd: "r,meth:setFad,-,2,-,1,0x520", min: 1, max: 1, offset: "0x520" , multiplier: [10]},
+    S__:  { rprop: "S__", rcmd: "r,meth:setS__,-,2,-,1,0x521", min: 1, max: 1, offset: "0x521" },
+    In:  { rprop: "Inx", rcmd: "r,meth:setInx,-,2,-,1,0x522", min: 2, max: 4, offset: "0x522" },
+    rL5:  { rprop: "rL5", rcmd: "r,meth:setrL5,-,2,-,1,0x525", min: 1, max: 1, offset: "0x525" },
+    con:  { rprop: "con", rcmd: "r,meth:setcon,-,2,-,1,0x526", min: 1, max: 1, offset: "0x526" },
+    nc:   { rprop: "nc", rcmd: "r,meth:setnc,-,2,-,1,0x527", min: 1, max: 1, offset: "0x527" },
+    OFl:  { rprop: "OFl", rcmd: "r,meth:setOfl,-,2,-,1,0x528", min: 1, max: 1, offset: "0x528" },
+    dry:  { rprop: "dry", rcmd: "r,meth:setdry,-,2,-,1,0x529", min: 1, max: 1, offset: "0x529" },
+    E_h:  { rprop: "E_h", rcmd: "r,meth:setE_h,-,2,-,1,0x52A", min: 1, max: 1, offset: "0x52A" },
+    SPd:  { rprop: "SPd", rcmd: "r,meth:setSPd,-,2,-,1,0x52B", min: 1, max: 1, offset: "0x52B" },
 };
 return requests[value];
 """
@@ -309,13 +342,13 @@ Device.api.setProperty("digitalInputs", {
 def setP0x_body():
     return """/**
     P00	RW 	bar
-    P01	RW	bar*10 (must be divided by 10)
+    P01	RW	bar
     P02	RW	bar*10 (must be divided by 10)
     P03	RW	bar*10 (must be divided by 10)
     P04	RW	bar*10 (must be divided by 10)
     P05	RW	bar*10 (must be divided by 10)
     P06	RW	bar*10 (must be divided by 10)
-    P07	RW	bar*10 (must be divided by 10)
+    P07	RW	bar
 */
 
 const itemCount = 8;
@@ -330,8 +363,9 @@ Device.api.log("debug", tagPropName + ": " + value.toString())
  .then(p => {
     for (var i = 0; i < itemCount * 2; i+=2) {
         let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
-        // Exception: P0x is not x10 scale like other values
-        if (i > 0) itemValue = itemValue / 10;
+        // Exception: P00, P01, P07 are not x10 scale like other values
+        if (i != 0 && i != 2 && i != 14) itemValue = itemValue / 10;
+        
         P0x['P0' + (i/2).toString()] = itemValue.toString() + ' bar';
     }
     
@@ -524,6 +558,528 @@ try {
   req.done = r => done(null, r);
 
   Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
+"""
+
+#####################
+#
+#  r__
+#
+#####################
+
+def setr___body():
+    return """/**
+*/
+let setValue = Device.convertToDec({ values: value, default: 0});
+Device.api.setProperty("r__", {
+    value: setValue,
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
+def writer___body():
+     return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
+*/
+let args = {
+  tagKey: "r__",
+  x: value.x,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
+"""
+#####################
+#
+#  S_h
+#
+#####################
+
+def setS_h_body():
+    return """/**
+*/
+let setValue = Device.convertToDec({ values: value, default: 0});
+Device.api.setProperty("S_h", {
+    value: setValue,
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
+def writeS_h_body():
+     return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
+*/
+let args = {
+  tagKey: "S_h",
+  x: value.x,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
+"""
+#####################
+#
+#  Fad
+#
+#####################
+
+def setFad_body():
+    return """/**
+*/
+let setValue = Device.convertToDec({ values: value, default: 0});
+Device.api.setProperty("Fad", {
+    value: (setValue/10).toFixed(1),
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
+def writeFad_body():
+     return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
+*/
+let args = {
+  tagKey: "Fad",
+  x: value.x,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
+"""
+#####################
+#
+#  S__
+#
+#####################
+
+def setS___body():
+    return """/**
+*/
+let setValue = Device.convertToDec({ values: value, default: 0});
+Device.api.setProperty("S__", {
+    value: setValue,
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
+def writeS___body():
+     return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
+*/
+let args = {
+  tagKey: "S__",
+  x: value.x,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
+"""
+#####################
+#
+#  rL5
+#
+#####################
+
+def setrL5_body():
+    return """/**
+*/
+let setValue = Device.convertToDec({ values: value, default: 0});
+Device.api.setProperty("rL5", {
+    value: setValue,
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
+def writerL5_body():
+     return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
+*/
+let args = {
+  tagKey: "rL5",
+  x: value.x,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
+"""
+#####################
+#
+#  con
+#
+#####################
+
+def setcon_body():
+    return """/**
+*/
+let setValue = Device.convertToDec({ values: value, default: 0});
+Device.api.setProperty("con", {
+    value: setValue,
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
+def writecon_body():
+     return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
+*/
+let args = {
+  tagKey: "con",
+  x: value.x,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
+"""
+#####################
+#
+#  nc
+#
+#####################
+
+def setnc_body():
+    return """/**
+*/
+let setValue = Device.convertToDec({ values: value, default: 0});
+Device.api.setProperty("nc", {
+    value: setValue,
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
+def writenc_body():
+     return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
+*/
+let args = {
+  tagKey: "nc",
+  x: value.x,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
+"""
+#####################
+#
+#  OFl
+#
+#####################
+
+def setOFl_body():
+    return """/**
+*/
+let setValue = Device.convertToDec({ values: value, default: 0});
+Device.api.setProperty("OFl", {
+    value: setValue,
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
+def writeOFl_body():
+     return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
+*/
+let args = {
+  tagKey: "OFl",
+  x: value.x,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
+"""
+#####################
+#
+#  dry
+#
+#####################
+
+def setdry_body():
+    return """/**
+*/
+let setValue = Device.convertToDec({ values: value, default: 0});
+Device.api.setProperty("dry", {
+    value: setValue,
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
+def writedry_body():
+     return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
+*/
+let args = {
+  tagKey: "dry",
+  x: value.x,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
+"""
+#####################
+#
+#  Inx
+#
+#####################
+
+def setInx_body():
+    return """/**
+*/
+const itemCount = 3;
+const tagPropName = "Inx";
+let Inx = {};
+for (var x = 0; x < itemCount; x++) {
+    Inx['In' + (x+2).toString()] = '-';
+}
+Device.api.log("debug", tagPropName + ": " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+        Inx['Inx' + (i/2 + 2).toString()] = itemValue.toString();
+    }
+    
+    Device.api.setProperty(tagPropName, {
+      value: Inx,
+      time: new Date().toISOString()
+      }).
+    then(property => {
+        done(null, property.value);
+    });
+ });
+"""
+
+def writeInx_body():
+     return """/**
+*/
+let args = {
+  tagKey: "In",
+  x: value.x,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
+"""
+#####################
+#
+#  E_h
+#
+#####################
+
+def setE_h_body():
+    return """/**
+*/
+let setValue = Device.convertToDec({ values: value, default: 0});
+Device.api.setProperty("E_h", {
+    value: setValue,
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
+def writeE_h_body():
+     return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
+*/
+let args = {
+  tagKey: "E_h",
+  x: value.x,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
+"""
+#####################
+#
+#  SPd
+#
+#####################
+
+def setSPd_body():
+    return """/**
+*/
+let setValue = Device.convertToDec({ values: value, default: 0});
+Device.api.setProperty("SPd", {
+    value: setValue,
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
+def writeSPd_body():
+     return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
+*/
+let args = {
+  tagKey: "SPd",
+  x: value.x,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+"""
+
+#####################
+#
+#  Level1Password
+#
+#####################
+
+def writeLevel1Password_body():
+    return """/**
+@value {{ x: integer, setValue: int[], byteCount: integer = 2 }}
+Example:
+Called as {"value": {"x": 1, "setValue":[5,9]}} to set the level1Password to 59
+Accepts 0...9 for each digit
+*/
+let args = {
+  tagKey: "cfgLevel1Pwd",
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+try {
+  let params = Device.fetchWriteRequest(args.tagKey);
+  let tagValue = Device.makeWriteValue({ value: args.setValue, byteCount: args.byteCount });
+  let tag_address = (parseInt(params.offset, 16) + (value.x - params.min)).toString();
+  let req = { cmd: `w,${tagValue.join(':')},${args.byteCount},0,1,${tag_address}`, done: r => done(null, r) };
+  Device.writeTag(req);
+}
+catch(e) {
+  done(e);
+}
+"""
+
+#####################
+#
+#  Level2Password
+#
+#####################
+
+def writeLevel2Password_body():
+    return """/**
+@value {{ x: integer, setValue: int[], byteCount: integer = 3 }}
+Example:
+Called as {"value": {"x": 1, "setValue":[5,9,5]}} to set the level2Password to 595
+Accepts 0...9 for each digit
+*/
+let args = {
+  tagKey: "cfgLevel2Pwd",
+  x: value.x,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 3
+};
+try {
+  let params = Device.fetchWriteRequest(args.tagKey);
+  let tagValue = Device.makeWriteValue({ value: args.setValue, byteCount: args.byteCount });
+  let tag_address = (parseInt(params.offset, 16) + (value.x - params.min)).toString();
+  let req = { cmd: `w,${tagValue.join(':')},${args.byteCount},0,1,${tag_address}`, done: r => done(null, r) };
+  Device.writeTag(req);
 }
 catch(e) {
   done(e);

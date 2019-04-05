@@ -110,6 +110,8 @@ const requests = {
   WT:                   { request: "r,meth:setWTx,-,16,-,1,0x50F" },
   Wt:                   { request: "r,meth:setWtx_,-,14,-,1,0x517" },
   C07:                  { request: "r,meth:setC07_x,-,4,-,1,0x51E" },
+  C07_25:               { request: "r,meth:setC07_25,-,2,-,1,0x559" },
+  C08:                  { request: "r,meth:setC08,-,2,-,1,0x526" },
   C02:                  { request: "r,meth:setC02,-,2,-,1,0x527" },
   C10:                  { request: "r,meth:setC10,-,2,-,1,0x528" },
   AP:                   { request: "r,meth:setAPx,-,10,-,1,0x529" },
@@ -122,6 +124,7 @@ const requests = {
   C20:                  { request: "r,meth:setC20_x,-,4,-,1,0x540" },
   C22:                  { request: "r,meth:setC22,-,4,-,1,0x542" },
   DR:                   { request: "r,meth:setDRx,-,14,-,1,0x544" },
+  DA:                   { request: "r,meth:setDAx,-,28,-,1,0x54B" },
 };
 return requests[value].request;
 """
@@ -134,12 +137,24 @@ def fetchWriteRequest_body():
 
 */
 const requests = {
+    cfgLevel1Pwd:  { rprop:"cfgLevel1Pwd", rcmd: "r,meth:setLevel1Pwd,-,2,-,1,0x100", min: 1, max: 1, offset: "0x100"},
+    cfgLevel2Pwd:  { rprop:"cfgLevel2Pwd", rcmd: "r,meth:setLevel2Pwd,-,4,-,1,0x103", min: 1, max: 1, offset: "0x103"},
+    cfgLevel3Pwd:  { rprop:"cfgLevel3Pwd", rcmd: "r,meth:setLevel3Pwd,-,6,-,1,0x106", min: 1, max: 1, offset: "0x106"},
+    ChangeAirFilter: { rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x520", min: 1, max: 1, offset: "0x520" },
+    ChangeOilFilter:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x520", min: 1, max: 1, offset: "0x521" },
+    ChangeSeperatorFilter:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x520", min: 1, max: 1, offset: "0x522" },
+    ChangeOil:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x520", min: 1, max: 1, offset: "0x523" },
+    CheckCompressor:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x520", min: 1, max: 1, offset: "0x524" },
+    BearingLubrication:{ rprop: "cfgMaintCycles", rcmd: "r,meth:setMaintCycles,-,12,-,1,0x520", min: 1, max: 1, offset: "0x525" },
     WP:  { rprop: "WPx", rcmd: "r,meth:setWPx,-,12,-,1,0x509", min: 1, max: 6, offset: "0x509", multiplier: [,10,10,10,10,10] },
     WT:  { rprop: "WTx", rcmd: "r,meth:setWTx,-,16,-,1,0x50F", min: 0, max: 7, offset: "0x50F" },
     Wt:  { rprop: "Wtx_", rcmd: "r,meth:setWtx_,-,14,-,1,0x517", min: 1, max: 7, offset: "0x517" },
     C07: { rprop: "C07_x", rcmd: "r,meth:setC07_x,-,4,-,1,0x51E", min: 1, max: 2, offset: "0x51E" },
+    C07_5: { rprop: "C07_5", rcmd: "r,meth:setC07_5,-,2,-,1,0x559", min: 5, max: 5, offset: "0x559" },
+    C25: { rprop: "C25", rcmd: "r,meth:setC25,-,2,-,1,0x55A", min: 25, max: 25, offset: "0x55A" },
     C02: { rprop: "C02", rcmd: "r,meth:setC02,-,2,-,1,0x527", min: 1, max: 1, offset: "0x527" },
-    C10: { rprop: "C10", rcmd: "r,meth:setNominalAirFlow,-,2,-,1,0x528", min: 1, max: 1, offset: "0x528", multiplier: [0.1] },
+    C08: { rprop: "C08", rcmd: "r,meth:setC08,-,2,-,1,0x526", min: 1, max: 1, offset: "0x526" },
+    C10: { rprop: "C10", rcmd: "r,meth:setC10,-,2,-,1,0x528", min: 1, max: 1, offset: "0x528", multiplier: [0.1] },
     AP:  { rprop: "APx", rcmd: "r,meth:setAPx,-,10,-,1,0x529", min: 1, max: 3, offset: "0x529", multiplier: [10,10,10] },
     AP4: { rprop: "APx", rcmd: "r,meth:setAPx,-,10,-,1,0x529", min: 4, max: 4, offset: "0x52D", multiplier: [10] },
     C19_1:{ rprop:"C19_x", rcmd: "r,meth:setC19_x,-,6,-,1,0x52C", min: 1, max: 1, offset: "0x52C" },
@@ -151,7 +166,8 @@ const requests = {
     AO:  { rprop: "AOx", rcmd: "r,meth:setAOx,-,8,-,1,0x53C", min: 1, max: 4, offset: "0x53C", multiplier: [10,10,10,10] },
     C20: { rprop:"C20_x", rcmd: "r,meth:setC20_x,-,4,-,1,0x540", min: 1, max: 2, offset: "0x540" },
     C22: { rprop: "C22", rcmd: "r,meth:setC2x,-,4,-,1,0x542", min: 2, max: 3, offset: "0x542" },
-    DR:  { rprop: "DRx", rcmd: "r,meth:setDriveProtocol,-,14,-,1,0x544", min: 0, max: 6, offset: "0x544", multiplier: [,,,0.1,0.1,0.01,0.01] },
+    DR:  { rprop: "DRx", rcmd: "r,meth:setDRx,-,14,-,1,0x544", min: 0, max: 6, offset: "0x544", multiplier: [,,,0.1,0.1,0.01,0.01] },
+    DA:  { rprop: "DAx", rcmd: "r,meth:setDAx,-,28,-,1,0x54B", min: 0, max: 13, offset: "0x54B", multiplier: [10,,,10,10,10,100,,10,100,,,,] },
 };
 return requests[value];
 """
@@ -1641,8 +1657,10 @@ Device.api.log("debug", "DRx: " + value.toString())
  .then(p => {
     for (var i = 0; i < itemCount * 2; i+=2) {
         let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
-        if (i == 0 && itemValue == 0) itemValue = 'NO INVERTER CONNECTED ON SECOND RS485';
-        if (i == 0 && itemValue == 1) itemValue = 'DANFOSS FC';
+        if (i == 0 && itemValue == 0) { itemValue = 'NO INVERTER CONNECTED ON SECOND RS485'; }
+        else if (i == 0 && itemValue == 1) { itemValue = 'DANFOSS FC'; }
+        else if (i == 6 || i == 8) { itemValue = (itemValue / 10).toFixed(1); }
+        else if (i == 10 || i == 12) { itemValue = (itemValue / 100).toFixed(2); }
         
         DR['DR' + (i/2).toString()] = itemValue.toString();
     }
@@ -1655,7 +1673,6 @@ Device.api.log("debug", "DRx: " + value.toString())
         done(null, property.value);
     });
  });
-
 """
 
 def writeDRx_body():
@@ -1673,6 +1690,59 @@ try {
   let req = Device.makeWriteRequest(args);
   req.done = r => done(null, r);
 
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
+"""
+
+#####################
+#
+#  DAx
+#
+#####################
+
+def setDAx_body():
+    return """/**
+*/
+const itemCount = 14;
+let DAx = {};
+for (var x = 0; x < itemCount; x++) {
+    DAx['DA' + (x).toString()] = '-';
+}
+Device.api.log("debug", "DAx: " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+        if(i == 6 || i == 0 || i == 10 || i== 8|| i == 16) itemValue = (itemValue/10).toFixed(1);
+        else if(i == 12 || i == 18 ) itemValue = (itemValue/100).toFixed(2);
+        DAx['DA' + ((i/2)).toString()] = itemValue.toString();
+    }
+    
+    Device.api.setProperty("DAx", {
+      value: DAx,
+      time: new Date().toISOString()
+      }).
+    then(property => {
+        done(null, property.value);
+    });
+ });
+"""
+
+def writeDAx_body():
+    return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
+*/
+let args = {
+  tagKey: "DA",
+  x: value.x,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
   Device.writeAndReadTag(req);
 }
 catch(e) {
@@ -1738,15 +1808,15 @@ Elements contains (depends on drive selected):
   9-FMAX [Hz*10]
 */
 
-let frequency = Device.convertToDec({ values: value.splice(0, 2), default: 0});
-let power = Device.convertToDec({ values: value.splice(2, 4), default: 0});
-let current = Device.convertToDec({ values: value.splice(4, 6), default: 0});
-let voltage = Device.convertToDec({ values: value.splice(6, 8), default: 0});
-let temp = Device.convertToDec({ values: value.splice(8, 10), default: 0});
-let rpm = Device.convertToDec({ values: value.splice(10, 12), default: 0});
-let energy = Device.convertToDec({ values: value.splice(12, 16), default: 0});
-let fmin = Device.convertToDec({ values: value.splice(16, 18), default: 0});
-let fmax = Device.convertToDec({ values: value.splice(18), default: 0});
+let frequency = Device.convertToDec({ values: value.slice(0, 2), default: 0});
+let power = Device.convertToDec({ values: value.slice(2, 4), default: 0});
+let current = Device.convertToDec({ values: value.slice(4, 6), default: 0});
+let voltage = Device.convertToDec({ values: value.slice(6, 8), default: 0});
+let temp = Device.convertToDec({ values: value.slice(8, 10), default: 0});
+let rpm = Device.convertToDec({ values: value.slice(10, 12), default: 0});
+let energy = Device.convertToDec({ values: value.slice(12, 16), default: 0});
+let fmin = Device.convertToDec({ values: value.slice(16, 18), default: 0});
+let fmax = Device.convertToDec({ values: value.slice(18), default: 0});
 
 let drive = {
   frequency: frequency / 10,
@@ -1814,4 +1884,214 @@ function toFaultString(fault) {
     done(null, faultString);
     
 })(toFaultString(value));
+"""
+
+#####################
+#
+#  C08
+#
+#####################
+
+def setC08_body():
+    return """/**
+Max starts per hour
+*/
+Device.api.setProperty("C08", {
+    value: Device.convertToDec({ values: value, default: 0}),
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
+def writeC08_body():
+     return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
+*/
+let args = {
+  tagKey: "C08",
+  x: value.x,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
+"""
+
+#####################
+#
+#  C07_5
+#
+#####################
+
+def setC07_5_body():
+    return """/**
+0.01
+*/
+let setValue = Device.convertToDec({ values: value, default: 0}) * 100;
+Device.api.setProperty("C07_5", {
+    value: setValue,
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
+def writeC07_5_body():
+     return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
+*/
+let args = {
+  tagKey: "C07_5",
+  x: value.x,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
+"""
+#####################
+#
+#  C25
+#
+#####################
+
+def setC25_body():
+    return """/**
+0.01
+*/
+let setValue = Device.convertToDec({ values: value, default: 0}) * 100;
+Device.api.setProperty("C25", {
+    value: setValue,
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+"""
+
+def writeC25_body():
+     return """/**
+@value {{ x: integer, setValue: integer, byteCount: integer = 2 }}
+*/
+let args = {
+  tagKey: "C25",
+  x: value.x,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+try {
+  let req = Device.makeWriteRequest(args);
+  req.done = r => done(null, r);
+  Device.writeAndReadTag(req);
+}
+catch(e) {
+  done(e);
+}
+"""
+
+#####################
+#
+#  Level1Password
+#
+#####################
+
+def writeLevel1Password_body():
+    return """/**
+@value {{ x: integer, setValue: int[], byteCount: integer = 2 }}
+Example:
+Called as {"value": {"x": 1, "setValue":[5,9]}} to set the level1Password to 59
+Accepts 0...9 for each digit
+*/
+let args = {
+  tagKey: "cfgLevel1Pwd",
+  setValue: value.setValue,
+  byteCount: value.byteCount || 2
+};
+try {
+  let params = Device.fetchWriteRequest(args.tagKey);
+  let tagValue = Device.makeWriteValue({ value: args.setValue, byteCount: args.byteCount });
+  let tag_address = (parseInt(params.offset, 16) + (value.x - params.min)).toString();
+  let req = { cmd: `w,${tagValue.join(':')},${args.byteCount},0,1,${tag_address}`, done: r => done(null, r) };
+  Device.writeTag(req);
+}
+catch(e) {
+  done(e);
+}
+"""
+
+#####################
+#
+#  Level2Password
+#
+#####################
+
+def writeLevel2Password_body():
+    return """/**
+@value {{ x: integer, setValue: int[], byteCount: integer = 4 }}
+Example:
+Called as {"value": {"x": 1, "setValue":[5,9,5,4]}} to set the level2Password to 5954
+Accepts 0...9 for each digit
+*/
+let args = {
+  tagKey: "cfgLevel2Pwd",
+  x: value.x,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 4
+};
+try {
+  let params = Device.fetchWriteRequest(args.tagKey);
+  let tagValue = Device.makeWriteValue({ value: args.setValue, byteCount: args.byteCount });
+  let tag_address = (parseInt(params.offset, 16) + (value.x - params.min)).toString();
+  let req = { cmd: `w,${tagValue.join(':')},${args.byteCount},0,1,${tag_address}`, done: r => done(null, r) };
+  Device.writeTag(req);
+}
+catch(e) {
+  done(e);
+}
+"""
+
+#####################
+#
+#  Level3Password
+#
+#####################
+
+def writeLevel3Password_body():
+    return """/**
+@value {{ x: integer, setValue: int[], byteCount: integer = 6 }}
+Example:
+Called as {"value": {"x": 1, "setValue":[5,9,5,4,6,6]}} to set the level3Password to 595466
+Accepts 0...9 for each digit
+*/
+let args = {
+  tagKey: "cfgLevel3Pwd",
+  x: value.x,
+  setValue: value.setValue,
+  byteCount: value.byteCount || 6
+};
+try {
+  let params = Device.fetchWriteRequest(args.tagKey);
+  let tagValue = Device.makeWriteValue({ value: args.setValue, byteCount: args.byteCount });
+  let tag_address = (parseInt(params.offset, 16) + (value.x - params.min)).toString();
+  let req = { cmd: `w,${tagValue.join(':')},${args.byteCount},0,1,${tag_address}`, done: r => done(null, r) };
+  Device.writeTag(req);
+}
+catch(e) {
+  done(e);
+}
 """

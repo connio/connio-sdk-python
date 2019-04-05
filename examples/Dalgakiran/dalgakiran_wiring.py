@@ -363,6 +363,13 @@ Ornegin:
     client.account.methods(compressor.id).create(name='readNbrOfStartsInLastHour', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('nbrOfStartsInLastHour')), access_type=accessLevel2)
     client.account.methods(compressor.id).create(name='readControllerTime', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('controllerTime')), access_type=accessLevel2)
 
+    client.account.methods(compressor.id).create(name='writeChangeAirFilter', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('writeChangeAirFilter_body')), access_type=accessLevel2)
+    client.account.methods(compressor.id).create(name='writeChangeOilFilter', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('writeChangeOilFilter_body')), access_type=accessLevel2)
+    client.account.methods(compressor.id).create(name='writeChangeOil', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('writeChangeOil_body')), access_type=accessLevel2)
+    client.account.methods(compressor.id).create(name='writeChangeSeperatorFilter', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('writeChangeSeperatorFilter_body')), access_type=accessLevel2)
+    client.account.methods(compressor.id).create(name='writeCheckCompressor', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('writeCheckCompressor_body')), access_type=accessLevel2)
+    client.account.methods(compressor.id).create(name='writeBearingLubrication', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('writeBearingLubrication_body')), access_type=accessLevel2)
+
 
 def wire(keyID, keySecret):
     start = time.time()
@@ -381,9 +388,9 @@ def wire(keyID, keySecret):
     # wireBase(client)
     
     # Wire different controller types
-    # L9c.wire(client)
-    # L26c.wire(client)
-    # L33c.wire(client)
+    L9c.wire(client)
+    L26c.wire(client)
+    L33c.wire(client)
     L200c.wire(client)
 
     # wireGw(client, 'ModbusGatewayXX', 'Modbus Gateway XX')
@@ -412,6 +419,7 @@ if __name__ == '__main__':
 
 #test26s
 #  IMEI: 869867036043836
+#  frecon-5-plus-depolu
 
 #DK TEST 3
 #  MAC: 00:1e:c0:91:97:f3

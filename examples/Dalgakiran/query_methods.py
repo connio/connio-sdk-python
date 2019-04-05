@@ -707,7 +707,7 @@ def showOEE_body():
 * Enter number of days to display OEE for each day and the aggregated OEE
 */    
 Array.prototype.insert = function ( index, item ) {
-    this.splice( index, 0, item );
+    this.split( index, 0, item );
 };
 
 let days = value || 7;
