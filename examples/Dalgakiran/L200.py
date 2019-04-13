@@ -92,11 +92,8 @@ const requests = {
   cfgSerialNumber:                  { request: "r,meth:setSerialNumber,-,20,-,1,0x00" },
   cfgLogikaModel:                   { request: "r,meth:setLogikaModel,-,2,-,1,0x0A" },
   cfgLogikaFwVersion:               { request: "r,meth:setLogikaFwVersion,-,2,-,1,0x0B" },
+  cfgIOBoardFirmwareRelease         { request: "r,meth:setIOBoardFirmwareRelease,-,2,-,1,0x00D"},
   cfgLevel1Pwd:                     { request: "r,meth:setLevel1Pwd,-,6,-,1,0x100" },
-  cfgLevel2Pwd:                     { request: "r,meth:setLevel2Pwd,-,6,-,1,0x103" },
-  cfgLevel3Pwd:                     { request: "r,meth:setLevel3Pwd,-,6,-,1,0x106" },
-  relayOutputs:                     { request: "r,meth:setRelayOutputs,-,2,-,1,0x404" },
-  digitalInputs:                    { request: "r,meth:setDigitalInputs,-,2,-,1,0x405" },
   cfgMaintCycles:                   { request: "r,meth:setMaintCycles,-,12,-,1,0x52C" },
   totalHours:                       { request: "r,meth:setTotalHours,-,4,-,1,0x600" },
   totalLoadHours:                   { request: "r,meth:setTotalLoadHours,-,4,-,1,0x602" },
@@ -105,6 +102,7 @@ const requests = {
   nbrOfStartsInLastHour:            { request: "r,meth:setNbrOfStartsInLastHour,-,2,-,1,0x611" },
   controllerTime:                   { request: "r,meth:setControllerTime,-,8,-,1,0x800" },
   // ---- Controller specific ----
+  
   workingFlags:                     { request: "r,meth:setWorkingFlags,-,2,-,1,0x403" },
   secondTemperature:                { request: "r,meth:setSecondTemperature,-,2,-,1,0x408" },
   secondPressure:                   { request: "r,meth:setSecondPressure,-,2,-,1,0x409" },
@@ -115,26 +113,32 @@ const requests = {
   driveMeasures:                    { request: "r,meth:setDriveMeasures,-,20,-,1,0xA01" },
   driveFaultString:                 { request: "r,meth:setDriveFaultString,-,26,-,1,0xA0B" },
   driveCommands:                    { request: "r,meth:setDriveCommands,-,2,-,1,0xA18" },
+  
   //
-  WP:                               { request: "r,meth:setWPx,-,12,-,1,0x504" },
-  SP:                               { request: "r,meth:setSPx,-,8,-,1,0x50A" },
-  SP5:                              { request: "r,meth:setSP5,-,2,-,1,0x542" },
-  SP6:                              { request: "r,meth:setSP6,-,2,-,1,0x548" },
-  //WPs:                              { request: "r,meth:setWPs,-,2,-,1,0x50E" },
-  //WPS2P:                            { request: "r,meth:setWPS2Px,-,6,-,1,0x50F" },
-  //WPS2Ps:                           { request: "r,meth:setWPS2Ps,-,2,-,1,0x512" },
-  WT:                               { request: "r,meth:setWTx,-,14,-,1,0x513" },
-  STA:                              { request: "r,meth:setSTAx,-,6,-,1,0x51A" },
-  //ST3:                              { request: "r,meth:setST3,-,2,-,1,0x51C" },
-  STT1:                             { request: "r,meth:setSTT1,-,2,-,1,0x51D" },
-  STD1:                             { request: "r,meth:setSTD1,-,2,-,1,0x51E" },
-  Wt:                               { request: "r,meth:setWtx_,-,20,-,1,0x522" },
-  R0:                               { request: "r,meth:setR0x,-,4,-,1,0x53D" },
-  R03:                              { request: "r,meth:setR03,-,2,-,1,0x502" },
-  DS:                               { request: "r,meth:setDSx,-,12,-,1,0xA1B" },
-  DA:                               { request: "r,meth:setDAx,-,28,-,1,0xA21" },
-  DF:                               { request: "r,meth:setDFx,-,12,-,1,0xA2E" },
-  DF7:                              { request: "r,meth:setDF7,-,2,-,1,0x541" },
+  R02:                               { request: "r,meth:setR02,-,2,-,1,0x500" },
+  V01:                               { request: "r,meth:setV01,-,2,-,1,0x501" },
+  WPx:                               { request: "r,meth:setWPx,-,12,-,1,0x502" },
+  WTx:                               { request: "r,meth:setWTx,-,8,-,1,0x508" },
+  V04:                               { request: "r,meth:setV04,-,2,-,1,0x50C" },
+  V02:                               { request: "r,meth:setV02_V03,-,4,-,1,0x50D" },
+  V07:                               { request: "r,meth:setV07, -,2,-,0x50F" },
+  S11:                               { request: "r,meth:setS11, -,2,-,0x510" },
+  T01:                               { request: "r,meth:setT01, -,2,-,0x511" },
+  S14:                               { request: "r,meth:setS14, -,2,-,0x512" },
+  R01:                               { request: "r,meth:setR01, -,2,-,0x513" },
+  S00:                               { request: "r,meth:setS00_S01_S02, -,6,-,0x514" },
+  S09:                               { request: "r,meth:setS09_S10, -,4,-,0x517" },
+  S06:                               { request: "r,meth:setS06, -,2,-,0x519" },
+  S05:                               { request: "r,meth:setS05, -,2,-,0x51A" },
+  S07:                               { request: "r,meth:setS07_S08, -,4,-,0x51B" },
+  S12:                               { request: "r,meth:setS12_S13, -,4,-,0x51D" },
+  S17:                               { request: "r,meth:setS17, -,2,-,0x51F" },
+  S16:                               { request: "r,meth:setS16, -,2,-,0x520" },
+  S03:                               { request: "r,meth:setS03_S04, -,4,-,0x521" },
+  S18:                               { request: "r,meth:setS18_S19, -,4,-,0x523" },
+  S21:                               { request: "r,meth:setS21, -,2,-,0x525" },
+  S20:                               { request: "r,meth:setS20, -,2,-,0x526" },
+  S22:                               { request: "r,meth:setS22, -,2,-,0x527" },
 };
 return requests[value].request;
 """
@@ -147,24 +151,31 @@ def fetchWriteRequest_body():
 
 */
 const requests = {
-    WP:      { rprob: "WPx", rcmd: "r,meth:setWPx,-,12,-,1,0x504", min: 1, max: 6, offset:"0x504", multiplier: [,10,10,10,10,10] },
-    SP:      { rprob: "SPx", rcmd: "r,meth:setSPx,-,8,-,1,0x50A", min: 1, max: 4, offset:"0x50A", multiplier: [,10,10,10] },
-    SP5:     { rprob: "SP5", rcmd: "r,meth:setSP5,-,2,-,1,0x542", min: 5, max: 5, offset:"0x542", multiplier: [10] },
-    SP6:     { rprob: "SP6", rcmd: "r,meth:setSP6,-,2,-,1,0x548", min: 6, max: 6, offset:"0x548", multiplier: [10] },
-    //WPs:     { rprob: "WPs", rcmd: "r,meth:setWPs,-,2,-,1,0x50E", min: 1, max: 1, offset:"0x50E" },
-    //WPS2P:   { rprob: "WPS2Px", rcmd: "r,meth:setWPS2Px,-,6,-,1,0x50F", min: 3, max: 5, offset:"0x50F" },
-    //WPS2Ps:  { rprob: "WPS2Ps", rcmd: "r,meth:setWPS2Ps,-,2,-,1,0x512", min: 1, max: 1, offset:"0x512" },
-    WT:      { rprob: "WTx", rcmd: "r,meth:setWTx,-,14,-,1,0x513", min: 1, max: 7, offset:"0x513", multiplier: [10,10,10,10,10,10,10] },
-    STA:     { rprob: "STAx", rcmd: "r,meth:setSTAx,-,6,-,1,0x51A", min: 1, max: 3, offset:"0x51A", multiplier: [10,10,10] },
-    //ST3:     { rprob: "ST3", rcmd: "r,meth:setST3,-,2,-,1,0x51C", min: 3, max: 3, offset:"0x51C" },
-    STT1:    { rprob: "STT1", rcmd: "r,meth:setSTT1,-,2,-,1,0x51D", min: 1, max: 1, offset:"0x51D", multiplier: [10] },
-    STD1:    { rprob: "STD1", rcmd: "r,meth:setSTD1,-,2,-,1,0x51E", min: 1, max: 1, offset:"0x51E", multiplier: [10] },
-    Wt:      { rprob: "Wtx_", rcmd: "r,meth:setWtx_,-,20,-,1,0x522", min: 1, max: 10, offset:"0x522", multiplier: [,,,,,,,,,0.1] },
-    R0:      { rprob: "R0x", rcmd: "r,meth:setR0x,-,4,-,1,0x53D", min: 1, max: 2, offset:"0x53D", multiplier: [10,0.1] },
-    DS:      { rprob: "DSx", rcmd: "r,meth:setDSx,-,12,-,1,0xA1B", min: 1, max: 6, offset:"0xA1B", multiplier: [,,0.1,0.1,0.1,0.1] },
-    DA:      { rprob: "DAx", rcmd: "r,meth:setDAx,-,28,-,1,0xA21", min: 0, max: 13, offset:"0xA21" },
-    DF:      { rprob: "DFx", rcmd: "r,meth:setDFx,-,12,-,1,0xA2E", min: 1, max: 6, offset:"0xA2E", multiplier: [0.01,0.01,0.01,0.01,0.01,0.01] },
-    //DF7:     { rprob: "DF7", rcmd: "r,meth:setDF7,-,2,-,1,0x541", min: 7, max: 7, offset:"0x541" },
+    R02:      { rprob: "R02", rcmd: "r,meth:setR02,-,2,-,1,0x500", min: 2, max: 2, offset:"0x500"},
+    V01:      { rprob: "V01", rcmd: "r,meth:setV01,-,2,-,1,0x501", min: 1, max: 1, offset:"0x501"},
+    WP:      { rprob: "WPx", rcmd: "r,meth:setWPx,-,12,-,1,0x502", min: 1, max: 6, offset:"0x502", multiplier: [,10,10,10,10,10] },
+    WT:      { rprob: "WTx", rcmd: "r,meth:setWTx,-,8,-,1,0x508", min: 1, max: 4, offset:"0x508", multiplier: [10,10,10,10] },
+    V04:      { rprob: "V04", rcmd: "r,meth:setV04,-,2,-,1,0x50C", min: 4, max: 4, offset:"0x50C"},
+    V02:      { rprob: "V02", rcmd: "r,meth:setV02_V03,-,4,-,1,0x50D", min: 2, max: 3, offset:"0x50D"},
+    V07:      { rprob: "V07", rcmd: "r,meth:setV07, -,2,-,0x50F", min: 7, max: 7, offset:"0x50F"},
+    S11:      { rprob: "S11", rcmd: "r,meth:setS11, -,2,-,0x510", min: 11, max:11, offset:"0x510"},
+    T01:      { rprob: "T01", rcmd: "r,meth:setT01, -,2,-,0x511", min: 1, max: 1, offset:"0x511"},
+    S14:      { rprob: "S14", rcmd: "r,meth:setS14, -,2,-,0x512", min: 14, max: 14, offset:"0x512"},
+    R01:      { rprob: "R01", rcmd: "r,meth:setR01, -,2,-,0x513", min: 1, max: 1, offset:"0x513"},
+    S00:      { rprob: "S00", rcmd: "r,meth:setS00_S01_S02, -,6,-,0x514", min: 0, max: 2, offset:"0x514", multiplier: [,,0.1] },
+    S09:      { rprob: "S09", rcmd: "r,meth:setS09_S10, -,4,-,0x517", min: 9, max: 9, offset:"0x517"},
+    S06:      { rprob: "S06", rcmd: "r,meth:setS06, -,2,-,0x519", min: 6, max: 6, offset:"0x519"},
+    S05:      { rprob: "S05", rcmd: "r,meth:setS05, -,2,-,0x51A", min: 5, max: 5, offset:"0x51A"},
+    S07:      { rprob: "S07", rcmd: "r,meth:setS07_S08, -,4,-,0x51B", min: 7, max: 8, offset:"0x51B"},
+    S12:      { rprob: "S12", rcmd: "r,meth:setS12_S13, -,4,-,0x51D", min: 12, max: 13, offset:"0x51D"},
+    S17:      { rprob: "S12", rcmd: "r,meth:setS17, -,2,-,0x51F", min: 17, max: 17, offset:"0x51F"},
+    S16:      { rprob: "S16", rcmd: "r,meth:setS16, -,2,-,0x520", min: 16, max: 16, offset:"0x520"},
+    S03:      { rprob: "S03", rcmd: "r,meth:setS03_S04, -,4,-,0x521", min: 3, max: 4, offset:"0x521"},
+    S18:      { rprob: "S18", rcmd: "r,meth:setS18_S19, -,4,-,0x523", min: 18, max: 19, offset:"0x523"},
+    S21:      { rprob: "S21", rcmd: "r,meth:setS21, -,2,-,0x525", min: 21, max: 21, offset:"0x525"},
+    S20:      { rprob: "S20", rcmd: "r,meth:setS20, -,2,-,0x526", min: 20, max: 20, offset:"0x526"},
+    S22:      { rprob: "S22", rcmd: "r,meth:setS22, -,2,-,0x527", min: 22, max: 22, offset:"0x527"},
+
 };
 return requests[value];
 """
@@ -180,7 +191,7 @@ if (value) {
   return "/dev/ttyS1:9600:8:N:1|"+
     "g0:0,g1:3600,g2:60,g3:3,g4:5|"+
     "r,meth:setAlarms,5,12,1,1,0x200|"+
-    "r,meth:setNonAckAlarms,5,12,1,1,0x206|"+
+    "r,meth:setNonAckAlarms,5,12,1,1,0x208|"+
     "r,meth:setControllerState,5,2,1,1,0x400|"+
     "r,meth:setCompressorState,5,2,1,1,0x401|"+
     "r,meth:setBlockingAlarm,5,2,1,1,0x402|"+
@@ -200,7 +211,7 @@ else {
   return "/dev/ttyS1:9600:8:N:1|"+
     "g0:0,g1:3600,g2:60,g3:3,g4:5|"+
     "r,meth:setAlarms,5,12,1,1,0x200|"+
-    "r,meth:setNonAckAlarms,5,12,1,1,0x206|"+
+    "r,meth:setNonAckAlarms,5,12,1,1,0x208|"+
     "r,meth:setControllerState,5,2,1,1,0x400|"+
     "r,meth:setCompressorState,5,2,1,1,0x401|"+
     "r,meth:setBlockingAlarm,5,2,1,1,0x402|"+
@@ -224,25 +235,11 @@ def fetchControllerStates_body():
 
 */
 return [
-    { code: 0, label: "RESET" },
-    { code: 1, label: "OFF" },
-    { code: 2, label: "STARTING - MOTOR IN STAR CONNECTION" },
-    { code: 3, label: "STARTING - PAUSE START TO DELTA CONNECTION" },
-    { code: 4, label: "STARTING - ACCELERATING IN DELTA CONNECTION" },
-    { code: 5, label: "LOAD RUNNING" },
-    { code: 6, label: "IDLE RUNNING - PRESSURE IN RANGE" },
-    { code: 7, label: "IDLE RUNNING - STOPPING" },
-    { code: 8, label: "INVERTER START" },
-    { code: 9, label: "INVERTER ACCELERATING" },
-    { code: 10, label: "INVERTER LOAD" },
-    { code: 11, label: "INVERTER IDLE RUNNING, PRESSURE IN RANGE" },
-    { code: 12, label: "INVERTER IDLE, STOPPING" },
-    { code: 13, label: "INVERTER STOP PAUSE" },
-    { code: 14, label: "INVERTER SETUP" },
-    { code: 15, label: "INVERTER POWER ON" },
-    { code: 16, label: "OIL MANAGEMENT" },
-    { code: 17, label: "BLOCKED BY FAULT" },
-    { code: 18, label: "FACTORY TEST" }
+    { code: 0, label: "OFF" },
+    { code: 1, label: "OFF - WAITING FOR NEXT WEEKLY TIMER INTERVAL" },
+    { code: 2, label: "STARTING - WAITING FOR SAFETY TIME" },
+    { code: 3, label: "ON" },
+    { code: 4, label: "BLOCKED" },
 ];
 """
 
@@ -442,3 +439,1243 @@ Device.api.setProperty("digitalInputs", {
     done(null, property.value);
  });
 """
+#####################
+#
+#  R02
+#
+#####################
+
+def setR02_body():
+    return """/**
+*/
+const tagPropName = "Rx";
+let R02 = Device.convertToDec({ values: value }, -1);
+Device.api.getProperty(tagPropName)
+  .then(property => {
+    property.value.R02 = R02;
+    Device.api.setProperty(tagPropName, {
+      value: property.value,
+      time: new Date().toISOString()
+    })
+    .then(property => {
+      done(null, property.value);
+    });
+  });
+"""
+
+def writeR02_body():
+    return """/**
+*/
+
+  let args = {
+      tagKey: "R02",
+      x: value.x,
+      setValue: value.setValue,
+      byteCount: value.byteCount || 2
+  };
+
+  try {
+      let req = Device.makeWriteRequest(args);
+      req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+  }
+  catch(e) {
+      done(e);
+  }
+        """
+
+#####################
+#
+#  V01
+#
+#####################
+
+def setV01_body():
+    return """/**
+*/
+
+    const tagPropName = "Vx";
+    let V01 = Device.convertToDec({ values: value }, -1);
+    Device.api.getProperty(tagPropName)
+        .then(property => {
+        property.value.V01 = V01;
+        Device.api.setProperty(tagPropName, {
+            value: property.value,
+            time: new Date().toISOString()
+        })
+        .then(property => {
+            done(null, property.value);
+        });
+    });
+"""
+
+def writeV01_body():
+    return """/**
+*/
+
+        let args = {
+            tagKey: "V01",
+            x: value.x,
+            setValue: value.setValue,
+            byteCount: value.byteCount || 2
+        };
+
+        try {
+            let req = Device.makeWriteRequest(args);
+            req.done = r => done(null, r);
+
+        Device.writeAndReadTag(req);
+        }
+        catch(e) {
+            done(e);
+        }
+        """
+
+#####################
+#
+#  WPx
+#
+#####################
+
+def setWPx_body():
+    return """/**
+WP1			Bar
+WP2			Bar x 10
+WP3			Bar x 10
+WP4			Bar x 10 
+WP5			Bar x 10
+WP6			Bar x 10
+*/
+
+const itemCount = 6;
+
+let WPx = {};
+for (var x = 0; x < itemCount; x++) {
+    WPx['WP' + (x+1).toString()] = '-';
+}
+
+Device.api.log("info", "WPx: " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+        if (i !=0){
+        itemValue = itemValue / 10;
+        }
+        WPx['WP' + ((i/2)+1).toString()] = itemValue.toString() + ' Bar';
+    }
+    
+    Device.api.setProperty("WPx", {
+      value: WPx,
+      time: new Date().toISOString()
+      }).
+    then(property => {
+        done(null, property.value);
+    });
+ });
+"""
+
+def writeWPx_body():
+    return """/**
+*/
+
+        let args = {
+            tagKey: "WPx",
+            x: value.x,
+            setValue: value.setValue,
+            byteCount: value.byteCount || 2
+        };
+
+        try {
+            let req = Device.makeWriteRequest(args);
+            req.done = r => done(null, r);
+
+        Device.writeAndReadTag(req);
+        }
+        catch(e) {
+            done(e);
+        }
+        """
+
+#####################
+#
+#  WTx
+#
+#####################
+
+def setWTx_body():
+    return """/**
+WT1	R		°C x 10
+WT2	R		°C x 10
+WT3	R		°C x 10
+WT4	R		°C x 10 
+*/
+
+const itemCount = 4;
+
+let WTx = {};
+for (var x = 0; x < itemCount; x++) {
+    WTx['WT' + (x+1).toString()] = '-';
+}
+
+Device.api.log("info", "WTx: " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+        itemValue = itemValue / 10;
+        WTx['WT' + ((i/2)+1).toString()] = itemValue.toString() + ' °C';
+    }
+    
+    Device.api.setProperty("WTx", {
+      value: WTx,
+      time: new Date().toISOString()
+      }).
+    then(property => {
+        done(null, property.value);
+    });
+ });
+"""
+
+def writeWTx_body():
+    return """/**
+*/
+
+        let args = {
+            tagKey: "WTx",
+            x: value.x,
+            setValue: value.setValue,
+            byteCount: value.byteCount || 2
+        };
+
+        try {
+            let req = Device.makeWriteRequest(args);
+            req.done = r => done(null, r);
+
+        Device.writeAndReadTag(req);
+        }
+        catch(e) {
+            done(e);
+        }
+        """
+
+#####################
+#
+#  V04
+#
+#####################
+
+def setV04_body():
+    return """/**
+*/
+
+    const tagPropName = "Vx";
+    let V04 = Device.convertToDec({ values: value }, -1);
+    Device.api.getProperty(tagPropName)
+        .then(property => {
+        property.value.V04 = V04.toString() + '%';
+        Device.api.setProperty(tagPropName, {
+            value: property.value,
+            time: new Date().toISOString()
+        })
+        .then(property => {
+            done(null, property.value);
+        });
+    });
+"""
+
+def writeV04_body():
+    return """/**
+*/
+
+        let args = {
+            tagKey: "V04",
+            x: value.x,
+            setValue: value.setValue,
+            byteCount: value.byteCount || 2
+        };
+
+        try {
+            let req = Device.makeWriteRequest(args);
+            req.done = r => done(null, r);
+
+        Device.writeAndReadTag(req);
+        }
+        catch(e) {
+            done(e);
+        }
+        """
+
+#####################
+#
+#  V02_V03
+#
+#####################
+
+def setV02_V03_body():
+  return """/**
+*/
+const itemCount = 2;
+const tagPropName = "Vx";
+let Vx = {};
+for (var x = 0; x < itemCount; x++) {
+    Vx['v' + (x+2).toString()] = '-';
+}
+Device.api.log("debug", tagPropName + ": " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+        Vx['V' + ((i/2)+2).toString()] = itemValue.toString();
+    }
+    
+  Device.api.getProperty(tagPropName)
+  .then(property => {
+    property.value.V02 = Vx[V2];
+    property.value.V03 = Vx[V3];
+    Device.api.setProperty(tagPropName, {
+      value: property.value,
+      time: new Date().toISOString()
+    })
+    .then(property => {
+      done(null, property.value);
+    });
+  });
+ });"""
+
+def writeV02_V03_body():
+    return """/**
+*/
+
+        let args = {
+            tagKey: "V02",
+            x: value.x,
+            setValue: value.setValue,
+            byteCount: value.byteCount || 2
+        };
+
+        try {
+            let req = Device.makeWriteRequest(args);
+            req.done = r => done(null, r);
+
+        Device.writeAndReadTag(req);
+        }
+        catch(e) {
+            done(e);
+        }
+        """
+
+#####################
+#
+#  V07
+#
+#####################
+
+def setV07_body():
+    return """/**
+*/
+
+    const tagPropName = "Vx";
+    let V07 = Device.convertToDec({ values: value }, -1);
+    Device.api.getProperty(tagPropName)
+        .then(property => {
+        property.value.V07 = V07;
+        Device.api.setProperty(tagPropName, {
+            value: property.value,
+            time: new Date().toISOString()
+        })
+        .then(property => {
+            done(null, property.value);
+        });
+    });
+"""
+
+def writeV07_body():
+    return """/**
+*/
+
+        let args = {
+            tagKey: "V07",
+            x: value.x,
+            setValue: value.setValue,
+            byteCount: value.byteCount || 2
+        };
+
+        try {
+            let req = Device.makeWriteRequest(args);
+            req.done = r => done(null, r);
+
+        Device.writeAndReadTag(req);
+        }
+        catch(e) {
+            done(e);
+        }
+        """
+
+#####################
+#
+#  S11
+#
+#####################
+
+def setS11_body():
+    return """/**
+*/
+
+    const tagPropName = "Sx";
+    let S11 = Device.convertToDec({ values: value }, -1);
+    Device.api.getProperty(tagPropName)
+        .then(property => {
+        property.value.S11 = S11;
+        Device.api.setProperty(tagPropName, {
+            value: property.value,
+            time: new Date().toISOString()
+        })
+        .then(property => {
+            done(null, property.value);
+        });
+    });
+"""
+
+def writeS11_body():
+    return """/**
+*/
+
+        let args = {
+            tagKey: "S11",
+            x: value.x,
+            setValue: value.setValue,
+            byteCount: value.byteCount || 2
+        };
+
+        try {
+            let req = Device.makeWriteRequest(args);
+            req.done = r => done(null, r);
+
+        Device.writeAndReadTag(req);
+        }
+        catch(e) {
+            done(e);
+        }
+        """
+
+#####################
+#
+#  T01
+#
+#####################
+
+def setT01_body():
+    return """/**
+*/
+
+    const tagPropName = "T01";
+    let T01 = Device.convertToDec({ values: value }, -1);
+    Device.api.getProperty(tagPropName)
+        .then(property => {
+        property.value.T01 = T01;
+        Device.api.setProperty(tagPropName, {
+            value: property.value,
+            time: new Date().toISOString()
+        })
+        .then(property => {
+            done(null, property.value);
+        });
+    });
+"""
+
+def writeT01_body():
+    return """/**
+*/
+
+        let args = {
+            tagKey: "T01",
+            x: value.x,
+            setValue: value.setValue,
+            byteCount: value.byteCount || 2
+        };
+
+        try {
+            let req = Device.makeWriteRequest(args);
+            req.done = r => done(null, r);
+
+        Device.writeAndReadTag(req);
+        }
+        catch(e) {
+            done(e);
+        }
+        """
+
+#####################
+#
+#  S14
+#
+#####################
+
+def setS14_body():
+    return """/**
+*/
+
+    const tagPropName = "Sx";
+    let S14 = Device.convertToDec({ values: value }, -1);
+    Device.api.getProperty(tagPropName)
+        .then(property => {
+        property.value.S14 = S14;
+        Device.api.setProperty(tagPropName, {
+            value: property.value,
+            time: new Date().toISOString()
+        })
+        .then(property => {
+            done(null, property.value);
+        });
+    });
+"""
+
+def writeS14_body():
+    return """/**
+*/
+
+        let args = {
+            tagKey: "S14",
+            x: value.x,
+            setValue: value.setValue,
+            byteCount: value.byteCount || 2
+        };
+
+        try {
+            let req = Device.makeWriteRequest(args);
+            req.done = r => done(null, r);
+
+        Device.writeAndReadTag(req);
+        }
+        catch(e) {
+            done(e);
+        }
+        """
+
+#####################
+#
+#  R01
+#
+#####################
+
+def setR01_body():
+    return """/**
+*/
+
+    const tagPropName = "Rx";
+    let R01 = Device.convertToDec({ values: value }, -1);
+    Device.api.getProperty(tagPropName)
+        .then(property => {
+        property.value.R01 = R01;
+        Device.api.setProperty(tagPropName, {
+            value: property.value,
+            time: new Date().toISOString()
+        })
+        .then(property => {
+            done(null, property.value);
+        });
+    });
+"""
+
+def writeR01_body():
+    return """/**
+*/
+
+        let args = {
+            tagKey: "R01",
+            x: value.x,
+            setValue: value.setValue,
+            byteCount: value.byteCount || 2
+        };
+
+        try {
+            let req = Device.makeWriteRequest(args);
+            req.done = r => done(null, r);
+
+        Device.writeAndReadTag(req);
+        }
+        catch(e) {
+            done(e);
+        }
+        """
+
+#####################
+#
+#  S00_S01_S02
+#
+#####################
+
+def setS00_S01_S02_body():
+    return """/**
+*/
+const itemCount = 3;
+const tagPropName = "Sx";
+let Sx = {};
+for (var x = 0; x < itemCount; x++) {
+    Sx['S' + (x).toString()] = '-';
+}
+Device.api.log("debug", tagPropName + ": " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+        if(i/2 == 2){
+            itemValue = itemValue *10;
+        }
+        Sx['S' + ((i/2)).toString()] = itemValue.toString();
+    }
+    
+  Device.api.getProperty(tagPropName)
+  .then(property => {
+    property.value.S00 = Sx[S0];
+    property.value.S01 = Sx[S1];
+    property.value.S02 = Sx[S2] + ' Liters';
+    Device.api.setProperty(tagPropName, {
+      value: property.value,
+      time: new Date().toISOString()
+    })
+    .then(property => {
+      done(null, property.value);
+    });
+  });
+ });"""
+
+def writeS00_S01_S02_body():
+    return """/**
+*/
+
+        let args = {
+            tagKey: "S00",
+            x: value.x,
+            setValue: value.setValue,
+            byteCount: value.byteCount || 2
+        };
+
+        try {
+            let req = Device.makeWriteRequest(args);
+            req.done = r => done(null, r);
+
+        Device.writeAndReadTag(req);
+        }
+        catch(e) {
+            done(e);
+        }
+        """
+
+#####################
+#
+#  S09_S10
+#
+#####################
+
+def setS09_S10_body():
+    return """/**
+*/
+const itemCount = 2;
+const tagPropName = "Sx";
+let Sx = {};
+for (var x = 0; x < itemCount; x++) {
+    Sx['S' + (x+9).toString()] = '-';
+}
+Device.api.log("debug", tagPropName + ": " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+        Sx['S' + ((i/2)+9).toString()] = itemValue.toString();
+    }
+    
+  Device.api.getProperty(tagPropName)
+  .then(property => {
+    property.value.S09 = Sx[S9];
+    property.value.S10 = Sx[S10] + "Hours";
+    Device.api.setProperty(tagPropName, {
+      value: property.value,
+      time: new Date().toISOString()
+    })
+    .then(property => {
+      done(null, property.value);
+    });
+  });
+ });"""
+
+def writeS09_S10_body():
+    return """/**
+*/
+
+        let args = {
+            tagKey: "S09",
+            x: value.x,
+            setValue: value.setValue,
+            byteCount: value.byteCount || 2
+        };
+
+        try {
+            let req = Device.makeWriteRequest(args);
+            req.done = r => done(null, r);
+
+        Device.writeAndReadTag(req);
+        }
+        catch(e) {
+            done(e);
+        }
+        """
+
+#####################
+#
+#  S06
+#
+#####################
+
+
+def setS06_body():
+    return """/**
+*/
+
+    const tagPropName = "Sx";
+    let S06 = Device.convertToDec({ values: value }, -1);
+    Device.api.getProperty(tagPropName)
+        .then(property => {
+        property.value.S06 = S06;
+        Device.api.setProperty(tagPropName, {
+            value: property.value,
+            time: new Date().toISOString()
+        })
+        .then(property => {
+            done(null, property.value);
+        });
+    });
+"""
+
+def writeS06_body():
+    return """/**
+*/
+
+        let args = {
+            tagKey: "S06",
+            x: value.x,
+            setValue: value.setValue,
+            byteCount: value.byteCount || 2
+        };
+
+        try {
+            let req = Device.makeWriteRequest(args);
+            req.done = r => done(null, r);
+
+        Device.writeAndReadTag(req);
+        }
+        catch(e) {
+            done(e);
+        }
+        """
+#####################
+#
+#  S05
+#
+#####################
+
+def setS05_body():
+    return """/**
+*/
+
+    const tagPropName = "Sx";
+    let S05 = Device.convertToDec({ values: value }, -1);
+    Device.api.getProperty(tagPropName)
+        .then(property => {
+        property.value.S05 = S05;
+        Device.api.setProperty(tagPropName, {
+            value: property.value,
+            time: new Date().toISOString()
+        })
+        .then(property => {
+            done(null, property.value);
+        });
+    });
+"""
+
+def writeS05_body():
+    return """/**
+*/
+
+        let args = {
+            tagKey: "S05",
+            x: value.x,
+            setValue: value.setValue,
+            byteCount: value.byteCount || 2
+        };
+
+        try {
+            let req = Device.makeWriteRequest(args);
+            req.done = r => done(null, r);
+
+        Device.writeAndReadTag(req);
+        }
+        catch(e) {
+            done(e);
+        }
+        """
+
+#####################
+#
+#  S07_S08
+#
+#####################
+
+def setS07_S08_body():
+    return """/**
+*/
+const itemCount = 2;
+const tagPropName = "Sx";
+let Sx = {};
+for (var x = 0; x < itemCount; x++) {
+    Sx['S' + (x+7).toString()] = '-';
+}
+Device.api.log("debug", tagPropName + ": " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+        Sx['S' + ((i/2)+7).toString()] = itemValue.toString();
+    }
+    
+  Device.api.getProperty(tagPropName)
+  .then(property => {
+    property.value.S07 = Sx[S7];
+    property.value.S08 = Sx[S8];
+    Device.api.setProperty(tagPropName, {
+      value: property.value,
+      time: new Date().toISOString()
+    })
+    .then(property => {
+      done(null, property.value);
+    });
+  });
+ });"""
+
+def writeS07_S08_body():
+    return """/**
+*/
+
+        let args = {
+            tagKey: "S07",
+            x: value.x,
+            setValue: value.setValue,
+            byteCount: value.byteCount || 2
+        };
+
+        try {
+            let req = Device.makeWriteRequest(args);
+            req.done = r => done(null, r);
+
+        Device.writeAndReadTag(req);
+        }
+        catch(e) {
+            done(e);
+        }
+        """
+
+#####################
+#
+#  S12_S13
+#
+#####################
+
+def setS12_S13_body():
+    return """/**
+*/
+const itemCount = 2;
+const tagPropName = "Sx";
+let Sx = {};
+for (var x = 0; x < itemCount; x++) {
+    Sx['S' + (x+12).toString()] = '-';
+}
+Device.api.log("debug", tagPropName + ": " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+        Sx['S' + ((i/2)+12).toString()] = itemValue.toString();
+    }
+    
+  Device.api.getProperty(tagPropName)
+  .then(property => {
+    property.value.S12 = Sx[S12] + " Seconds";
+    property.value.S13 = Sx[S13] + " Minutes";
+    Device.api.setProperty(tagPropName, {
+      value: property.value,
+      time: new Date().toISOString()
+    })
+    .then(property => {
+      done(null, property.value);
+    });
+  });
+ });"""
+
+def writeS12_S13_body():
+    return """/**
+*/
+
+        let args = {
+            tagKey: "S12",
+            x: value.x,
+            setValue: value.setValue,
+            byteCount: value.byteCount || 2
+        };
+
+        try {
+            let req = Device.makeWriteRequest(args);
+            req.done = r => done(null, r);
+
+        Device.writeAndReadTag(req);
+        }
+        catch(e) {
+            done(e);
+        }
+        """
+
+#####################
+#
+#  S17
+#
+#####################
+
+def setS17_body():
+    return """/**
+*/
+
+    const tagPropName = "Sx";
+    let S17 = Device.convertToDec({ values: value }, -1);
+    Device.api.getProperty(tagPropName)
+        .then(property => {
+        property.value.S17 = S17.toString() + ' %';
+        Device.api.setProperty(tagPropName, {
+            value: property.value,
+            time: new Date().toISOString()
+        })
+        .then(property => {
+            done(null, property.value);
+        });
+    });
+"""
+
+def writeS17_body():
+    return """/**
+*/
+
+        let args = {
+            tagKey: "S17",
+            x: value.x,
+            setValue: value.setValue,
+            byteCount: value.byteCount || 2
+        };
+
+        try {
+            let req = Device.makeWriteRequest(args);
+            req.done = r => done(null, r);
+
+        Device.writeAndReadTag(req);
+        }
+        catch(e) {
+            done(e);
+        }
+        """
+
+#####################
+#
+#  S16
+#
+#####################
+
+
+def setS16_body():
+    return """/**
+*/
+
+    const tagPropName = "Sx";
+    let S16 = Device.convertToDec({ values: value }, -1);
+    Device.api.getProperty(tagPropName)
+        .then(property => {
+        property.value.S16 = S16.toString() + ' %';
+        Device.api.setProperty(tagPropName, {
+            value: property.value,
+            time: new Date().toISOString()
+        })
+        .then(property => {
+            done(null, property.value);
+        });
+    });
+"""
+
+def writeS16_body():
+    return """/**
+*/
+
+        let args = {
+            tagKey: "S16",
+            x: value.x,
+            setValue: value.setValue,
+            byteCount: value.byteCount || 2
+        };
+
+        try {
+            let req = Device.makeWriteRequest(args);
+            req.done = r => done(null, r);
+
+        Device.writeAndReadTag(req);
+        }
+        catch(e) {
+            done(e);
+        }
+        """
+
+#####################
+#
+#  S03_S04
+#
+#####################
+
+def setS03_S04_body():
+    return """/**
+*/
+const itemCount = 2;
+const tagPropName = "Sx";
+let Sx = {};
+for (var x = 0; x < itemCount; x++) {
+    Sx['S' + (x+3).toString()] = '-';
+}
+Device.api.log("debug", tagPropName + ": " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+        Sx['S' + ((i/2)+3).toString()] = itemValue.toString();
+    }
+    
+  Device.api.getProperty(tagPropName)
+  .then(property => {
+    property.value.S03 = Sx[S3].toString() + ' Seconds';
+    property.value.S04 = Sx[S4].toString() + ' Seconds';
+    Device.api.setProperty(tagPropName, {
+      value: property.value,
+      time: new Date().toISOString()
+    })
+    .then(property => {
+      done(null, property.value);
+    });
+  });
+ });"""
+
+def writeS03_S04_body():
+    return """/**
+*/
+
+        let args = {
+            tagKey: "S03",
+            x: value.x,
+            setValue: value.setValue,
+            byteCount: value.byteCount || 2
+        };
+
+        try {
+            let req = Device.makeWriteRequest(args);
+            req.done = r => done(null, r);
+
+        Device.writeAndReadTag(req);
+        }
+        catch(e) {
+            done(e);
+        }
+        """
+
+#####################
+#
+#  S18_S19
+#
+#####################
+
+def setS18_S19_body():
+    return """/**
+*/
+const itemCount = 2;
+const tagPropName = "Sx";
+let Sx = {};
+for (var x = 0; x < itemCount; x++) {
+    Sx['S' + (x+18).toString()] = '-';
+}
+Device.api.log("debug", tagPropName + ": " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+        Sx['S' + ((i/2)+18).toString()] = itemValue.toString();
+    }
+    
+  Device.api.getProperty(tagPropName)
+  .then(property => {
+    property.value.S18 = Sx[S18];
+    property.value.S19 = Sx[S19];
+    Device.api.setProperty(tagPropName, {
+      value: property.value,
+      time: new Date().toISOString()
+    })
+    .then(property => {
+      done(null, property.value);
+    });
+  });
+ });"""
+
+def writeS18_S19_body():
+    return """/**
+*/
+
+        let args = {
+            tagKey: "S18",
+            x: value.x,
+            setValue: value.setValue,
+            byteCount: value.byteCount || 2
+        };
+
+        try {
+            let req = Device.makeWriteRequest(args);
+            req.done = r => done(null, r);
+
+        Device.writeAndReadTag(req);
+        }
+        catch(e) {
+            done(e);
+        }
+        """
+
+#####################
+#
+#  S21
+#
+#####################
+
+def setS21_body():
+    return """/**
+*/
+
+    const tagPropName = "Sx";
+    let S21 = Device.convertToDec({ values: value }, -1);
+    Device.api.getProperty(tagPropName)
+        .then(property => {
+        property.value.S21 = S21.toString() + ' Seconds';
+        Device.api.setProperty(tagPropName, {
+            value: property.value,
+            time: new Date().toISOString()
+        })
+        .then(property => {
+            done(null, property.value);
+        });
+    });
+"""
+
+def writeS21_body():
+    return """/**
+*/
+
+        let args = {
+            tagKey: "S21",
+            x: value.x,
+            setValue: value.setValue,
+            byteCount: value.byteCount || 2
+        };
+
+        try {
+            let req = Device.makeWriteRequest(args);
+            req.done = r => done(null, r);
+
+        Device.writeAndReadTag(req);
+        }
+        catch(e) {
+            done(e);
+        }
+        """
+
+#####################
+#
+#  S20
+#
+#####################
+
+def setS20_body():
+    return """/**
+*/
+
+    const tagPropName = "Sx";
+    let S20 = Device.convertToDec({ values: value }, -1);
+    Device.api.getProperty(tagPropName)
+        .then(property => {
+        property.value.S20 = S20.toString() + ' Seconds';
+        Device.api.setProperty(tagPropName, {
+            value: property.value,
+            time: new Date().toISOString()
+        })
+        .then(property => {
+            done(null, property.value);
+        });
+    });
+"""
+
+def writeS20_body():
+    return """/**
+*/
+
+        let args = {
+            tagKey: "S20",
+            x: value.x,
+            setValue: value.setValue,
+            byteCount: value.byteCount || 2
+        };
+
+        try {
+            let req = Device.makeWriteRequest(args);
+            req.done = r => done(null, r);
+
+        Device.writeAndReadTag(req);
+        }
+        catch(e) {
+            done(e);
+        }
+        """
+#####################
+#
+#  S22
+#
+#####################
+
+def setS22_body():
+    return """/**
+*/
+
+    const tagPropName = "Sx";
+    let S22 = Device.convertToDec({ values: value }, -1);
+    Device.api.getProperty(tagPropName)
+        .then(property => {
+        property.value.S22 = S22;
+        Device.api.setProperty(tagPropName, {
+            value: property.value,
+            time: new Date().toISOString()
+        })
+        .then(property => {
+            done(null, property.value);
+        });
+    });
+"""
+
+def writeS22_body():
+    return """/**
+*/
+
+        let args = {
+            tagKey: "S22",
+            x: value.x,
+            setValue: value.setValue,
+            byteCount: value.byteCount || 2
+        };
+
+        try {
+            let req = Device.makeWriteRequest(args);
+            req.done = r => done(null, r);
+
+        Device.writeAndReadTag(req);
+        }
+        catch(e) {
+            done(e);
+        }
+        """
+
