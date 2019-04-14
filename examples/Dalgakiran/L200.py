@@ -90,9 +90,7 @@ def fetchReadRequest_body():
 */
 const requests = {
   cfgSerialNumber:                  { request: "r,meth:setSerialNumber,-,20,-,1,0x00" },
-  cfgLogikaModel:                   { request: "r,meth:setLogikaModel,-,2,-,1,0x0A" },
-  cfgLogikaFwVersion:               { request: "r,meth:setLogikaFwVersion,-,2,-,1,0x0B" },
-  cfgIOBoardFirmwareRelease         { request: "r,meth:setIOBoardFirmwareRelease,-,2,-,1,0x00D"},
+  cfgLogikaFwVersion:               { request: "r,meth:setLogikaFwVersion,-,2,-,1,0x0D" },
   cfgLevel1Pwd:                     { request: "r,meth:setLevel1Pwd,-,6,-,1,0x100" },
   cfgMaintCycles:                   { request: "r,meth:setMaintCycles,-,12,-,1,0x52C" },
   totalHours:                       { request: "r,meth:setTotalHours,-,4,-,1,0x600" },
@@ -131,6 +129,31 @@ const requests = {
   CompressorsAvailable:             { request: "r,meth:setCompressorsAvailable,-,2,-,1,0x415" ),
   CompressorsSelected:              { request: "r,meth:setCompressorsSelected,-,2,-,1,0x416" ),
   CompressorsOn:                    { request: "r,meth:setCompressorsOn,-,2,-,1,0x417" ),
+  //Slave Read Tags
+  SlaveFwVersion_Comp0:             { request: "r,meth:setSlaveFwVersion_Comp0,-,2,-,1,0x1000" ),
+  SlaveFwVersion_Comp1:             { request: "r,meth:setSlaveFwVersion_Comp1,-,2,-,1,0x1100" ),
+  SlaveFwVersion_Comp2:             { request: "r,meth:setSlaveFwVersion_Comp2,-,2,-,1,0x1200" ),
+  SlaveFwVersion_Comp3:             { request: "r,meth:setSlaveFwVersion_Comp3,-,2,-,1,0x1300" ),
+  SlaveControllerState_Comp0:       { request: "r,meth:setSlaveControllerState_Comp0,-,2,-,1,0x1001" ),
+  SlaveControllerState_Comp1:       { request: "r,meth:setSlaveControllerState_Comp1,-,2,-,1,0x1101" ),
+  SlaveControllerState_Comp2:       { request: "r,meth:setSlaveControllerState_Comp2,-,2,-,1,0x1201" ),
+  SlaveControllerState_Comp3:       { request: "r,meth:setSlaveControllerState_Comp3,-,2,-,1,0x1301" ),
+  SlaveRelativeSpeed_Comp0:         { request: "r,meth:setSlaveRelativeSpeed_Comp0,-,2,-,1,0x1002" ),
+  SlaveRelativeSpeed_Comp1:         { request: "r,meth:setSlaveRelativeSpeed_Comp1,-,2,-,1,0x1102" ),
+  SlaveRelativeSpeed_Comp2:         { request: "r,meth:setSlaveRelativeSpeed_Comp2,-,2,-,1,0x1202" ),
+  SlaveRelativeSpeed_Comp3:         { request: "r,meth:setSlaveRelativeSpeed_Comp3,-,2,-,1,0x1302" ),
+  SlaveControllerType_Comp0:        { request: "r,meth:setSlaveControllerType_Comp0,-,2,-,1,0x1004" ),
+  SlaveControllerType_Comp1:        { request: "r,meth:setSlaveControllerType_Comp1,-,2,-,1,0x1104" ),
+  SlaveControllerType_Comp2:        { request: "r,meth:setSlaveControllerType_Comp2,-,2,-,1,0x1204" ),
+  SlaveControllerType_Comp3:        { request: "r,meth:setSlaveControllerType_Comp3,-,2,-,1,0x1304" ),
+  SlaveSelenoidDelay_Comp0:         { request: "r,meth:setSlaveSelenoidDelay_Comp0,-,2,-,1,0x1005" ),
+  SlaveSelenoidDelay_Comp1:         { request: "r,meth:setSlaveSelenoidDelay_Comp1,-,2,-,1,0x1105" ),
+  SlaveSelenoidDelay_Comp2:         { request: "r,meth:setSlaveSelenoidDelay_Comp2,-,2,-,1,0x1205" ),
+  SlaveSelenoidDelay_Comp3:         { request: "r,meth:setSlaveSelenoidDelay_Comp3,-,2,-,1,0x1305" ),
+  SlaveAirFlow_Comp0:               { request: "r,meth:setSlaveAirFlow_Comp0,-,2,-,1,0x1006" ),
+  SlaveAirFlow_Comp1:               { request: "r,meth:setSlaveAirFlow_Comp1,-,2,-,1,0x1106" ),
+  SlaveAirFlow_Comp2:               { request: "r,meth:setSlaveAirFlow_Comp2,-,2,-,1,0x1206" ),
+  SlaveAirFlow_Comp3:               { request: "r,meth:setSlaveAirFlow_Comp3,-,2,-,1,0x1306" ),
   //
   R02:                               { request: "r,meth:setR02,-,2,-,1,0x500" },
   V01:                               { request: "r,meth:setV01,-,2,-,1,0x501" },
@@ -259,7 +282,21 @@ return [
     { code: 4, label: "BLOCKED" },
 ];
 """
+def fetchSlaveControllerStates_body():
+    return """/**
 
+*/
+return [
+    { code: 0, label: "RESET" },
+    { code: 1, label: "OFF" },
+    { code: 2, label: "STARTING" },
+    { code: 3, label: "LOAD RUNNING" },
+    { code: 4, label: "IDLE RUNNING" },
+    { code: 5, label: "SAFETY TIME" },
+    { code: 6, label: "UNDER MAINTENANCE" },
+    { code: 7, label: "FAULT" },
+];
+"""
 #
 #
 #
@@ -956,10 +993,156 @@ def setAirProduced_body():
 """
 
 
+#####################
+#
+#  SlaveFwVersion
+#
+#####################
+def setSlaveFwVersion_body(compressorNo):
+    return '''/**
+    value: [ 3, 1 ] => "1.3"
+    */
+    (async function f(major, minor) {
+        let releaseNo = major.toString() + "." + minor.toString();
+        
+        await Device.api.setProperty("SlaveFwVersion_Comp''' + compressorNo + ''', {
+            value: releaseNo,
+            time: new Date().toISOString()
+        });    
+        done(null, releaseNo);    
+    })(value[0], value[1]);
+    '''
 
+#####################
+#
+#  SlaveControllerState
+#
+#####################
+def setSlaveControllerState_body(compressorNo):
+    return '''/**
+    Sets controller state property
+*/
+let table = Device.fetchSlaveControllerStates();
+let state = { code: -1, label: "NOT_SET" };
+let code = Device.convertToDec({ values: value, default: -1 });
 
+if (code >= 0 && code < table.length) {
+  state = table[code];
+  
+  Device.api.getProperty("slaveControllerState_Comp''' + compressorNo + '''").then( stateProp => {
+    if (!stateProp.value || state.code !== stateProp.value.code) {
+        Device.api.setProperty("slaveControllerState_Comp''' + compressorNo + '''", {
+            value: state,
+            time: new Date().toISOString()
+        })
+        .then(property => {
+            done(null, state);
+        });
+    }
+    else{
+        done(null, "nothing updated");
+    }
+  });
+}
+else {    
+    done("invalid argument");
+}
+'''
+#####################
+#
+#  SlaveControllerType
+#
+#####################
 
+def setSlaveControllerType_body(compressorNo):
+    return '''/**
+*/
+const tagPropName = "SlaveControllerType_Comp''' + compressorNo + '''";
+let SlaveControllerType = Device.convertToDec({ values: value }, -1);
+if (SlaveControllerType == 1) SlaveControllerType = "Slave";
+else{SlaveControllerType = "Logik";}
+Device.api.getProperty(tagPropName)
+  .then(property => {
+    property.value.SlaveControllerType = SlaveControllerType;
+    Device.api.setProperty(tagPropName, {
+      value: property.value,
+      time: new Date().toISOString()
+    })
+    .then(property => {
+      done(null, property.value);
+    });
+  });
+'''
 
+#####################
+#
+#  SlaveSelenoidDelay
+#
+#####################
+
+def setSlaveSelenoidDelay_body(compressorNo):
+    return '''/**
+*/
+const tagPropName = "SlaveSelenoidDelay_Comp''' + compressorNo + '''";
+let SlaveSelenoidDelay = Device.convertToDec({ values: value }, -1);
+Device.api.getProperty(tagPropName)
+  .then(property => {
+    property.value.SlaveSelenoidDelay = SlaveSelenoidDelay.toString() + ' sec';
+    Device.api.setProperty(tagPropName, {
+      value: property.value,
+      time: new Date().toISOString()
+    })
+    .then(property => {
+      done(null, property.value);
+    });
+  });
+'''
+
+#####################
+#
+#  SlaveAirFlow
+#
+#####################
+def setSlaveAirFlow_body(compressorNo):
+    return '''/**
+*/
+const tagPropName = "SlaveAirFlow_Comp''' + compressorNo + '''";
+let SlaveAirFlow = Device.convertToDec({ values: value }, -1);
+SlaveAirFlow = SlaveAirFlow / 10;
+Device.api.getProperty(tagPropName)
+  .then(property => {
+    property.value.SlaveAirFlow = SlaveAirFlow.toString() + ' Liters/min';
+    Device.api.setProperty(tagPropName, {
+      value: property.value,
+      time: new Date().toISOString()
+    })
+    .then(property => {
+      done(null, property.value);
+    });
+  });
+'''
+#####################
+#
+#  SlaveRelativeSpeed
+#
+#####################
+def setSlaveRelativeSpeed_body(compressorNo):
+    return '''/**
+*/
+const tagPropName = "SlaveRelativeSpeed_Comp''' + compressorNo + '''";
+let SlaveRelativeSpeed = Device.convertToDec({ values: value }, -1);
+Device.api.getProperty(tagPropName)
+  .then(property => {
+    property.value.SlaveRelativeSpeed = SlaveRelativeSpeed.toString();
+    Device.api.setProperty(tagPropName, {
+      value: property.value,
+      time: new Date().toISOString()
+    })
+    .then(property => {
+      done(null, property.value);
+    });
+  });
+'''
 #####################
 #
 #  R02
