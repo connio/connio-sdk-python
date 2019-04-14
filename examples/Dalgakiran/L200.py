@@ -113,7 +113,24 @@ const requests = {
   driveMeasures:                    { request: "r,meth:setDriveMeasures,-,20,-,1,0xA01" },
   driveFaultString:                 { request: "r,meth:setDriveFaultString,-,26,-,1,0xA0B" },
   driveCommands:                    { request: "r,meth:setDriveCommands,-,2,-,1,0xA18" },
-  
+
+  //
+  AmbientTemperature:               { request: "r,meth:setAmbientTemperature,-,2,-,1,0x405" ),
+  InternalVoltageVcc:               { request: "r,meth:setInternalVoltageVcc,-,2,-,1,0x406" ),
+  InternalVoltageVL:                { request: "r,meth:setInternalVoltageVL,-,2,-,1,0x407" ),
+  ResidualCompressorCapacity:       { request: "r,meth:setResidualCompressorCapacity,-,2,-,1,0x408" ),
+  ExcessCompressorCapacity:         { request: "r,meth:setExcessCompressorCapacity,-,2,-,1,0x409" ),
+  CurrentStopPressure:              { request: "r,meth:setCurrentStopPressure,-,2,-,1,0x40A" ),
+  CurrentStartPressure:             { request: "r,meth:setCurrentStartPressure,-,2,-,1,0x40B" ),
+  CurrentTotalPower:                { request: "r,meth:setCurrentTotalPower,-,4,-,1,0x40C" ),
+  AverageAirDelivery:               { request: "r,meth:setAverageAirDelivery,-,4,-,1,0x40E" ),
+  CurrentTotalAirDelivery:          { request: "r,meth:setCurrentTotalAirDelivery,-,4,-,1,0x410" ),
+  CompressorsConfigured:            { request: "r,meth:setCompressorsConfigured,-,2,-,1,0x412" ),
+  CompressorsSlave:                 { request: "r,meth:setCompressorsSlave,-,2,-,1,0x413" ),
+  CompressorsSetToMaintenance:      { request: "r,meth:setCompressorsSetToMaintenance,-,2,-,1,0x414" ),
+  CompressorsAvailable:             { request: "r,meth:setCompressorsAvailable,-,2,-,1,0x415" ),
+  CompressorsSelected:              { request: "r,meth:setCompressorsSelected,-,2,-,1,0x416" ),
+  CompressorsOn:                    { request: "r,meth:setCompressorsOn,-,2,-,1,0x417" ),
   //
   R02:                               { request: "r,meth:setR02,-,2,-,1,0x500" },
   V01:                               { request: "r,meth:setV01,-,2,-,1,0x501" },
@@ -194,9 +211,9 @@ if (value) {
     "r,meth:setNonAckAlarms,5,12,1,1,0x208|"+
     "r,meth:setControllerState,5,2,1,1,0x400|"+
     "r,meth:setCompressorState,5,2,1,1,0x401|"+
-    "r,meth:setBlockingAlarm,5,2,1,1,0x402|"+
+    "r,meth:setBlockingAlarm,5,2,1,1,0x401|"+
     "r,meth:setScrewTemperature,3,2,0,1,0x406|"+
-    "r,meth:setWorkingPressure,3,2,0,1,0x407|"+
+    "r,meth:setWorkingPressure,3,2,0,1,0x404|"+
     "r,meth:setSecondTemperature,3,2,0,1,0x408|"+
     "r,meth:setSecondPressure,3,2,0,1,0x409|"+
     "r,meth:setConfigSwitches,60,4,1,1,0x500|"+    
@@ -214,9 +231,9 @@ else {
     "r,meth:setNonAckAlarms,5,12,1,1,0x208|"+
     "r,meth:setControllerState,5,2,1,1,0x400|"+
     "r,meth:setCompressorState,5,2,1,1,0x401|"+
-    "r,meth:setBlockingAlarm,5,2,1,1,0x402|"+
+    "r,meth:setBlockingAlarm,5,2,1,1,0x401|"+
     "r,meth:setScrewTemperature,3,2,0,1,0x406|"+
-    "r,meth:setWorkingPressure,3,2,0,1,0x407|"+
+    "r,meth:setWorkingPressure,3,2,0,1,0x404|"+
     "r,meth:setSecondTemperature,3,2,0,1,0x408|"+
     "r,meth:setSecondPressure,3,2,0,1,0x409|"+
     "r,meth:setConfigSwitches,60,4,1,1,0x500|"+
@@ -439,6 +456,510 @@ Device.api.setProperty("digitalInputs", {
     done(null, property.value);
  });
 """
+
+#####################
+#
+#  AmbientTemperature
+#
+#####################
+
+def setAmbientTemperature_body():
+    return """/**
+*/
+
+    const tagPropName = "AmbientTemperature";
+    let AmbientTemperature = Device.convertToDec({ values: value }, -1);
+    AmbientTemperature = AmbientTemperature / 10;
+    Device.api.getProperty(tagPropName)
+        .then(property => {
+        property.value.AmbientTemperature = AmbientTemperature.toString() +  ' °C';
+        Device.api.setProperty(tagPropName, {
+            value: property.value,
+            time: new Date().toISOString()
+        })
+        .then(property => {
+            done(null, property.value);
+        });
+    });
+"""
+
+#####################
+#
+#  InternalVoltageVcc
+#
+#####################
+
+def setInternalVoltageVcc_body():
+    return """/**
+*/
+
+    const tagPropName = "InternalVoltageVcc";
+    let InternalVoltageVcc = Device.convertToDec({ values: value }, -1);
+    InternalVoltageVcc = InternalVoltageVcc / 10;
+    Device.api.getProperty(tagPropName)
+        .then(property => {
+        property.value.InternalVoltageVcc = InternalVoltageVcc.toString() + ' V';
+        Device.api.setProperty(tagPropName, {
+            value: property.value,
+            time: new Date().toISOString()
+        })
+        .then(property => {
+            done(null, property.value);
+        });
+    });
+"""
+
+#####################
+#
+#  InternalVoltageVL
+#
+#####################
+
+def setInternalVoltageVL_body():
+    return """/**
+*/
+
+    const tagPropName = "InternalVoltageVL";
+    let InternalVoltageVL = Device.convertToDec({ values: value }, -1);
+    InternalVoltageVL = InternalVoltageVL / 10;
+    Device.api.getProperty(tagPropName)
+        .then(property => {
+        property.value.InternalVoltageVL = InternalVoltageVL.toString() + ' V';
+        Device.api.setProperty(tagPropName, {
+            value: property.value,
+            time: new Date().toISOString()
+        })
+        .then(property => {
+            done(null, property.value);
+        });
+    });
+"""
+
+#####################
+#
+#  ResidualCompressorCapacity
+#
+#####################
+
+def setResidualCompressorCapacity_body():
+    return """/**
+*/
+
+    const tagPropName = "ResidualCompressorCapacity";
+    let ResidualCompressorCapacity = Device.convertToDec({ values: value }, -1);
+    ResidualCompressorCapacity = ResidualCompressorCapacity / 10;
+    Device.api.getProperty(tagPropName)
+        .then(property => {
+        property.value.ResidualCompressorCapacity = ResidualCompressorCapacity.toString() + ' Lit';
+        Device.api.setProperty(tagPropName, {
+            value: property.value,
+            time: new Date().toISOString()
+        })
+        .then(property => {
+            done(null, property.value);
+        });
+    });
+"""
+
+#####################
+#
+#  ExcessCompressorCapacity
+#
+#####################
+
+def setExcessCompressorCapacity_body():
+    return """/**
+*/
+
+    const tagPropName = "ExcessCompressorCapacity";
+    let ExcessCompressorCapacity = Device.convertToDec({ values: value }, -1);
+    ExcessCompressorCapacity = ExcessCompressorCapacity / 10;
+    Device.api.getProperty(tagPropName)
+        .then(property => {
+        property.value.ExcessCompressorCapacity = ExcessCompressorCapacity.toString() + ' Lit';
+        Device.api.setProperty(tagPropName, {
+            value: property.value,
+            time: new Date().toISOString()
+        })
+        .then(property => {
+            done(null, property.value);
+        });
+    });
+"""
+
+#####################
+#
+#  CurrentStopPressure
+#
+#####################
+
+def setCurrentStopPressure_body():
+    return """/**
+*/
+
+    const tagPropName = "CurrentStopPressure";
+    let CurrentStopPressure = Device.convertToDec({ values: value }, -1);
+    CurrentStopPressure = CurrentStopPressure / 10;
+    Device.api.getProperty(tagPropName)
+        .then(property => {
+        property.value.CurrentStopPressure = CurrentStopPressure.toString() + ' Bar';
+        Device.api.setProperty(tagPropName, {
+            value: property.value,
+            time: new Date().toISOString()
+        })
+        .then(property => {
+            done(null, property.value);
+        });
+    });
+"""
+
+#####################
+#
+#  CurrentStartPressure
+#
+#####################
+
+def setCurrentStartPressure_body():
+    return """/**
+*/
+
+    const tagPropName = "CurrentStartPressure";
+    let CurrentStartPressure = Device.convertToDec({ values: value }, -1);
+    CurrentStartPressure = CurrentStartPressure / 10;
+    Device.api.getProperty(tagPropName)
+        .then(property => {
+        property.value.CurrentStartPressure = CurrentStartPressure.toString() + ' Bar';
+        Device.api.setProperty(tagPropName, {
+            value: property.value,
+            time: new Date().toISOString()
+        })
+        .then(property => {
+            done(null, property.value);
+        });
+    });
+"""
+
+#####################
+#
+#  CurrentTotalPower
+#
+#####################
+
+def setCurrentTotalPower_body():
+    return """/**
+*/
+
+    const tagPropName = "CurrentTotalPower";
+    let CurrentTotalPower = Device.convertToDec({ values: value }, -1);
+    CurrentTotalPower = CurrentTotalPower * 10;
+    Device.api.getProperty(tagPropName)
+        .then(property => {
+        property.value.CurrentTotalPower = CurrentTotalPower.toString() + ' kW';
+        Device.api.setProperty(tagPropName, {
+            value: property.value,
+            time: new Date().toISOString()
+        })
+        .then(property => {
+            done(null, property.value);
+        });
+    });
+"""
+
+#####################
+#
+#  AverageAirDelivery
+#
+#####################
+
+def setAverageAirDelivery_body():
+    return """/**
+*/
+
+    const tagPropName = "AverageAirDelivery";
+    let AverageAirDelivery = Device.convertToDec({ values: value }, -1);
+    AverageAirDelivery = AverageAirDelivery * 10;
+    Device.api.getProperty(tagPropName)
+        .then(property => {
+        property.value.AverageAirDelivery = AverageAirDelivery.toString() + ' Lit';
+        Device.api.setProperty(tagPropName, {
+            value: property.value,
+            time: new Date().toISOString()
+        })
+        .then(property => {
+            done(null, property.value);
+        });
+    });
+"""
+
+#####################
+#
+#  CurrentTotalAirDelivery
+#
+#####################
+
+def setCurrentTotalAirDelivery_body():
+    return """/**
+*/
+
+    const tagPropName = "CurrentTotalAirDelivery";
+    let CurrentTotalAirDelivery = Device.convertToDec({ values: value }, -1);
+    CurrentTotalAirDelivery = CurrentTotalAirDelivery * 10;
+    Device.api.getProperty(tagPropName)
+        .then(property => {
+        property.value.CurrentTotalAirDelivery = CurrentTotalAirDelivery.toString() + ' Lit';
+        Device.api.setProperty(tagPropName, {
+            value: property.value,
+            time: new Date().toISOString()
+        })
+        .then(property => {
+            done(null, property.value);
+        });
+    });
+"""
+
+
+#####################
+#
+#  CompressorsConfigured
+#
+#####################
+
+def setCompressorsConfigured_body():
+    return """/**
+*/
+let data = Device.convertToDec({ values: value, default: 0});
+
+let result = [];
+if (data & 1) result.push("Compressor 0 Present");
+if (data & 2) result.push("Compressor 1 Present");
+if (data & 4) result.push("Compressor 2 Present");
+if (data & 8) result.push("Compressor 3 Present");
+
+if (result.length == 0) result = ["No Compressors Present"];
+
+Device.api.setProperty("CompressorsConfigured", {
+    value: result.toString(),
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+
+"""
+#####################
+#
+#  CompressorsSlave
+#
+#####################
+
+def setCompressorsSlave_body():
+    return """/**
+*/
+let data = Device.convertToDec({ values: value, default: 0});
+
+let result = [];
+if (data & 1) result.push("Compressor 0 Controlled By Logik Controller");
+else{
+    result.push("Compressor 0 Controlled By Slave Device");
+}
+if (data & 2) result.push("Compressor 1 Controlled By Logik Controller");
+else{
+    result.push("Compressor 1 Controlled By Slave Device");
+}
+if (data & 4) result.push("Compressor 2 Controlled By Logik Controller");
+else{
+    result.push("Compressor 2 Controlled By Slave Device");
+}
+if (data & 8) result.push("Compressor 3 Controlled By Logik Controller");
+else{
+    result.push("Compressor 3 Controlled By Slave Device");
+}
+
+if (result.length == 0) result = ["-"];
+
+Device.api.setProperty("CompressorsSlave", {
+    value: result.toString(),
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+
+"""
+
+#####################
+#
+#  CompressorsSetToMaintenance
+#
+#####################
+
+def setCompressorsSetToMaintenance_body():
+    return """/**
+*/
+let data = Device.convertToDec({ values: value, default: 0});
+
+let result = [];
+if (data & 1) result.push("Compressor 0 Set To Maintenance");
+if (data & 2) result.push("Compressor 1 Set To Maintenance");
+if (data & 4) result.push("Compressor 2 Set To Maintenance");
+if (data & 8) result.push("Compressor 3 Set To Maintenance");
+
+if (result.length == 0) result = ["No Compressors Set To Maintenance"];
+
+Device.api.setProperty("CompressorsSetToMaintenance", {
+    value: result.toString(),
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+
+"""
+
+#####################
+#
+#  CompressorsAvailable
+#
+#####################
+
+def setCompressorsAvailable_body():
+    return """/**
+*/
+let data = Device.convertToDec({ values: value, default: 0});
+
+let result = [];
+if (data & 1) result.push("Compressor 0 Available");
+if (data & 2) result.push("Compressor 1 Available");
+if (data & 4) result.push("Compressor 2 Available");
+if (data & 8) result.push("Compressor 3 Available");
+
+if (result.length == 0) result = ["No Compressors Available"];
+
+Device.api.setProperty("CompressorsAvailable", {
+    value: result.toString(),
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+
+"""
+
+#####################
+#
+#  CompressorsSelected
+#
+#####################
+
+def setCompressorsSelected_body():
+    return """/**
+*/
+let data = Device.convertToDec({ values: value, default: 0});
+
+let result = [];
+if (data & 1) result.push("Compressor 0 Selected");
+if (data & 2) result.push("Compressor 1 Selected");
+if (data & 4) result.push("Compressor 2 Selected");
+if (data & 8) result.push("Compressor 3 Selected");
+
+if (result.length == 0) result = ["No Compressors Selected"];
+
+Device.api.setProperty("CompressorsSelected", {
+    value: result.toString(),
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+
+"""
+
+#####################
+#
+#  CompressorsOn
+#
+#####################
+
+def setCompressorsOn_body():
+    return """/**
+*/
+let data = Device.convertToDec({ values: value, default: 0});
+
+let result = [];
+if (data & 1) result.push("Compressor 0 Command To Load");
+if (data & 2) result.push("Compressor 1 Command To Load");
+if (data & 4) result.push("Compressor 2 Command To Load");
+if (data & 8) result.push("Compressor 3 Command To Load");
+
+if (result.length == 0) result = ["All Compressors Stopped or Running Idle"];
+
+Device.api.setProperty("CompressorsSelected", {
+    value: result.toString(),
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+
+"""
+
+#####################
+#
+#  TotalEnergyConsumption
+#
+#####################
+def setTotalEnergyConsumption_body():
+    return """/**
+*/
+
+    const tagPropName = "TotalEnergyConsumption";
+    let TotalEnergyConsumption = Device.convertToDec({ values: value }, -1);
+    TotalEnergyConsumption = TotalEnergyConsumption / 10;
+    Device.api.getProperty(tagPropName)
+        .then(property => {
+        property.value.TotalEnergyConsumption = TotalEnergyConsumption.toString() + ' kWh';
+        Device.api.setProperty(tagPropName, {
+            value: property.value,
+            time: new Date().toISOString()
+        })
+        .then(property => {
+            done(null, property.value);
+        });
+    });
+"""
+
+
+#####################
+#
+#  AirProduced
+#
+#####################
+
+def setAirProduced_body():
+    return """/**
+*/
+
+    const tagPropName = "AirProduced";
+    let AirProduced = Device.convertToDec({ values: value }, -1);
+    AirProduced = AirProduced;
+    Device.api.getProperty(tagPropName)
+        .then(property => {
+        property.value.AirProduced = AirProduced.toString() + ' m^3';
+        Device.api.setProperty(tagPropName, {
+            value: property.value,
+            time: new Date().toISOString()
+        })
+        .then(property => {
+            done(null, property.value);
+        });
+    });
+"""
+
+
+
+
+
+
 #####################
 #
 #  R02

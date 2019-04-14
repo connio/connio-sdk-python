@@ -37,6 +37,23 @@ def wire(client, name='LogikaL200', friendly="Logika L200 Controller", base="Bas
     client.account.properties(compressor.id).create(name='relayOutputs', data_type='string', access_type='protected', publish_type='never')
     client.account.properties(compressor.id).create(name='digitalInputs', data_type='string', access_type='protected', publish_type='never')
     
+    client.account.properties(compressor.id).create(name="AmbientTemperature", data_type='object', access_type='protected', publish_type='never')
+    client.account.properties(compressor.id).create(name="InternalVoltageVcc", data_type='object', access_type='protected', publish_type='never')
+    client.account.properties(compressor.id).create(name="InternalVoltageVL", data_type='object', access_type='protected', publish_type='never')
+    client.account.properties(compressor.id).create(name="ResidualCompressorCapacity", data_type='object', access_type='protected', publish_type='never')
+    client.account.properties(compressor.id).create(name="ExcessCompressorCapacity", data_type='object', access_type='protected', publish_type='never')
+    client.account.properties(compressor.id).create(name="CurrentStopPressure", data_type='object', access_type='protected', publish_type='never')
+    client.account.properties(compressor.id).create(name="CurrentStartPressure", data_type='object', access_type='protected', publish_type='never')
+    client.account.properties(compressor.id).create(name="CurrentTotalPower", data_type='object', access_type='protected', publish_type='never')
+    client.account.properties(compressor.id).create(name="AverageAirDelivery", data_type='object', access_type='protected', publish_type='never')
+    client.account.properties(compressor.id).create(name="CurrentTotalAirDelivery", data_type='object', access_type='protected', publish_type='never')
+    client.account.properties(compressor.id).create(name="CompressorsConfigured", data_type='object', access_type='protected', publish_type='never')
+    client.account.properties(compressor.id).create(name="CompressorsSlave", data_type='object', access_type='protected', publish_type='never')
+    client.account.properties(compressor.id).create(name="CompressorsSetToMaintenance", data_type='object', access_type='protected', publish_type='never')
+    client.account.properties(compressor.id).create(name="CompressorsAvailable", data_type='object', access_type='protected', publish_type='never')
+    client.account.properties(compressor.id).create(name="CompressorsSelected", data_type='object', access_type='protected', publish_type='never')
+    client.account.properties(compressor.id).create(name="CompressorsOn", data_type='object', access_type='protected', publish_type='never')
+
     client.account.properties(compressor.id).create(name="WPx", data_type='object', access_type='protected', publish_type='never')
     client.account.properties(compressor.id).create(name="WTx", data_type='object', access_type='protected', publish_type='never')
     client.account.properties(compressor.id).create(name="Vx", data_type='object', access_type='protected', publish_type='never')
@@ -58,6 +75,24 @@ def wire(client, name='LogikaL200', friendly="Logika L200 Controller", base="Bas
     accessLevel3 = 'private'
 
     # Controller specific SET methods (private)
+    client.account.methods(compressor.id).create(name='setAmbientTemperature', method_impl= MethodInstance.MethodImplementation(setAmbientTemperature_body()), access_type=accessLevel3)
+    client.account.methods(compressor.id).create(name='setInternalVoltageVcc', method_impl= MethodInstance.MethodImplementation(setInternalVoltageVcc_body()), access_type=accessLevel3)
+    client.account.methods(compressor.id).create(name='setInternalVoltageVL', method_impl= MethodInstance.MethodImplementation(setInternalVoltageVL_body()), access_type=accessLevel3)
+    client.account.methods(compressor.id).create(name='setResidualCompressorCapacity', method_impl= MethodInstance.MethodImplementation(setResidualCompressorCapacity_body()), access_type=accessLevel3)
+    client.account.methods(compressor.id).create(name='setExcessCompressorCapacity', method_impl= MethodInstance.MethodImplementation(setExcessCompressorCapacity_body()), access_type=accessLevel3)
+    client.account.methods(compressor.id).create(name='setCurrentStopPressure', method_impl= MethodInstance.MethodImplementation(setCurrentStopPressure_body()), access_type=accessLevel3)
+    client.account.methods(compressor.id).create(name='setCurrentStartPressure', method_impl= MethodInstance.MethodImplementation(setCurrentStartPressure_body()), access_type=accessLevel3)
+    client.account.methods(compressor.id).create(name='setCurrentTotalPower', method_impl= MethodInstance.MethodImplementation(setCurrentTotalPower_body()), access_type=accessLevel3)
+    client.account.methods(compressor.id).create(name='setAverageAirDelivery', method_impl= MethodInstance.MethodImplementation(setAverageAirDelivery_body()), access_type=accessLevel3)
+    client.account.methods(compressor.id).create(name='setCurrentTotalAirDelivery', method_impl= MethodInstance.MethodImplementation(setCurrentTotalAirDelivery_body()), access_type=accessLevel3)
+    client.account.methods(compressor.id).create(name='setCompressorsConfigured', method_impl= MethodInstance.MethodImplementation(setCompressorsConfigured_body()), access_type=accessLevel3)
+    client.account.methods(compressor.id).create(name='setCompressorsSlave', method_impl= MethodInstance.MethodImplementation(setCompressorsSlave_body()), access_type=accessLevel3)
+    client.account.methods(compressor.id).create(name='setCompressorsSetToMaintenance', method_impl= MethodInstance.MethodImplementation(setCompressorsSetToMaintenance_body()), access_type=accessLevel3)
+    client.account.methods(compressor.id).create(name='setCompressorsAvailable', method_impl= MethodInstance.MethodImplementation(setCompressorsAvailable_body()), access_type=accessLevel3)
+    client.account.methods(compressor.id).create(name='setCompressorsSelected', method_impl= MethodInstance.MethodImplementation(setCompressorsSelected_body()), access_type=accessLevel3)
+    client.account.methods(compressor.id).create(name='setCompressorsOn', method_impl= MethodInstance.MethodImplementation(setCompressorsOn_body()), access_type=accessLevel3)
+
+
     client.account.methods(compressor.id).create(name='setR02', method_impl= MethodInstance.MethodImplementation(setR02_body()), access_type=accessLevel3)
     client.account.methods(compressor.id).create(name='setV01', method_impl= MethodInstance.MethodImplementation(setV01_body()), access_type=accessLevel3)
     client.account.methods(compressor.id).create(name='setWPx', method_impl= MethodInstance.MethodImplementation(setWPx_body()), access_type=accessLevel3)
@@ -86,6 +121,24 @@ def wire(client, name='LogikaL200', friendly="Logika L200 Controller", base="Bas
     accessLevel4 = 'public'
 
     # Controller specific tag R/W operations - Read-only tags first
+    client.account.methods(compressor.id).create(name='readAmbientTemperature', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('AmbientTemperature')), access_type=accessLevel4)
+    client.account.methods(compressor.id).create(name='readInternalVoltageVcc', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('InternalVoltageVcc')), access_type=accessLevel4)
+    client.account.methods(compressor.id).create(name='readInternalVoltageVL', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('InternalVoltageVL')), access_type=accessLevel4)
+    client.account.methods(compressor.id).create(name='readResidualCompressorCapacity', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('ResidualCompressorCapacity')), access_type=accessLevel4)
+    client.account.methods(compressor.id).create(name='readExcessCompressorCapacity', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('ExcessCompressorCapacity')), access_type=accessLevel4)
+    client.account.methods(compressor.id).create(name='readCurrentStopPressure', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('CurrentStopPressure')), access_type=accessLevel4)
+    client.account.methods(compressor.id).create(name='readCurrentStartPressure', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('CurrentStartPressure')), access_type=accessLevel4)
+    client.account.methods(compressor.id).create(name='readCurrentTotalPower', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('CurrentTotalPower')), access_type=accessLevel4)
+    client.account.methods(compressor.id).create(name='readAverageAirDelivery', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('AverageAirDelivery')), access_type=accessLevel4)
+    client.account.methods(compressor.id).create(name='readCurrentTotalAirDelivery', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('CurrentTotalAirDelivery')), access_type=accessLevel4)
+    client.account.methods(compressor.id).create(name='readCompressorsConfigured', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('CompressorsConfigured')), access_type=accessLevel4)
+    client.account.methods(compressor.id).create(name='readCompressorsSlave', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('CompressorsSlave')), access_type=accessLevel4)
+    client.account.methods(compressor.id).create(name='readCompressorsSetToMaintenance', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('CompressorsSetToMaintenance')), access_type=accessLevel4)
+    client.account.methods(compressor.id).create(name='readCompressorsAvailable', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('CompressorsAvailable')), access_type=accessLevel4)
+    client.account.methods(compressor.id).create(name='readCompressorsSelected', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('CompressorsSelected')), access_type=accessLevel4)
+    client.account.methods(compressor.id).create(name='readCompressorsOn', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('CompressorsOn')), access_type=accessLevel4)
+
+
     client.account.methods(compressor.id).create(name='readWPx', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('WP')), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='readWTx', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('WT')), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='readR02', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('R02')), access_type=accessLevel4)
