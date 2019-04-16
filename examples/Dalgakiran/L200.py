@@ -130,6 +130,8 @@ const requests = {
   CompressorsAvailable:             { request: "r,meth:setCompressorsAvailable,-,2,-,1,0x415" ),
   CompressorsSelected:              { request: "r,meth:setCompressorsSelected,-,2,-,1,0x416" ),
   CompressorsOn:                    { request: "r,meth:setCompressorsOn,-,2,-,1,0x417" ),
+  TotalEnergyConsumption:           { request: "r,meth:setTotalEnergyConsumption,-,4,-,1,0x600" ),
+  AirProduced:                      { request: "r,meth:setAirProduced,-,4,-,1,0x602" ),
   //Slave Read Tags
   SlaveFwVersion_Comp0:             { request: "r,meth:setSlaveFwVersion_Comp0,-,2,-,1,0x1000" ),
   SlaveFwVersion_Comp1:             { request: "r,meth:setSlaveFwVersion_Comp1,-,2,-,1,0x1100" ),
@@ -188,10 +190,10 @@ const requests = {
   SlaveSafetyTime_Comp1:            { request: "r,meth:setSlaveSafetyTime_Comp1,-,2,-,1,0x110F" ),
   SlaveSafetyTime_Comp2:            { request: "r,meth:setSlaveSafetyTime_Comp2,-,2,-,1,0x120F" ),
   SlaveSafetyTime_Comp3:            { request: "r,meth:setSlaveSafetyTime_Comp3,-,2,-,1,0x130F" ),
-  SlaveStartsHour_Comp0:         { request: "r,meth:setSlaveStartsHour_Comp0,-,2,-,1,0x1010" ),
-  SlaveStartsHour_Comp1:         { request: "r,meth:setSlaveStartsHour_Comp1,-,2,-,1,0x1110" ),
-  SlaveStartsHour_Comp2:         { request: "r,meth:setSlaveStartsHour_Comp2,-,2,-,1,0x1210" ),
-  SlaveStartsHour_Comp3:         { request: "r,meth:setSlaveStartsHour_Comp3,-,2,-,1,0x1310" ),
+  SlaveStartsHour_Comp0:            { request: "r,meth:setSlaveStartsHour_Comp0,-,2,-,1,0x1010" ),
+  SlaveStartsHour_Comp1:            { request: "r,meth:setSlaveStartsHour_Comp1,-,2,-,1,0x1110" ),
+  SlaveStartsHour_Comp2:            { request: "r,meth:setSlaveStartsHour_Comp2,-,2,-,1,0x1210" ),
+  SlaveStartsHour_Comp3:            { request: "r,meth:setSlaveStartsHour_Comp3,-,2,-,1,0x1310" ),
   SlaveAnalogInput_Comp0:           { request: "r,meth:setSlaveAnalogInput_Comp0,-,2,-,1,0x1011" ),
   SlaveAnalogInput_Comp1:           { request: "r,meth:setSlaveAnalogInput_Comp1,-,2,-,1,0x1111" ),
   SlaveAnalogInput_Comp2:           { request: "r,meth:setSlaveAnalogInput_Comp2,-,2,-,1,0x1211" ),
@@ -212,10 +214,10 @@ const requests = {
   SlaveChangeOilFilter_Comp1:       { request: "r,meth:setSlaveChangeOilFilter_Comp1,-,2,-,1,0x1115" ),
   SlaveChangeOilFilter_Comp2:       { request: "r,meth:setSlaveChangeOilFilter_Comp2,-,2,-,1,0x1215" ),
   SlaveChangeOilFilter_Comp3:       { request: "r,meth:setSlaveChangeOilFilter_Comp3,-,2,-,1,0x1315" ),
-  SlaveChangeSeperatorFilter_Comp0:    { request: "r,meth:setSlaveChangeSeperatorFilter_Comp0,-,2,-,1,0x1016" ),
-  SlaveChangeSeperatorFilter_Comp1:    { request: "r,meth:setSlaveChangeSeperatorFilter_Comp1,-,2,-,1,0x1116" ),
-  SlaveChangeSeperatorFilter_Comp2:    { request: "r,meth:setSlaveChangeSeperatorFilter_Comp2,-,2,-,1,0x1216" ),
-  SlaveChangeSeperatorFilter_Comp3:    { request: "r,meth:setSlaveChangeSeperatorFilter_Comp3,-,2,-,1,0x1316" ),
+  SlaveChangeSeperatorFilter_Comp0: { request: "r,meth:setSlaveChangeSeperatorFilter_Comp0,-,2,-,1,0x1016" ),
+  SlaveChangeSeperatorFilter_Comp1: { request: "r,meth:setSlaveChangeSeperatorFilter_Comp1,-,2,-,1,0x1116" ),
+  SlaveChangeSeperatorFilter_Comp2: { request: "r,meth:setSlaveChangeSeperatorFilter_Comp2,-,2,-,1,0x1216" ),
+  SlaveChangeSeperatorFilter_Comp3: { request: "r,meth:setSlaveChangeSeperatorFilter_Comp3,-,2,-,1,0x1316" ),
   SlaveChangeOil_Comp0:             { request: "r,meth:setSlaveChangeOil_Comp0,-,2,-,1,0x1017" ),
   SlaveChangeOil_Comp1:             { request: "r,meth:setSlaveChangeOil_Comp1,-,2,-,1,0x1117" ),
   SlaveChangeOil_Comp2:             { request: "r,meth:setSlaveChangeOil_Comp2,-,2,-,1,0x1217" ),
@@ -232,14 +234,14 @@ const requests = {
   SlaveNumberOfTotalCompressorHours_Comp1:    { request: "r,meth:setSlaveNumberOfTotalCompressorHours_Comp1,-,4,-,1,0x111A" ),
   SlaveNumberOfTotalCompressorHours_Comp2:    { request: "r,meth:setSlaveNumberOfTotalCompressorHours_Comp2,-,4,-,1,0x121A" ),
   SlaveNumberOfTotalCompressorHours_Comp3:    { request: "r,meth:setSlaveNumberOfTotalCompressorHours_Comp3,-,4,-,1,0x131A" ),
-  SlaveNumberOfLoadCompressorHours_Comp0:    { request: "r,meth:setSlaveNumberOfLoadCompressorHours_Comp0,-,4,-,1,0x101C" ),
-  SlaveNumberOfLoadCompressorHours_Comp1:    { request: "r,meth:setSlaveNumberOfLoadCompressorHours_Comp1,-,4,-,1,0x111C" ),
-  SlaveNumberOfLoadCompressorHours_Comp2:    { request: "r,meth:setSlaveNumberOfLoadCompressorHours_Comp2,-,4,-,1,0x121C" ),
-  SlaveNumberOfLoadCompressorHours_Comp3:    { request: "r,meth:setSlaveNumberOfLoadCompressorHours_Comp3,-,4,-,1,0x131C" ),
-  SlaveMaintCounters_Comp0:    { request: "r,meth:setSlaveMaintCounters_Comp0,-,24,-,1,0x101E" ),
-  SlaveMaintCounters_Comp1:    { request: "r,meth:setSlaveMaintCounters_Comp1,-,24,-,1,0x111E" ),
-  SlaveMaintCounters_Comp2:    { request: "r,meth:setSlaveMaintCounters_Comp2,-,24,-,1,0x121E" ),
-  SlaveMaintCounters_Comp3:    { request: "r,meth:setSlaveMaintCounters_Comp3,-,24,-,1,0x131E" ),
+  SlaveNumberOfLoadCompressorHours_Comp0:     { request: "r,meth:setSlaveNumberOfLoadCompressorHours_Comp0,-,4,-,1,0x101C" ),
+  SlaveNumberOfLoadCompressorHours_Comp1:     { request: "r,meth:setSlaveNumberOfLoadCompressorHours_Comp1,-,4,-,1,0x111C" ),
+  SlaveNumberOfLoadCompressorHours_Comp2:     { request: "r,meth:setSlaveNumberOfLoadCompressorHours_Comp2,-,4,-,1,0x121C" ),
+  SlaveNumberOfLoadCompressorHours_Comp3:     { request: "r,meth:setSlaveNumberOfLoadCompressorHours_Comp3,-,4,-,1,0x131C" ),
+  SlaveMaintCounters_Comp0:                   { request: "r,meth:setSlaveMaintCounters_Comp0,-,24,-,1,0x101E" ),
+  SlaveMaintCounters_Comp1:                   { request: "r,meth:setSlaveMaintCounters_Comp1,-,24,-,1,0x111E" ),
+  SlaveMaintCounters_Comp2:                   { request: "r,meth:setSlaveMaintCounters_Comp2,-,24,-,1,0x121E" ),
+  SlaveMaintCounters_Comp3:                   { request: "r,meth:setSlaveMaintCounters_Comp3,-,24,-,1,0x131E" ),
   
   //
   R02:                               { request: "r,meth:setR02,-,2,-,1,0x500" },
@@ -278,11 +280,108 @@ def fetchWriteRequest_body():
 
 */
 const requests = {
-    cfgLevel1Pwd: { rprop:"cfgLevel1Pwd", rcmd: "r,meth:setLevel1Pwd,-,6,-,1,0x100", min: 1, max: 1, offset: "0x100"},
+    cfgLevel1Pwd:                               { rprop:"cfgLevel1Pwd", rcmd: "r,meth:setLevel1Pwd,-,6,-,1,0x100", min: 1, max: 1, offset: "0x100"},
+    TotalEnergyConsumption:                     { rprop:"TotalEnergyConsumption", rcmd: "r,meth:setTotalEnergyConsumption,-,4,-,1,0x600", min: 1, max: 1 offset: "0X600"},
+    AirProduced:                                { rprop:"AirProduced", rcmd: "r,meth:setAirProduced,-,4,-,1,0x602", min: 1, max: 1 offset: "0x602"},
+    //Slave Write Tags
+    SlaveControllerType_Comp0:                  { rprob: "SlaveControllerType_Comp0", rcmd: "r,meth:setSlaveControllerType_Comp0,-,2,-,0x1004", min: 1, max: 1, offset:"0x1004" },
+    SlaveControllerType_Comp1:                  { rprob: "SlaveControllerType_Comp1", rcmd: "r,meth:setSlaveControllerType_Comp1,-,2,-,0x1104", min: 1, max: 1, offset:"0x1104" },
+    SlaveControllerType_Comp2:                  { rprob: "SlaveControllerType_Comp2", rcmd: "r,meth:setSlaveControllerType_Comp2,-,2,-,0x1204", min: 1, max: 1, offset:"0x1204" },
+    SlaveControllerType_Comp3:                  { rprob: "SlaveControllerType_Comp3", rcmd: "r,meth:setSlaveControllerType_Comp3,-,2,-,0x1304", min: 1, max: 1, offset:"0x1304" },
+    SlaveSelenoidDelay_Comp0:                   { rprob: "SlaveSelenoidDelay_Comp0", rcmd: "r,meth:setSlaveSelenoidDelay_Comp0,-,2,-,0x1005", min: 1, max: 1, offset:"0x1005" },
+    SlaveSelenoidDelay_Comp1:                   { rprob: "SlaveSelenoidDelay_Comp1", rcmd: "r,meth:setSlaveSelenoidDelay_Comp1,-,2,-,0x1105", min: 1, max: 1, offset:"0x1105" },
+    SlaveSelenoidDelay_Comp2:                   { rprob: "SlaveSelenoidDelay_Comp2", rcmd: "r,meth:setSlaveSelenoidDelay_Comp2,-,2,-,0x1205", min: 1, max: 1, offset:"0x1205" },
+    SlaveSelenoidDelay_Comp3:                   { rprob: "SlaveSelenoidDelay_Comp3", rcmd: "r,meth:setSlaveSelenoidDelay_Comp3,-,2,-,0x1305", min: 1, max: 1, offset:"0x1305" },
+    SlaveAirFlow_Comp0:                         { rprob: "SlaveAirFlow_Comp0", rcmd: "r,meth:setSlaveAirFlow_Comp0,-,2,-,0x1006", min: 1, max: 1, offset:"0x1006" },
+    SlaveAirFlow_Comp1:                         { rprob: "SlaveAirFlow_Comp1", rcmd: "r,meth:setSlaveAirFlow_Comp1,-,2,-,0x1106", min: 1, max: 1, offset:"0x1106" },
+    SlaveAirFlow_Comp2:                         { rprob: "SlaveAirFlow_Comp2", rcmd: "r,meth:setSlaveAirFlow_Comp2,-,2,-,0x1206", min: 1, max: 1, offset:"0x1206" },
+    SlaveAirFlow_Comp3:                         { rprob: "SlaveAirFlow_Comp3", rcmd: "r,meth:setSlaveAirFlow_Comp3,-,2,-,0x1306", min: 1, max: 1, offset:"0x1306" },
+    SlaveNominalPower_Comp0:                    { rprob: "SlaveNominalPower_Comp0", rcmd: "r,meth:setSlaveNominalPower_Comp0,-,2,-,0x1008", min: 1, max: 1, offset:"0x1008" },
+    SlaveNominalPower_Comp1:                    { rprob: "SlaveNominalPower_Comp1", rcmd: "r,meth:setSlaveNominalPower_Comp1,-,2,-,0x1108", min: 1, max: 1, offset:"0x1108" },
+    SlaveNominalPower_Comp2:                    { rprob: "SlaveNominalPower_Comp2", rcmd: "r,meth:setSlaveNominalPower_Comp2,-,2,-,0x1208", min: 1, max: 1, offset:"0x1208" },
+    SlaveNominalPower_Comp3:                    { rprob: "SlaveNominalPower_Comp3", rcmd: "r,meth:setSlaveNominalPower_Comp3,-,2,-,0x1308", min: 1, max: 1, offset:"0x1308" },
+    SlaveUnloadPower_Comp0:                     { rprob: "SlaveUnloadPower_Comp0", rcmd: "r,meth:setSlaveUnloadPower_Comp0,-,2,-,0x1009", min: 1, max: 1, offset:"0x1009" },
+    SlaveUnloadPower_Comp1:                     { rprob: "SlaveUnloadPower_Comp1", rcmd: "r,meth:setSlaveUnloadPower_Comp1,-,2,-,0x1109", min: 1, max: 1, offset:"0x1109" },
+    SlaveUnloadPower_Comp2:                     { rprob: "SlaveUnloadPower_Comp2", rcmd: "r,meth:setSlaveUnloadPower_Comp2,-,2,-,0x1209", min: 1, max: 1, offset:"0x1209" },
+    SlaveUnloadPower_Comp3:                     { rprob: "SlaveUnloadPower_Comp3", rcmd: "r,meth:setSlaveUnloadPower_Comp3,-,2,-,0x1309", min: 1, max: 1, offset:"0x1309" },
+    SlavePriorityInS0_Comp0:                    { rprob: "SlavePriorityInS0_Comp0", rcmd: "r,meth:setSlavePriorityInS0_Comp0,-,2,-,0x100A", min: 1, max: 1, offset:"0x100A" },
+    SlavePriorityInS0_Comp1:                    { rprob: "SlavePriorityInS0_Comp1", rcmd: "r,meth:setSlavePriorityInS0_Comp1,-,2,-,0x110A", min: 1, max: 1, offset:"0x110A" },
+    SlavePriorityInS0_Comp2:                    { rprob: "SlavePriorityInS0_Comp2", rcmd: "r,meth:setSlavePriorityInS0_Comp2,-,2,-,0x120A", min: 1, max: 1, offset:"0x120A" },
+    SlavePriorityInS0_Comp3:                    { rprob: "SlavePriorityInS0_Comp3", rcmd: "r,meth:setSlavePriorityInS0_Comp3,-,2,-,0x130A", min: 1, max: 1, offset:"0x130A" },
+    SlavePriorityInS1_Comp0:                    { rprob: "SlavePriorityInS1_Comp0", rcmd: "r,meth:setSlavePriorityInS1_Comp0,-,2,-,0x100B", min: 1, max: 1, offset:"0x100B" },
+    SlavePriorityInS1_Comp1:                    { rprob: "SlavePriorityInS1_Comp1", rcmd: "r,meth:setSlavePriorityInS1_Comp1,-,2,-,0x110B", min: 1, max: 1, offset:"0x110B" },
+    SlavePriorityInS1_Comp2:                    { rprob: "SlavePriorityInS1_Comp2", rcmd: "r,meth:setSlavePriorityInS1_Comp2,-,2,-,0x120B", min: 1, max: 1, offset:"0x120B" },
+    SlavePriorityInS1_Comp3:                    { rprob: "SlavePriorityInS1_Comp3", rcmd: "r,meth:setSlavePriorityInS1_Comp3,-,2,-,0x130B", min: 1, max: 1, offset:"0x130B" },
+    SlavePriorityInS2_Comp0:                    { rprob: "SlavePriorityInS2_Comp0", rcmd: "r,meth:setSlavePriorityInS2_Comp0,-,2,-,0x100C", min: 1, max: 1, offset:"0x100C" },
+    SlavePriorityInS2_Comp1:                    { rprob: "SlavePriorityInS2_Comp1", rcmd: "r,meth:setSlavePriorityInS2_Comp1,-,2,-,0x110C", min: 1, max: 1, offset:"0x110C" },
+    SlavePriorityInS2_Comp2:                    { rprob: "SlavePriorityInS2_Comp2", rcmd: "r,meth:setSlavePriorityInS2_Comp2,-,2,-,0x120C", min: 1, max: 1, offset:"0x120C" },
+    SlavePriorityInS2_Comp3:                    { rprob: "SlavePriorityInS2_Comp3", rcmd: "r,meth:setSlavePriorityInS2_Comp3,-,2,-,0x130C", min: 1, max: 1, offset:"0x130C" },
+    SlavePriorityInS3_Comp0:                    { rprob: "SlavePriorityInS3_Comp0", rcmd: "r,meth:setSlavePriorityInS3_Comp0,-,2,-,0x100D", min: 1, max: 1, offset:"0x100D" },
+    SlavePriorityInS3_Comp1:                    { rprob: "SlavePriorityInS3_Comp1", rcmd: "r,meth:setSlavePriorityInS3_Comp1,-,2,-,0x110D", min: 1, max: 1, offset:"0x110D" },
+    SlavePriorityInS3_Comp2:                    { rprob: "SlavePriorityInS3_Comp2", rcmd: "r,meth:setSlavePriorityInS3_Comp2,-,2,-,0x120D", min: 1, max: 1, offset:"0x120D" },
+    SlavePriorityInS3_Comp3:                    { rprob: "SlavePriorityInS3_Comp3", rcmd: "r,meth:setSlavePriorityInS3_Comp3,-,2,-,0x130D", min: 1, max: 1, offset:"0x130D" },
+    SlaveUnloadTime_Comp0:                      { rprob: "SlaveUnloadTime_Comp0", rcmd: "r,meth:setSlaveUnloadTime_Comp0,-,2,-,0x100E", min: 1, max: 1, offset:"0x100E" },
+    SlaveUnloadTime_Comp1:                      { rprob: "SlaveUnloadTime_Comp1", rcmd: "r,meth:setSlaveUnloadTime_Comp1,-,2,-,0x110E", min: 1, max: 1, offset:"0x110E" },
+    SlaveUnloadTime_Comp2:                      { rprob: "SlaveUnloadTime_Comp2", rcmd: "r,meth:setSlaveUnloadTime_Comp2,-,2,-,0x120E", min: 1, max: 1, offset:"0x120E" },
+    SlaveUnloadTime_Comp3:                      { rprob: "SlaveUnloadTime_Comp3", rcmd: "r,meth:setSlaveUnloadTime_Comp3,-,2,-,0x130E", min: 1, max: 1, offset:"0x130E" },
+    SlaveSafetyTime_Comp0:                      { rprob: "SlaveSafetyTime_Comp0", rcmd: "r,meth:setSlaveSafetyTime_Comp0,-,2,-,0x100F", min: 1, max: 1, offset:"0x100F" },
+    SlaveSafetyTime_Comp1:                      { rprob: "SlaveSafetyTime_Comp1", rcmd: "r,meth:setSlaveSafetyTime_Comp1,-,2,-,0x110F", min: 1, max: 1, offset:"0x110F" },
+    SlaveSafetyTime_Comp2:                      { rprob: "SlaveSafetyTime_Comp2", rcmd: "r,meth:setSlaveSafetyTime_Comp2,-,2,-,0x120F", min: 1, max: 1, offset:"0x120F" },
+    SlaveSafetyTime_Comp3:                      { rprob: "SlaveSafetyTime_Comp3", rcmd: "r,meth:setSlaveSafetyTime_Comp3,-,2,-,0x130F", min: 1, max: 1, offset:"0x130F" },
+    SlaveStartsHour_Comp0:                      { rprob: "SlaveStartsHour_Comp0", rcmd: "r,meth:setSlaveStartsHour_Comp0,-,2,-,0x1010", min: 1, max: 1, offset:"0x1010" },
+    SlaveStartsHour_Comp1:                      { rprob: "SlaveStartsHour_Comp1", rcmd: "r,meth:setSlaveStartsHour_Comp1,-,2,-,0x1110", min: 1, max: 1, offset:"0x1110" },
+    SlaveStartsHour_Comp2:                      { rprob: "SlaveStartsHour_Comp2", rcmd: "r,meth:setSlaveStartsHour_Comp2,-,2,-,0x1210", min: 1, max: 1, offset:"0x1210" },
+    SlaveStartsHour_Comp3:                      { rprob: "SlaveStartsHour_Comp3", rcmd: "r,meth:setSlaveStartsHour_Comp3,-,2,-,0x1310", min: 1, max: 1, offset:"0x1310" },
+    SlaveAnalogInput_Comp0:                     { rprob: "SlaveAnalogInput_Comp0", rcmd: "r,meth:setSlaveAnalogInput_Comp0,-,2,-,0x1011", min: 1, max: 1, offset:"0x1011" },
+    SlaveAnalogInput_Comp1:                     { rprob: "SlaveAnalogInput_Comp1", rcmd: "r,meth:setSlaveAnalogInput_Comp1,-,2,-,0x1111", min: 1, max: 1, offset:"0x1111" },
+    SlaveAnalogInput_Comp2:                     { rprob: "SlaveAnalogInput_Comp2", rcmd: "r,meth:setSlaveAnalogInput_Comp2,-,2,-,0x1211", min: 1, max: 1, offset:"0x1211" },
+    SlaveAnalogInput_Comp3:                     { rprob: "SlaveAnalogInput_Comp3", rcmd: "r,meth:setSlaveAnalogInput_Comp3,-,2,-,0x1311", min: 1, max: 1, offset:"0x1311" },
+    SlaveExcludedForMaint_Comp0:                { rprob: "SlaveExcludedForMaint_Comp0", rcmd: "r,meth:setSlaveExcludedForMaint_Comp0,-,2,-,0x1012", min: 1, max: 1, offset:"0x1012" },
+    SlaveExcludedForMaint_Comp1:                { rprob: "SlaveExcludedForMaint_Comp1", rcmd: "r,meth:setSlaveExcludedForMaint_Comp1,-,2,-,0x1112", min: 1, max: 1, offset:"0x1112" },
+    SlaveExcludedForMaint_Comp2:                { rprob: "SlaveExcludedForMaint_Comp2", rcmd: "r,meth:setSlaveExcludedForMaint_Comp2,-,2,-,0x1212", min: 1, max: 1, offset:"0x1212" },
+    SlaveExcludedForMaint_Comp3:                { rprob: "SlaveExcludedForMaint_Comp3", rcmd: "r,meth:setSlaveExcludedForMaint_Comp3,-,2,-,0x1312", min: 1, max: 1, offset:"0x1312" },
+    SlaveEnableMaintenance_Comp0:               { rprob: "SlaveEnableMaintenance_Comp0", rcmd: "r,meth:setSlaveEnableMaintenance_Comp0,-,2,-,0x1013", min: 1, max: 1, offset:"0x1013" },
+    SlaveEnableMaintenance_Comp1:               { rprob: "SlaveEnableMaintenance_Comp1", rcmd: "r,meth:setSlaveEnableMaintenance_Comp1,-,2,-,0x1113", min: 1, max: 1, offset:"0x1113" },
+    SlaveEnableMaintenance_Comp2:               { rprob: "SlaveEnableMaintenance_Comp2", rcmd: "r,meth:setSlaveEnableMaintenance_Comp2,-,2,-,0x1213", min: 1, max: 1, offset:"0x1213" },
+    SlaveEnableMaintenance_Comp3:               { rprob: "SlaveEnableMaintenance_Comp3", rcmd: "r,meth:setSlaveEnableMaintenance_Comp3,-,2,-,0x1313", min: 1, max: 1, offset:"0x1313" },
+    SlaveChangeAirFilter_Comp0:                 { rprob: "SlaveChangeAirFilter_Comp0", rcmd: "r,meth:setSlaveChangeAirFilter_Comp0,-,2,-,0x1014", min: 1, max: 1, offset:"0x1014" },
+    SlaveChangeAirFilter_Comp1:                 { rprob: "SlaveChangeAirFilter_Comp1", rcmd: "r,meth:setSlaveChangeAirFilter_Comp1,-,2,-,0x1114", min: 1, max: 1, offset:"0x1114" },
+    SlaveChangeAirFilter_Comp2:                 { rprob: "SlaveChangeAirFilter_Comp2", rcmd: "r,meth:setSlaveChangeAirFilter_Comp2,-,2,-,0x1214", min: 1, max: 1, offset:"0x1214" },
+    SlaveChangeAirFilter_Comp3:                 { rprob: "SlaveChangeAirFilter_Comp3", rcmd: "r,meth:setSlaveChangeAirFilter_Comp3,-,2,-,0x1314", min: 1, max: 1, offset:"0x1314" },
+    SlaveChangeOilFilter_Comp0:                 { rprob: "SlaveChangeOilFilter_Comp0", rcmd: "r,meth:setSlaveChangeOilFilter_Comp0,-,2,-,0x1015", min: 1, max: 1, offset:"0x1015" },
+    SlaveChangeOilFilter_Comp1:                 { rprob: "SlaveChangeOilFilter_Comp1", rcmd: "r,meth:setSlaveChangeOilFilter_Comp1,-,2,-,0x1115", min: 1, max: 1, offset:"0x1115" },
+    SlaveChangeOilFilter_Comp2:                 { rprob: "SlaveChangeOilFilter_Comp2", rcmd: "r,meth:setSlaveChangeOilFilter_Comp2,-,2,-,0x1215", min: 1, max: 1, offset:"0x1215" },
+    SlaveChangeOilFilter_Comp3:                 { rprob: "SlaveChangeOilFilter_Comp3", rcmd: "r,meth:setSlaveChangeOilFilter_Comp3,-,2,-,0x1315", min: 1, max: 1, offset:"0x1315" },
+    SlaveChangeSeperatorFilter_Comp0:           { rprob: "SlaveChangeSeperatorFilter_Comp0", rcmd: "r,meth:setSlaveChangeSeperatorFilter_Comp0,-,2,-,0x1016", min: 1, max: 1, offset:"0x1016" },
+    SlaveChangeSeperatorFilter_Comp1:           { rprob: "SlaveChangeSeperatorFilter_Comp1", rcmd: "r,meth:setSlaveChangeSeperatorFilter_Comp1,-,2,-,0x1116", min: 1, max: 1, offset:"0x1116" },
+    SlaveChangeSeperatorFilter_Comp2:           { rprob: "SlaveChangeSeperatorFilter_Comp2", rcmd: "r,meth:setSlaveChangeSeperatorFilter_Comp2,-,2,-,0x1216", min: 1, max: 1, offset:"0x1216" },
+    SlaveChangeSeperatorFilter_Comp3:           { rprob: "SlaveChangeSeperatorFilter_Comp3", rcmd: "r,meth:setSlaveChangeSeperatorFilter_Comp3,-,2,-,0x1316", min: 1, max: 1, offset:"0x1316" },
+    SlaveChangeOil_Comp0:                       { rprob: "SlaveChangeOil_Comp0", rcmd: "r,meth:setSlaveChangeOil_Comp0,-,2,-,0x1017", min: 1, max: 1, offset:"0x1017" },
+    SlaveChangeOil_Comp1:                       { rprob: "SlaveChangeOil_Comp1", rcmd: "r,meth:setSlaveChangeOil_Comp1,-,2,-,0x1117", min: 1, max: 1, offset:"0x1117" },
+    SlaveChangeOil_Comp2:                       { rprob: "SlaveChangeOil_Comp2", rcmd: "r,meth:setSlaveChangeOil_Comp2,-,2,-,0x1217", min: 1, max: 1, offset:"0x1217" },
+    SlaveChangeOil_Comp3:                       { rprob: "SlaveChangeOil_Comp3", rcmd: "r,meth:setSlaveChangeOil_Comp3,-,2,-,0x1317", min: 1, max: 1, offset:"0x1317" },
+    SlaveCheckCompressor_Comp0:                 { rprob: "SlaveCheckCompressor_Comp0", rcmd: "r,meth:setSlaveCheckCompressor_Comp0,-,2,-,0x1018", min: 1, max: 1, offset:"0x1018" },
+    SlaveCheckCompressor_Comp1:                 { rprob: "SlaveCheckCompressor_Comp1", rcmd: "r,meth:setSlaveCheckCompressor_Comp1,-,2,-,0x1118", min: 1, max: 1, offset:"0x1118" },
+    SlaveCheckCompressor_Comp2:                 { rprob: "SlaveCheckCompressor_Comp2", rcmd: "r,meth:setSlaveCheckCompressor_Comp2,-,2,-,0x1218", min: 1, max: 1, offset:"0x1218" },
+    SlaveCheckCompressor_Comp3:                 { rprob: "SlaveCheckCompressor_Comp3", rcmd: "r,meth:setSlaveCheckCompressor_Comp3,-,2,-,0x1318", min: 1, max: 1, offset:"0x1318" },
+    SlaveBearingLubrication_Comp0:              { rprob: "SlaveBearingLubrication_Comp0", rcmd: "r,meth:setSlaveBearingLubrication_Comp0,-,2,-,0x1019", min: 1, max: 1, offset:"0x1019" },
+    SlaveBearingLubrication_Comp1:              { rprob: "SlaveBearingLubrication_Comp1", rcmd: "r,meth:setSlaveBearingLubrication_Comp1,-,2,-,0x1119", min: 1, max: 1, offset:"0x1119" },
+    SlaveBearingLubrication_Comp2:              { rprob: "SlaveBearingLubrication_Comp2", rcmd: "r,meth:setSlaveBearingLubrication_Comp2,-,2,-,0x1219", min: 1, max: 1, offset:"0x1219" },
+    SlaveBearingLubrication_Comp3:              { rprob: "SlaveBearingLubrication_Comp3", rcmd: "r,meth:setSlaveBearingLubrication_Comp3,-,2,-,0x1319", min: 1, max: 1, offset:"0x1319" },
+    SlaveNumberOfTotalCompressorHours_Comp0:    { rprob: "SlaveNumberOfTotalCompressorHours_Comp0", rcmd: "r,meth:setSlaveNumberOfTotalCompressorHours_Comp0,-,4,-,0x101A", min: 1, max: 1, offset:"0x101A" },
+    SlaveNumberOfTotalCompressorHours_Comp1:    { rprob: "SlaveNumberOfTotalCompressorHours_Comp1", rcmd: "r,meth:setSlaveNumberOfTotalCompressorHours_Comp1,-,4,-,0x111A", min: 1, max: 1, offset:"0x111A" },
+    SlaveNumberOfTotalCompressorHours_Comp2:    { rprob: "SlaveNumberOfTotalCompressorHours_Comp2", rcmd: "r,meth:setSlaveNumberOfTotalCompressorHours_Comp2,-,4,-,0x121A", min: 1, max: 1, offset:"0x121A" },
+    SlaveNumberOfTotalCompressorHours_Comp3:    { rprob: "SlaveNumberOfTotalCompressorHours_Comp3", rcmd: "r,meth:setSlaveNumberOfTotalCompressorHours_Comp3,-,4,-,0x131A", min: 1, max: 1, offset:"0x131A" },
+    SlaveNumberOfLoadCompressorHours_Comp0:     { rprob: "SlaveNumberOfLoadCompressorHours_Comp0", rcmd: "r,meth:setSlaveNumberOfLoadCompressorHours_Comp0,-,4,-,0x101C", min: 1, max: 1, offset:"0x101C" },
+    SlaveNumberOfLoadCompressorHours_Comp1:     { rprob: "SlaveNumberOfLoadCompressorHours_Comp1", rcmd: "r,meth:setSlaveNumberOfLoadCompressorHours_Comp1,-,4,-,0x111C", min: 1, max: 1, offset:"0x111C" },
+    SlaveNumberOfLoadCompressorHours_Comp2:     { rprob: "SlaveNumberOfLoadCompressorHours_Comp2", rcmd: "r,meth:setSlaveNumberOfLoadCompressorHours_Comp2,-,4,-,0x121C", min: 1, max: 1, offset:"0x121C" },
+    SlaveNumberOfLoadCompressorHours_Comp3:     { rprob: "SlaveNumberOfLoadCompressorHours_Comp3", rcmd: "r,meth:setSlaveNumberOfLoadCompressorHours_Comp3,-,4,-,0x131C", min: 1, max: 1, offset:"0x131C" },
+
+    
     R02:      { rprob: "R02", rcmd: "r,meth:setR02,-,2,-,1,0x500", min: 2, max: 2, offset:"0x500"},
     V01:      { rprob: "V01", rcmd: "r,meth:setV01,-,2,-,1,0x501", min: 1, max: 1, offset:"0x501"},
-    WP:      { rprob: "WPx", rcmd: "r,meth:setWPx,-,12,-,1,0x502", min: 1, max: 6, offset:"0x502", multiplier: [,10,10,10,10,10] },
-    WT:      { rprob: "WTx", rcmd: "r,meth:setWTx,-,8,-,1,0x508", min: 1, max: 4, offset:"0x508", multiplier: [10,10,10,10] },
+    WP:       { rprob: "WPx", rcmd: "r,meth:setWPx,-,12,-,1,0x502", min: 1, max: 6, offset:"0x502", multiplier: [,10,10,10,10,10] },
+    WT:       { rprob: "WTx", rcmd: "r,meth:setWTx,-,8,-,1,0x508", min: 1, max: 4, offset:"0x508", multiplier: [10,10,10,10] },
     V04:      { rprob: "V04", rcmd: "r,meth:setV04,-,2,-,1,0x50C", min: 4, max: 4, offset:"0x50C"},
     V02:      { rprob: "V02", rcmd: "r,meth:setV02_V03,-,4,-,1,0x50D", min: 2, max: 3, offset:"0x50D"},
     V07:      { rprob: "V07", rcmd: "r,meth:setV07, -,2,-,0x50F", min: 7, max: 7, offset:"0x50F"},
@@ -1065,7 +1164,26 @@ def setTotalEnergyConsumption_body():
         });
     });
 """
+def writeTotalEnergyConsumption_body():
+    return """/**
+*/
 
+  let args = {
+      tagKey: "TotalEnergyConsumption",
+      x: value.x,
+      setValue: value.setValue,
+      byteCount: value.byteCount || 2
+  };
+
+  try {
+      let req = Device.makeWriteRequest(args);
+      req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+  }
+  catch(e) {
+      done(e);
+  }"""
 
 #####################
 #
@@ -1092,7 +1210,26 @@ def setAirProduced_body():
         });
     });
 """
+def writeAirProduced_body():
+    return """/**
+*/
 
+  let args = {
+      tagKey: "AirProduced",
+      x: value.x,
+      setValue: value.setValue,
+      byteCount: value.byteCount || 2
+  };
+
+  try {
+      let req = Device.makeWriteRequest(args);
+      req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+  }
+  catch(e) {
+      done(e);
+  }"""
 
 #####################
 #
@@ -1175,6 +1312,27 @@ Device.api.getProperty(tagPropName)
   });
 '''
 
+def writeSlaveControllerType_body(compressorNo):
+    return """/**
+*/
+
+  let args = {
+      tagKey: "SlaveControllerType_Comp""" + str(compressorNo) +"""",
+      x: value.x,
+      setValue: value.setValue,
+      byteCount: value.byteCount || 2
+  };
+
+  try {
+      let req = Device.makeWriteRequest(args);
+      req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+  }
+  catch(e) {
+      done(e);
+  }"""
+
 #####################
 #
 #  SlaveSelenoidDelay
@@ -1199,6 +1357,27 @@ Device.api.getProperty(tagPropName)
   });
 '''
 
+def writeSlaveSelenoidDelay_body(compressorNo):
+    return """/**
+*/
+
+  let args = {
+      tagKey: "SlaveSelenoidDelay_Comp""" + str(compressorNo) +"""",
+      x: value.x,
+      setValue: value.setValue,
+      byteCount: value.byteCount || 2
+  };
+
+  try {
+      let req = Device.makeWriteRequest(args);
+      req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+  }
+  catch(e) {
+      done(e);
+  }"""
+
 #####################
 #
 #  SlaveAirFlow
@@ -1222,6 +1401,29 @@ Device.api.getProperty(tagPropName)
     });
   });
 '''
+
+def writeSlaveAirFlow_body(compressorNo):
+    return """/**
+*/
+
+  let args = {
+      tagKey: "SlaveAirFlow_Comp""" + str(compressorNo) +"""",
+      x: value.x,
+      setValue: value.setValue,
+      byteCount: value.byteCount || 2
+  };
+
+  try {
+      let req = Device.makeWriteRequest(args);
+      req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+  }
+  catch(e) {
+      done(e);
+  }"""
+
+
 #####################
 #
 #  SlaveRelativeSpeed
@@ -1268,6 +1470,27 @@ Device.api.getProperty(tagPropName)
   });
 '''
 
+def writeSlaveNominalPower_body(compressorNo):
+    return """/**
+*/
+
+  let args = {
+      tagKey: "SlaveNominalPower_Comp""" + str(compressorNo) +"""",
+      x: value.x,
+      setValue: value.setValue,
+      byteCount: value.byteCount || 2
+  };
+
+  try {
+      let req = Device.makeWriteRequest(args);
+      req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+  }
+  catch(e) {
+      done(e);
+  }"""
+
 #####################
 #
 #  SlaveUnloadPower
@@ -1291,6 +1514,27 @@ Device.api.getProperty(tagPropName)
     });
   });
 '''
+
+def writeSlaveUnloadPower_body(compressorNo):
+    return """/**
+*/
+
+  let args = {
+      tagKey: "SlaveUnloadPower_Comp""" + str(compressorNo) +"""",
+      x: value.x,
+      setValue: value.setValue,
+      byteCount: value.byteCount || 2
+  };
+
+  try {
+      let req = Device.makeWriteRequest(args);
+      req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+  }
+  catch(e) {
+      done(e);
+  }"""
 
 #####################
 #
@@ -1316,6 +1560,26 @@ Device.api.getProperty(tagPropName)
   });
 '''
 
+def writeSlavePriorityInS0_body(compressorNo):
+    return """/**
+*/
+
+  let args = {
+      tagKey: "SlavePriorityInS0_Comp""" + str(compressorNo) +"""",
+      x: value.x,
+      setValue: value.setValue,
+      byteCount: value.byteCount || 2
+  };
+
+  try {
+      let req = Device.makeWriteRequest(args);
+      req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+  }
+  catch(e) {
+      done(e);
+  }"""
 #####################
 #
 #  SlavePriorityInS1
@@ -1340,6 +1604,26 @@ Device.api.getProperty(tagPropName)
   });
 '''
 
+def writeSlavePriorityInS1_body(compressorNo):
+    return """/**
+*/
+
+  let args = {
+      tagKey: "SlavePriorityInS1_Comp""" + str(compressorNo) +"""",
+      x: value.x,
+      setValue: value.setValue,
+      byteCount: value.byteCount || 2
+  };
+
+  try {
+      let req = Device.makeWriteRequest(args);
+      req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+  }
+  catch(e) {
+      done(e);
+  }"""
 #####################
 #
 #  SlavePriorityInS2
@@ -1364,6 +1648,26 @@ Device.api.getProperty(tagPropName)
   });
 '''
 
+def writeSlavePriorityInS2_body(compressorNo):
+    return """/**
+*/
+
+  let args = {
+      tagKey: "SlavePriorityInS2_Comp""" + str(compressorNo) +"""",
+      x: value.x,
+      setValue: value.setValue,
+      byteCount: value.byteCount || 2
+  };
+
+  try {
+      let req = Device.makeWriteRequest(args);
+      req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+  }
+  catch(e) {
+      done(e);
+  }"""
 #####################
 #
 #  SlavePriorityInS3
@@ -1388,6 +1692,26 @@ Device.api.getProperty(tagPropName)
   });
 '''
 
+def writeSlavePriorityInS3_body(compressorNo):
+    return """/**
+*/
+
+  let args = {
+      tagKey: "SlavePriorityInS3_Comp""" + str(compressorNo) +"""",
+      x: value.x,
+      setValue: value.setValue,
+      byteCount: value.byteCount || 2
+  };
+
+  try {
+      let req = Device.makeWriteRequest(args);
+      req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+  }
+  catch(e) {
+      done(e);
+  }"""
 #####################
 #
 #  SlaveUnloadTime
@@ -1412,6 +1736,26 @@ Device.api.getProperty(tagPropName)
   });
 '''
 
+def writeSlaveUnloadTime_body(compressorNo):
+    return """/**
+*/
+
+  let args = {
+      tagKey: "SlaveUnloadTime_Comp""" + str(compressorNo) +"""",
+      x: value.x,
+      setValue: value.setValue,
+      byteCount: value.byteCount || 2
+  };
+
+  try {
+      let req = Device.makeWriteRequest(args);
+      req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+  }
+  catch(e) {
+      done(e);
+  }"""
 #####################
 #
 #  SlaveSafetyTime
@@ -1436,6 +1780,26 @@ Device.api.getProperty(tagPropName)
   });
 '''
 
+def writeSlaveSafetyTime_body(compressorNo):
+    return """/**
+*/
+
+  let args = {
+      tagKey: "SlaveSafetyTime_Comp""" + str(compressorNo) +"""",
+      x: value.x,
+      setValue: value.setValue,
+      byteCount: value.byteCount || 2
+  };
+
+  try {
+      let req = Device.makeWriteRequest(args);
+      req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+  }
+  catch(e) {
+      done(e);
+  }"""
 #####################
 #
 #  SlaveStartsHour
@@ -1459,6 +1823,27 @@ Device.api.getProperty(tagPropName)
     });
   });
 '''
+
+def writeSlaveStartsHour_body(compressorNo):
+    return """/**
+*/
+
+  let args = {
+      tagKey: "SlaveStartsHour_Comp""" + str(compressorNo) +"""",
+      x: value.x,
+      setValue: value.setValue,
+      byteCount: value.byteCount || 2
+  };
+
+  try {
+      let req = Device.makeWriteRequest(args);
+      req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+  }
+  catch(e) {
+      done(e);
+  }"""
 
 #####################
 #
@@ -1486,6 +1871,27 @@ Device.api.getProperty(tagPropName)
   });
 '''
 
+def writeSlaveAnalogInput_body(compressorNo):
+    return """/**
+*/
+
+  let args = {
+      tagKey: "SlaveAnalogInput_Comp""" + str(compressorNo) +"""",
+      x: value.x,
+      setValue: value.setValue,
+      byteCount: value.byteCount || 2
+  };
+
+  try {
+      let req = Device.makeWriteRequest(args);
+      req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+  }
+  catch(e) {
+      done(e);
+  }"""
+
 #####################
 #
 #  SlaveExcludedForMaint
@@ -1511,6 +1917,27 @@ Device.api.getProperty(tagPropName)
     });
   });
 '''
+
+def writeSlaveExcludedForMaint_body(compressorNo):
+    return """/**
+*/
+
+  let args = {
+      tagKey: "SlaveExcludedForMaint_Comp""" + str(compressorNo) +"""",
+      x: value.x,
+      setValue: value.setValue,
+      byteCount: value.byteCount || 2
+  };
+
+  try {
+      let req = Device.makeWriteRequest(args);
+      req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+  }
+  catch(e) {
+      done(e);
+  }"""
 
 #####################
 #
@@ -1538,6 +1965,27 @@ Device.api.getProperty(tagPropName)
   });
 '''
 
+def writeSlaveEnableMaintenance_body(compressorNo):
+    return """/**
+*/
+
+  let args = {
+      tagKey: "SlaveEnableMaintenance_Comp""" + str(compressorNo) +"""",
+      x: value.x,
+      setValue: value.setValue,
+      byteCount: value.byteCount || 2
+  };
+
+  try {
+      let req = Device.makeWriteRequest(args);
+      req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+  }
+  catch(e) {
+      done(e);
+  }"""
+
 #####################
 #
 #  SlaveChangeAirFilter
@@ -1561,6 +2009,27 @@ Device.api.getProperty(tagPropName)
     });
   });
 '''
+
+def writeSlaveChangeAirFilter_body(compressorNo):
+    return """/**
+*/
+
+  let args = {
+      tagKey: "SlaveChangeAirFilter_Comp""" + str(compressorNo) +"""",
+      x: value.x,
+      setValue: value.setValue,
+      byteCount: value.byteCount || 2
+  };
+
+  try {
+      let req = Device.makeWriteRequest(args);
+      req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+  }
+  catch(e) {
+      done(e);
+  }"""
 
 #####################
 #
@@ -1586,6 +2055,27 @@ Device.api.getProperty(tagPropName)
   });
 '''
 
+def writeSlaveChangeOilFilter_body(compressorNo):
+    return """/**
+*/
+
+  let args = {
+      tagKey: "SlaveChangeOilFilter_Comp""" + str(compressorNo) +"""",
+      x: value.x,
+      setValue: value.setValue,
+      byteCount: value.byteCount || 2
+  };
+
+  try {
+      let req = Device.makeWriteRequest(args);
+      req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+  }
+  catch(e) {
+      done(e);
+  }"""
+
 #####################
 #
 #  SlaveChangeSeperatorFilter
@@ -1609,6 +2099,27 @@ Device.api.getProperty(tagPropName)
     });
   });
 '''
+
+def writeSlaveChangeSeperatorFilter_body(compressorNo):
+    return """/**
+*/
+
+  let args = {
+      tagKey: "SlaveChangeSeperatorFilter_Comp""" + str(compressorNo) +"""",
+      x: value.x,
+      setValue: value.setValue,
+      byteCount: value.byteCount || 2
+  };
+
+  try {
+      let req = Device.makeWriteRequest(args);
+      req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+  }
+  catch(e) {
+      done(e);
+  }"""
 
 #####################
 #
@@ -1634,6 +2145,26 @@ Device.api.getProperty(tagPropName)
   });
 '''
 
+def writeSlaveChangeOil_body(compressorNo):
+    return """/**
+*/
+
+  let args = {
+      tagKey: "SlaveChangeOil_Comp""" + str(compressorNo) +"""",
+      x: value.x,
+      setValue: value.setValue,
+      byteCount: value.byteCount || 2
+  };
+
+  try {
+      let req = Device.makeWriteRequest(args);
+      req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+  }
+  catch(e) {
+      done(e);
+  }"""
 #####################
 #
 #  SlaveCheckCompressor
@@ -1657,6 +2188,27 @@ Device.api.getProperty(tagPropName)
     });
   });
 '''
+
+def writeSlaveCheckCompressor_body(compressorNo):
+    return """/**
+*/
+
+  let args = {
+      tagKey: "SlaveCheckCompressor_Comp""" + str(compressorNo) +"""",
+      x: value.x,
+      setValue: value.setValue,
+      byteCount: value.byteCount || 2
+  };
+
+  try {
+      let req = Device.makeWriteRequest(args);
+      req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+  }
+  catch(e) {
+      done(e);
+  }"""
 
 #####################
 #
@@ -1682,6 +2234,27 @@ Device.api.getProperty(tagPropName)
   });
 '''
 
+def writeSlaveBearingLubrication_body(compressorNo):
+    return """/**
+*/
+
+  let args = {
+      tagKey: "SlaveBearingLubrication_Comp""" + str(compressorNo) +"""",
+      x: value.x,
+      setValue: value.setValue,
+      byteCount: value.byteCount || 2
+  };
+
+  try {
+      let req = Device.makeWriteRequest(args);
+      req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+  }
+  catch(e) {
+      done(e);
+  }"""
+
 #####################
 #
 #  SlaveNumberOfTotalCompressorHours
@@ -1706,6 +2279,27 @@ Device.api.getProperty(tagPropName)
   });
 '''
 
+def writeSlaveNumberOfTotalCompressorHours_body(compressorNo):
+    return """/**
+*/
+
+  let args = {
+      tagKey: "SlaveNumberOfTotalCompressorHours_Comp""" + str(compressorNo) +"""",
+      x: value.x,
+      setValue: value.setValue,
+      byteCount: value.byteCount || 2
+  };
+
+  try {
+      let req = Device.makeWriteRequest(args);
+      req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+  }
+  catch(e) {
+      done(e);
+  }"""
+
 #####################
 #
 #  SlaveNumberOfLoadCompresorHours
@@ -1729,6 +2323,27 @@ Device.api.getProperty(tagPropName)
     });
   });
 '''
+
+def writeSlaveNumberOfLoadCompressorHours_body(compressorNo):
+    return """/**
+*/
+
+  let args = {
+      tagKey: "SlaveNumberOfLoadCompressorHours_Comp""" + str(compressorNo) +"""",
+      x: value.x,
+      setValue: value.setValue,
+      byteCount: value.byteCount || 2
+  };
+
+  try {
+      let req = Device.makeWriteRequest(args);
+      req.done = r => done(null, r);
+
+  Device.writeAndReadTag(req);
+  }
+  catch(e) {
+      done(e);
+  }"""
 
 #####################
 #
