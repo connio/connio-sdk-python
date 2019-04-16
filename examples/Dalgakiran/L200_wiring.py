@@ -37,6 +37,7 @@ def wire(client, name='LogikaL200', friendly="Logika L200 Controller", base="Bas
     client.account.properties(compressor.id).create(name='relayOutputs', data_type='string', access_type='protected', publish_type='never')
     client.account.properties(compressor.id).create(name='digitalInputs', data_type='string', access_type='protected', publish_type='never')
     
+    client.account.properties(compressor.id).create(name="IOBoardFwVersion", data_type='object', access_type='protected', publish_type='never')
     client.account.properties(compressor.id).create(name="TotalEnergyConsumption", data_type='object', access_type='protected', publish_type='never')
     client.account.properties(compressor.id).create(name="AirProduced", data_type='object', access_type='protected', publish_type='never')
     client.account.properties(compressor.id).create(name="AmbientTemperature", data_type='object', access_type='protected', publish_type='never')
@@ -195,8 +196,8 @@ def wire(client, name='LogikaL200', friendly="Logika L200 Controller", base="Bas
     client.account.methods(compressor.id).create(name='fetchCompressorStateTypes', method_impl= MethodInstance.MethodImplementation(fetchCompressorStateTypes_body()), access_type=accessLevel2)
     
     accessLevel3 = 'private'
-
     # Controller specific SET methods (private)
+    client.account.methods(compressor.id).create(name='setIOBoardFwVersion', method_impl= MethodInstance.MethodImplementation(setIOBoardFwVersion_body()), access_type=accessLevel3)
     client.account.methods(compressor.id).create(name='setAmbientTemperature', method_impl= MethodInstance.MethodImplementation(setAmbientTemperature_body()), access_type=accessLevel3)
     client.account.methods(compressor.id).create(name='setInternalVoltageVcc', method_impl= MethodInstance.MethodImplementation(setInternalVoltageVcc_body()), access_type=accessLevel3)
     client.account.methods(compressor.id).create(name='setInternalVoltageVL', method_impl= MethodInstance.MethodImplementation(setInternalVoltageVL_body()), access_type=accessLevel3)
@@ -371,6 +372,7 @@ def wire(client, name='LogikaL200', friendly="Logika L200 Controller", base="Bas
     client.account.methods(compressor.id).create(name='readCompressorsAvailable', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('CompressorsAvailable')), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='readCompressorsSelected', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('CompressorsSelected')), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='readCompressorsOn', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('CompressorsOn')), access_type=accessLevel4)
+    client.account.methods(compressor.id).create(name='readIOBoardFwVersion', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('IOBoardFwVersion')), access_type=accessLevel4)
 
     client.account.methods(compressor.id).create(name='readTotalEnergyConsumption', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('TotalEnergyConsumption')), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='readAirProduced', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('AirProduced')), access_type=accessLevel4)

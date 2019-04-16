@@ -101,7 +101,7 @@ const requests = {
   nbrOfStartsInLastHour:            { request: "r,meth:setNbrOfStartsInLastHour,-,2,-,1,0x611" },
   controllerTime:                   { request: "r,meth:setControllerTime,-,8,-,1,0x800" },
   // ---- Controller specific ----
-  
+  IOBoardFwVersion:                 { request: "r,meth:setIOBoardFwVersion,-,2,-,1,0x0D" },
   workingFlags:                     { request: "r,meth:setWorkingFlags,-,2,-,1,0x403" },
   secondTemperature:                { request: "r,meth:setSecondTemperature,-,2,-,1,0x408" },
   secondPressure:                   { request: "r,meth:setSecondPressure,-,2,-,1,0x409" },
@@ -1230,6 +1230,25 @@ def writeAirProduced_body():
   catch(e) {
       done(e);
   }"""
+#####################
+#
+#  IOBoardFwVersion
+#
+#####################
+def setIOBoardFwVersion_body():
+    return '''/**
+    value: [ 3, 1 ] => "1.3"
+    */
+    (async function f(major, minor) {
+        let releaseNo = major.toString() + "." + minor.toString();
+        
+        await Device.api.setProperty("IOBoardFwVersion, {
+            value: releaseNo,
+            time: new Date().toISOString()
+        });    
+        done(null, releaseNo);    
+    })(value[0], value[1]);
+    '''
 
 #####################
 #
