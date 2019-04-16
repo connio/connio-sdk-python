@@ -281,7 +281,7 @@ def fetchWriteRequest_body():
 */
 const requests = {
     cfgLevel1Pwd:                               { rprop:"cfgLevel1Pwd", rcmd: "r,meth:setLevel1Pwd,-,6,-,1,0x100", min: 1, max: 1, offset: "0x100"},
-    TotalEnergyConsumption:                     { rprop:"TotalEnergyConsumption", rcmd: "r,meth:setTotalEnergyConsumption,-,4,-,1,0x600", min: 1, max: 1 offset: "0X600"},
+    TotalEnergyConsumption:                     { rprop:"TotalEnergyConsumption", rcmd: "r,meth:setTotalEnergyConsumption,-,4,-,1,0x600", min: 1, max: 1 offset: "0X600", multiplier: [10] },
     AirProduced:                                { rprop:"AirProduced", rcmd: "r,meth:setAirProduced,-,4,-,1,0x602", min: 1, max: 1 offset: "0x602"},
     //Slave Write Tags
     SlaveControllerType_Comp0:                  { rprob: "SlaveControllerType_Comp0", rcmd: "r,meth:setSlaveControllerType_Comp0,-,2,-,0x1004", min: 1, max: 1, offset:"0x1004" },
@@ -292,10 +292,10 @@ const requests = {
     SlaveSelenoidDelay_Comp1:                   { rprob: "SlaveSelenoidDelay_Comp1", rcmd: "r,meth:setSlaveSelenoidDelay_Comp1,-,2,-,0x1105", min: 1, max: 1, offset:"0x1105" },
     SlaveSelenoidDelay_Comp2:                   { rprob: "SlaveSelenoidDelay_Comp2", rcmd: "r,meth:setSlaveSelenoidDelay_Comp2,-,2,-,0x1205", min: 1, max: 1, offset:"0x1205" },
     SlaveSelenoidDelay_Comp3:                   { rprob: "SlaveSelenoidDelay_Comp3", rcmd: "r,meth:setSlaveSelenoidDelay_Comp3,-,2,-,0x1305", min: 1, max: 1, offset:"0x1305" },
-    SlaveAirFlow_Comp0:                         { rprob: "SlaveAirFlow_Comp0", rcmd: "r,meth:setSlaveAirFlow_Comp0,-,2,-,0x1006", min: 1, max: 1, offset:"0x1006" },
-    SlaveAirFlow_Comp1:                         { rprob: "SlaveAirFlow_Comp1", rcmd: "r,meth:setSlaveAirFlow_Comp1,-,2,-,0x1106", min: 1, max: 1, offset:"0x1106" },
-    SlaveAirFlow_Comp2:                         { rprob: "SlaveAirFlow_Comp2", rcmd: "r,meth:setSlaveAirFlow_Comp2,-,2,-,0x1206", min: 1, max: 1, offset:"0x1206" },
-    SlaveAirFlow_Comp3:                         { rprob: "SlaveAirFlow_Comp3", rcmd: "r,meth:setSlaveAirFlow_Comp3,-,2,-,0x1306", min: 1, max: 1, offset:"0x1306" },
+    SlaveAirFlow_Comp0:                         { rprob: "SlaveAirFlow_Comp0", rcmd: "r,meth:setSlaveAirFlow_Comp0,-,2,-,0x1006", min: 1, max: 1, offset:"0x1006", multiplier: [10] },
+    SlaveAirFlow_Comp1:                         { rprob: "SlaveAirFlow_Comp1", rcmd: "r,meth:setSlaveAirFlow_Comp1,-,2,-,0x1106", min: 1, max: 1, offset:"0x1106", multiplier: [10] },
+    SlaveAirFlow_Comp2:                         { rprob: "SlaveAirFlow_Comp2", rcmd: "r,meth:setSlaveAirFlow_Comp2,-,2,-,0x1206", min: 1, max: 1, offset:"0x1206", multiplier: [10] },
+    SlaveAirFlow_Comp3:                         { rprob: "SlaveAirFlow_Comp3", rcmd: "r,meth:setSlaveAirFlow_Comp3,-,2,-,0x1306", min: 1, max: 1, offset:"0x1306", multiplier: [10] },
     SlaveNominalPower_Comp0:                    { rprob: "SlaveNominalPower_Comp0", rcmd: "r,meth:setSlaveNominalPower_Comp0,-,2,-,0x1008", min: 1, max: 1, offset:"0x1008" },
     SlaveNominalPower_Comp1:                    { rprob: "SlaveNominalPower_Comp1", rcmd: "r,meth:setSlaveNominalPower_Comp1,-,2,-,0x1108", min: 1, max: 1, offset:"0x1108" },
     SlaveNominalPower_Comp2:                    { rprob: "SlaveNominalPower_Comp2", rcmd: "r,meth:setSlaveNominalPower_Comp2,-,2,-,0x1208", min: 1, max: 1, offset:"0x1208" },
