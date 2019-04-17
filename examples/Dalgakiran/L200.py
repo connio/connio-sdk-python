@@ -78,7 +78,7 @@ return { list: [
  { byteNo: 11, type: 'warning', bit: Math.pow(2,1), code: 'A81', label: "Drive Warning" },
  { byteNo: 11, type: 'alarm', bit: Math.pow(2,3), code: 'A83', label: "Drive No Comm" },
 ],
-blackOutCode: 'A12' };
+blackOutCode: 'A04' };
 """
 
 #
@@ -461,17 +461,24 @@ else {
     "r,meth:setAlarms,5,12,1,1,0x200|"+
     "r,meth:setNonAckAlarms,5,12,1,1,0x208|"+
     "r,meth:setControllerState,5,2,1,1,0x400|"+
-    "r,meth:setCompressorState,5,2,1,1,0x401|"+
+    "r,meth:setSlaveControllerState_Comp0,5,2,1,1,0x1001|"+
+    "r,meth:setSlaveControllerState_Comp1,5,2,1,1,0x1101|"+
+    "r,meth:setSlaveControllerState_Comp2,5,2,1,1,0x1201|"+
+    "r,meth:setSlaveControllerState_Comp3,5,2,1,1,0x1301|"+
     "r,meth:setBlockingAlarm,5,2,1,1,0x401|"+
-    "r,meth:setScrewTemperature,3,2,0,1,0x406|"+
     "r,meth:setWorkingPressure,3,2,0,1,0x404|"+
-    "r,meth:setSecondTemperature,3,2,0,1,0x408|"+
-    "r,meth:setSecondPressure,3,2,0,1,0x409|"+
-    "r,meth:setConfigSwitches,60,4,1,1,0x500|"+
-    "r,meth:setControllerSupplyVoltage,60,2,1,1,0x40A|"+
-    "r,meth:setTotalHours,3600,4,1,1,0x600|"+
-    "r,meth:setTotalLoadHours,3600,4,1,1,0x602|"+
-    "r,meth:setMaintCounters,3600,24,1,1,0x604";
+    "r,meth:setSlaveMaintCounters_Comp0,3600,24,1,1,0x101E|"+
+    "r,meth:setSlaveMaintCounters_Comp1,3600,24,1,1,0x111E|"+
+    "r,meth:setSlaveMaintCounters_Comp2,3600,24,1,1,0x121E|"+
+    "r,meth:setSlaveMaintCounters_Comp3,3600,24,1,1,0x131E|"+
+    "r,meth:setSlaveNumberOfTotalCompressorHours_Comp0,3600,4,1,1,0x101A|"+
+    "r,meth:setSlaveNumberOfTotalCompressorHours_Comp1,3600,4,1,1,0x111A|"+
+    "r,meth:setSlaveNumberOfTotalCompressorHours_Comp2,3600,4,1,1,0x121A|"+
+    "r,meth:setSlaveNumberOfTotalCompressorHours_Comp3,3600,4,1,1,0x131A|"+
+    "r,meth:setSlaveNumberOfLoadCompressorHours_Comp0,3600,4,1,1,0x101C|"+
+    "r,meth:setSlaveNumberOfLoadCompressorHours_Comp1,3600,4,1,1,0x111C|"+
+    "r,meth:setSlaveNumberOfLoadCompressorHours_Comp2,3600,4,1,1,0x121C|"+
+    "r,meth:setSlaveNumberOfLoadCompressorHours_Comp3,3600,4,1,1,0x131C|"+
 }
 """
 
