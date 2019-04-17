@@ -157,7 +157,6 @@ const requests = {
   SlaveAirFlow_Comp1:               { request: "r,meth:setSlaveAirFlow_Comp1,-,2,-,1,0x1106" ),
   SlaveAirFlow_Comp2:               { request: "r,meth:setSlaveAirFlow_Comp2,-,2,-,1,0x1206" ),
   SlaveAirFlow_Comp3:               { request: "r,meth:setSlaveAirFlow_Comp3,-,2,-,1,0x1306" ),
-
   SlaveNominalPower_Comp0:          { request: "r,meth:setSlaveNominalPower_Comp0,-,2,-,1,0x1008" ),
   SlaveNominalPower_Comp1:          { request: "r,meth:setSlaveNominalPower_Comp1,-,2,-,1,0x1108" ),
   SlaveNominalPower_Comp2:          { request: "r,meth:setSlaveNominalPower_Comp2,-,2,-,1,0x1208" ),
@@ -242,6 +241,28 @@ const requests = {
   SlaveMaintCounters_Comp1:                   { request: "r,meth:setSlaveMaintCounters_Comp1,-,24,-,1,0x111E" ),
   SlaveMaintCounters_Comp2:                   { request: "r,meth:setSlaveMaintCounters_Comp2,-,24,-,1,0x121E" ),
   SlaveMaintCounters_Comp3:                   { request: "r,meth:setSlaveMaintCounters_Comp3,-,24,-,1,0x131E" ),
+  //Clock Timers
+  ClockTimer0:     { request: "r,meth:setClockTimer0,-,6,-,1,0x700" ),
+  ClockTimer1:     { request: "r,meth:setClockTimer1,-,6,-,1,0x703" ),
+  ClockTimer2:     { request: "r,meth:setClockTimer2,-,6,-,1,0x706" ),
+  ClockTimer3:     { request: "r,meth:setClockTimer3,-,6,-,1,0x709" ),
+  ClockTimer4:     { request: "r,meth:setClockTimer4,-,6,-,1,0x70C" ),
+  ClockTimer5:     { request: "r,meth:setClockTimer5,-,6,-,1,0x70F" ),
+  ClockTimer6:     { request: "r,meth:setClockTimer6,-,6,-,1,0x712" ),
+  ClockTimer7:     { request: "r,meth:setClockTimer7,-,6,-,1,0x715" ),
+  ClockTimer8:     { request: "r,meth:setClockTimer8,-,6,-,1,0x718" ),
+  ClockTimer9:     { request: "r,meth:setClockTimer9,-,6,-,1,0x71B" ),
+  ClockTimer10:    { request: "r,meth:setClockTimer10,-,6,-,1,0x71E" ),
+  ClockTimer11:    { request: "r,meth:setClockTimer11,-,6,-,1,0x721" ),
+  ClockTimer12:    { request: "r,meth:setClockTimer12,-,6,-,1,0x724" ),
+  ClockTimer13:    { request: "r,meth:setClockTimer13,-,6,-,1,0x727" ),
+  ClockTimer14:    { request: "r,meth:setClockTimer14,-,6,-,1,0x72A" ),
+  ClockTimer15:    { request: "r,meth:setClockTimer15,-,6,-,1,0x72D" ),
+  ClockTimer16:    { request: "r,meth:setClockTimer16,-,6,-,1,0x730" ),
+  ClockTimer17:    { request: "r,meth:setClockTimer17,-,6,-,1,0x733" ),
+  ClockTimer18:    { request: "r,meth:setClockTimer18,-,6,-,1,0x736" ),
+  ClockTimer19:    { request: "r,meth:setClockTimer19,-,6,-,1,0x739" ),
+  ClockTimer20:    { request: "r,meth:setClockTimer20,-,6,-,1,0x73C" ),
   
   //
   R02:                               { request: "r,meth:setR02,-,2,-,1,0x500" },
@@ -276,7 +297,7 @@ return requests[value].request;
 #
 #
 def fetchWriteRequest_body():
-    return """/**
+  return """/**
 
 */
 const requests = {
@@ -368,14 +389,14 @@ const requests = {
     SlaveBearingLubrication_Comp1:              { rprob: "SlaveBearingLubrication_Comp1", rcmd: "r,meth:setSlaveBearingLubrication_Comp1,-,2,-,0x1119", min: 1, max: 1, offset:"0x1119" },
     SlaveBearingLubrication_Comp2:              { rprob: "SlaveBearingLubrication_Comp2", rcmd: "r,meth:setSlaveBearingLubrication_Comp2,-,2,-,0x1219", min: 1, max: 1, offset:"0x1219" },
     SlaveBearingLubrication_Comp3:              { rprob: "SlaveBearingLubrication_Comp3", rcmd: "r,meth:setSlaveBearingLubrication_Comp3,-,2,-,0x1319", min: 1, max: 1, offset:"0x1319" },
-    SlaveNumberOfTotalCompressorHours_Comp0:    { rprob: "SlaveNumberOfTotalCompressorHours_Comp0", rcmd: "r,meth:setSlaveNumberOfTotalCompressorHours_Comp0,-,4,-,0x101A", min: 1, max: 1, offset:"0x101A" },
-    SlaveNumberOfTotalCompressorHours_Comp1:    { rprob: "SlaveNumberOfTotalCompressorHours_Comp1", rcmd: "r,meth:setSlaveNumberOfTotalCompressorHours_Comp1,-,4,-,0x111A", min: 1, max: 1, offset:"0x111A" },
-    SlaveNumberOfTotalCompressorHours_Comp2:    { rprob: "SlaveNumberOfTotalCompressorHours_Comp2", rcmd: "r,meth:setSlaveNumberOfTotalCompressorHours_Comp2,-,4,-,0x121A", min: 1, max: 1, offset:"0x121A" },
-    SlaveNumberOfTotalCompressorHours_Comp3:    { rprob: "SlaveNumberOfTotalCompressorHours_Comp3", rcmd: "r,meth:setSlaveNumberOfTotalCompressorHours_Comp3,-,4,-,0x131A", min: 1, max: 1, offset:"0x131A" },
-    SlaveNumberOfLoadCompressorHours_Comp0:     { rprob: "SlaveNumberOfLoadCompressorHours_Comp0", rcmd: "r,meth:setSlaveNumberOfLoadCompressorHours_Comp0,-,4,-,0x101C", min: 1, max: 1, offset:"0x101C" },
-    SlaveNumberOfLoadCompressorHours_Comp1:     { rprob: "SlaveNumberOfLoadCompressorHours_Comp1", rcmd: "r,meth:setSlaveNumberOfLoadCompressorHours_Comp1,-,4,-,0x111C", min: 1, max: 1, offset:"0x111C" },
-    SlaveNumberOfLoadCompressorHours_Comp2:     { rprob: "SlaveNumberOfLoadCompressorHours_Comp2", rcmd: "r,meth:setSlaveNumberOfLoadCompressorHours_Comp2,-,4,-,0x121C", min: 1, max: 1, offset:"0x121C" },
-    SlaveNumberOfLoadCompressorHours_Comp3:     { rprob: "SlaveNumberOfLoadCompressorHours_Comp3", rcmd: "r,meth:setSlaveNumberOfLoadCompressorHours_Comp3,-,4,-,0x131C", min: 1, max: 1, offset:"0x131C" },
+    SlaveNumberOfTotalCompressorHours_Comp0:    { rprob: "SlaveNumberOfTotalCompressorHours_Comp0", rcmd: "r,meth:setSlaveNumberOfTotalCompressorHours_Comp0,-,4,-,0x101A", min: 1, max: 1, offset:"0x101A" , multiplier: [60] },
+    SlaveNumberOfTotalCompressorHours_Comp1:    { rprob: "SlaveNumberOfTotalCompressorHours_Comp1", rcmd: "r,meth:setSlaveNumberOfTotalCompressorHours_Comp1,-,4,-,0x111A", min: 1, max: 1, offset:"0x111A" , multiplier: [60] },
+    SlaveNumberOfTotalCompressorHours_Comp2:    { rprob: "SlaveNumberOfTotalCompressorHours_Comp2", rcmd: "r,meth:setSlaveNumberOfTotalCompressorHours_Comp2,-,4,-,0x121A", min: 1, max: 1, offset:"0x121A" , multiplier: [60] },
+    SlaveNumberOfTotalCompressorHours_Comp3:    { rprob: "SlaveNumberOfTotalCompressorHours_Comp3", rcmd: "r,meth:setSlaveNumberOfTotalCompressorHours_Comp3,-,4,-,0x131A", min: 1, max: 1, offset:"0x131A" , multiplier: [60] },
+    SlaveNumberOfLoadCompressorHours_Comp0:     { rprob: "SlaveNumberOfLoadCompressorHours_Comp0", rcmd: "r,meth:setSlaveNumberOfLoadCompressorHours_Comp0,-,4,-,0x101C", min: 1, max: 1, offset:"0x101C" , multiplier: [60] },
+    SlaveNumberOfLoadCompressorHours_Comp1:     { rprob: "SlaveNumberOfLoadCompressorHours_Comp1", rcmd: "r,meth:setSlaveNumberOfLoadCompressorHours_Comp1,-,4,-,0x111C", min: 1, max: 1, offset:"0x111C" , multiplier: [60] },
+    SlaveNumberOfLoadCompressorHours_Comp2:     { rprob: "SlaveNumberOfLoadCompressorHours_Comp2", rcmd: "r,meth:setSlaveNumberOfLoadCompressorHours_Comp2,-,4,-,0x121C", min: 1, max: 1, offset:"0x121C" , multiplier: [60] },
+    SlaveNumberOfLoadCompressorHours_Comp3:     { rprob: "SlaveNumberOfLoadCompressorHours_Comp3", rcmd: "r,meth:setSlaveNumberOfLoadCompressorHours_Comp3,-,4,-,0x131C", min: 1, max: 1, offset:"0x131C" , multiplier: [60] },
 
     
     R02:      { rprob: "R02", rcmd: "r,meth:setR02,-,2,-,1,0x500", min: 2, max: 2, offset:"0x500"},
@@ -2285,9 +2306,10 @@ def setSlaveNumberOfTotalCompressorHours_body(compressorNo):
 */
 const tagPropName = "SlaveNumberOfTotalCompressorHours_Comp''' + str(compressorNo) + '''";
 let SlaveNumberOfTotalCompressorHours = Device.convertToDec({ values: value }, -1);
+SlaveNumberOfTotalCompressorHours = SlaveNumberOfTotalCompressorHours / 60;
 Device.api.getProperty(tagPropName)
   .then(property => {
-    property.value.SlaveNumberOfTotalCompressorHours = SlaveNumberOfTotalCompressorHours.toString() + " Minutes";
+    property.value.SlaveNumberOfTotalCompressorHours = SlaveNumberOfTotalCompressorHours.toString() + " Hours";
     Device.api.setProperty(tagPropName, {
       value: property.value,
       time: new Date().toISOString()
@@ -2330,9 +2352,10 @@ def setSlaveNumberOfLoadCompressorHours_body(compressorNo):
 */
 const tagPropName = "SlaveNumberOfLoadCompressorHours_Comp''' + str(compressorNo) + '''";
 let SlaveNumberOfLoadCompressorHours = Device.convertToDec({ values: value }, -1);
+SlaveNumberOfLoadCompressorHours = SlaveNumberOfLoadCompressorHours / 60;
 Device.api.getProperty(tagPropName)
   .then(property => {
-    property.value.SlaveNumberOfLoadCompressorHours = SlaveNumberOfLoadCompressorHours.toString().toString() + " Minutes";
+    property.value.SlaveNumberOfLoadCompressorHours = SlaveNumberOfLoadCompressorHours.toString().toString() + " Hours";
     Device.api.setProperty(tagPropName, {
       value: property.value,
       time: new Date().toISOString()
@@ -2530,23 +2553,23 @@ def writeV01_body():
     return """/**
 */
 
-        let args = {
-            tagKey: "V01",
-            x: value.x,
-            setValue: value.setValue,
-            byteCount: value.byteCount || 2
-        };
+let args = {
+    tagKey: "V01",
+    x: value.x,
+    setValue: value.setValue,
+    byteCount: value.byteCount || 2
+};
 
-        try {
-            let req = Device.makeWriteRequest(args);
-            req.done = r => done(null, r);
+try {
+    let req = Device.makeWriteRequest(args);
+    req.done = r => done(null, r);
 
-        Device.writeAndReadTag(req);
-        }
-        catch(e) {
-            done(e);
-        }
-        """
+Device.writeAndReadTag(req);
+}
+catch(e) {
+    done(e);
+}
+"""
 
 #####################
 #
@@ -2595,23 +2618,23 @@ def writeWPx_body():
     return """/**
 */
 
-        let args = {
-            tagKey: "WPx",
-            x: value.x,
-            setValue: value.setValue,
-            byteCount: value.byteCount || 2
-        };
+let args = {
+    tagKey: "WPx",
+    x: value.x,
+    setValue: value.setValue,
+    byteCount: value.byteCount || 2
+};
 
-        try {
-            let req = Device.makeWriteRequest(args);
-            req.done = r => done(null, r);
+try {
+    let req = Device.makeWriteRequest(args);
+    req.done = r => done(null, r);
 
-        Device.writeAndReadTag(req);
-        }
-        catch(e) {
-            done(e);
-        }
-        """
+Device.writeAndReadTag(req);
+}
+catch(e) {
+    done(e);
+}
+"""
 
 #####################
 #
@@ -2656,23 +2679,23 @@ def writeWTx_body():
     return """/**
 */
 
-        let args = {
-            tagKey: "WTx",
-            x: value.x,
-            setValue: value.setValue,
-            byteCount: value.byteCount || 2
-        };
+let args = {
+    tagKey: "WTx",
+    x: value.x,
+    setValue: value.setValue,
+    byteCount: value.byteCount || 2
+};
 
-        try {
-            let req = Device.makeWriteRequest(args);
-            req.done = r => done(null, r);
+try {
+    let req = Device.makeWriteRequest(args);
+    req.done = r => done(null, r);
 
-        Device.writeAndReadTag(req);
-        }
-        catch(e) {
-            done(e);
-        }
-        """
+Device.writeAndReadTag(req);
+}
+catch(e) {
+    done(e);
+}
+"""
 
 #####################
 #
@@ -2684,42 +2707,42 @@ def setV04_body():
     return """/**
 */
 
-    const tagPropName = "Vx";
-    let V04 = Device.convertToDec({ values: value }, -1);
-    Device.api.getProperty(tagPropName)
-        .then(property => {
-        property.value.V04 = V04.toString() + '%';
-        Device.api.setProperty(tagPropName, {
-            value: property.value,
-            time: new Date().toISOString()
-        })
-        .then(property => {
-            done(null, property.value);
-        });
+const tagPropName = "Vx";
+let V04 = Device.convertToDec({ values: value }, -1);
+Device.api.getProperty(tagPropName)
+    .then(property => {
+    property.value.V04 = V04.toString() + '%';
+    Device.api.setProperty(tagPropName, {
+        value: property.value,
+        time: new Date().toISOString()
+    })
+    .then(property => {
+        done(null, property.value);
     });
+});
 """
 
 def writeV04_body():
     return """/**
 */
 
-        let args = {
-            tagKey: "V04",
-            x: value.x,
-            setValue: value.setValue,
-            byteCount: value.byteCount || 2
-        };
+let args = {
+    tagKey: "V04",
+    x: value.x,
+    setValue: value.setValue,
+    byteCount: value.byteCount || 2
+};
 
-        try {
-            let req = Device.makeWriteRequest(args);
-            req.done = r => done(null, r);
+try {
+    let req = Device.makeWriteRequest(args);
+    req.done = r => done(null, r);
 
-        Device.writeAndReadTag(req);
-        }
-        catch(e) {
-            done(e);
-        }
-        """
+Device.writeAndReadTag(req);
+}
+catch(e) {
+    done(e);
+}
+"""
 
 #####################
 #
@@ -2761,23 +2784,23 @@ def writeV02_V03_body():
     return """/**
 */
 
-        let args = {
-            tagKey: "V02",
-            x: value.x,
-            setValue: value.setValue,
-            byteCount: value.byteCount || 2
-        };
+let args = {
+    tagKey: "V02",
+    x: value.x,
+    setValue: value.setValue,
+    byteCount: value.byteCount || 2
+};
 
-        try {
-            let req = Device.makeWriteRequest(args);
-            req.done = r => done(null, r);
+try {
+    let req = Device.makeWriteRequest(args);
+    req.done = r => done(null, r);
 
-        Device.writeAndReadTag(req);
-        }
-        catch(e) {
-            done(e);
-        }
-        """
+Device.writeAndReadTag(req);
+}
+catch(e) {
+    done(e);
+}
+"""
 
 #####################
 #
@@ -2789,42 +2812,42 @@ def setV07_body():
     return """/**
 */
 
-    const tagPropName = "Vx";
-    let V07 = Device.convertToDec({ values: value }, -1);
-    Device.api.getProperty(tagPropName)
-        .then(property => {
-        property.value.V07 = V07;
-        Device.api.setProperty(tagPropName, {
-            value: property.value,
-            time: new Date().toISOString()
-        })
-        .then(property => {
-            done(null, property.value);
-        });
+const tagPropName = "Vx";
+let V07 = Device.convertToDec({ values: value }, -1);
+Device.api.getProperty(tagPropName)
+    .then(property => {
+    property.value.V07 = V07;
+    Device.api.setProperty(tagPropName, {
+        value: property.value,
+        time: new Date().toISOString()
+    })
+    .then(property => {
+        done(null, property.value);
     });
+});
 """
 
 def writeV07_body():
     return """/**
 */
 
-        let args = {
-            tagKey: "V07",
-            x: value.x,
-            setValue: value.setValue,
-            byteCount: value.byteCount || 2
-        };
+let args = {
+    tagKey: "V07",
+    x: value.x,
+    setValue: value.setValue,
+    byteCount: value.byteCount || 2
+};
 
-        try {
-            let req = Device.makeWriteRequest(args);
-            req.done = r => done(null, r);
+try {
+    let req = Device.makeWriteRequest(args);
+    req.done = r => done(null, r);
 
-        Device.writeAndReadTag(req);
-        }
-        catch(e) {
-            done(e);
-        }
-        """
+Device.writeAndReadTag(req);
+}
+catch(e) {
+    done(e);
+}
+"""
 
 #####################
 #
@@ -2836,42 +2859,42 @@ def setS11_body():
     return """/**
 */
 
-    const tagPropName = "Sx";
-    let S11 = Device.convertToDec({ values: value }, -1);
-    Device.api.getProperty(tagPropName)
-        .then(property => {
-        property.value.S11 = S11;
-        Device.api.setProperty(tagPropName, {
-            value: property.value,
-            time: new Date().toISOString()
-        })
-        .then(property => {
-            done(null, property.value);
-        });
+const tagPropName = "Sx";
+let S11 = Device.convertToDec({ values: value }, -1);
+Device.api.getProperty(tagPropName)
+    .then(property => {
+    property.value.S11 = S11;
+    Device.api.setProperty(tagPropName, {
+        value: property.value,
+        time: new Date().toISOString()
+    })
+    .then(property => {
+        done(null, property.value);
     });
+});
 """
 
 def writeS11_body():
     return """/**
 */
 
-        let args = {
-            tagKey: "S11",
-            x: value.x,
-            setValue: value.setValue,
-            byteCount: value.byteCount || 2
-        };
+let args = {
+    tagKey: "S11",
+    x: value.x,
+    setValue: value.setValue,
+    byteCount: value.byteCount || 2
+};
 
-        try {
-            let req = Device.makeWriteRequest(args);
-            req.done = r => done(null, r);
+try {
+    let req = Device.makeWriteRequest(args);
+    req.done = r => done(null, r);
 
-        Device.writeAndReadTag(req);
-        }
-        catch(e) {
-            done(e);
-        }
-        """
+Device.writeAndReadTag(req);
+}
+catch(e) {
+    done(e);
+}
+"""
 
 #####################
 #
@@ -2883,42 +2906,42 @@ def setT01_body():
     return """/**
 */
 
-    const tagPropName = "T01";
-    let T01 = Device.convertToDec({ values: value }, -1);
-    Device.api.getProperty(tagPropName)
-        .then(property => {
-        property.value.T01 = T01;
-        Device.api.setProperty(tagPropName, {
-            value: property.value,
-            time: new Date().toISOString()
-        })
-        .then(property => {
-            done(null, property.value);
-        });
+const tagPropName = "T01";
+let T01 = Device.convertToDec({ values: value }, -1);
+Device.api.getProperty(tagPropName)
+    .then(property => {
+    property.value.T01 = T01;
+    Device.api.setProperty(tagPropName, {
+        value: property.value,
+        time: new Date().toISOString()
+    })
+    .then(property => {
+        done(null, property.value);
     });
+});
 """
 
 def writeT01_body():
     return """/**
 */
 
-        let args = {
-            tagKey: "T01",
-            x: value.x,
-            setValue: value.setValue,
-            byteCount: value.byteCount || 2
-        };
+let args = {
+    tagKey: "T01",
+    x: value.x,
+    setValue: value.setValue,
+    byteCount: value.byteCount || 2
+};
 
-        try {
-            let req = Device.makeWriteRequest(args);
-            req.done = r => done(null, r);
+try {
+    let req = Device.makeWriteRequest(args);
+    req.done = r => done(null, r);
 
-        Device.writeAndReadTag(req);
-        }
-        catch(e) {
-            done(e);
-        }
-        """
+Device.writeAndReadTag(req);
+}
+catch(e) {
+    done(e);
+}
+"""
 
 #####################
 #
@@ -2930,42 +2953,42 @@ def setS14_body():
     return """/**
 */
 
-    const tagPropName = "Sx";
-    let S14 = Device.convertToDec({ values: value }, -1);
-    Device.api.getProperty(tagPropName)
-        .then(property => {
-        property.value.S14 = S14;
-        Device.api.setProperty(tagPropName, {
-            value: property.value,
-            time: new Date().toISOString()
-        })
-        .then(property => {
-            done(null, property.value);
-        });
+const tagPropName = "Sx";
+let S14 = Device.convertToDec({ values: value }, -1);
+Device.api.getProperty(tagPropName)
+    .then(property => {
+    property.value.S14 = S14;
+    Device.api.setProperty(tagPropName, {
+        value: property.value,
+        time: new Date().toISOString()
+    })
+    .then(property => {
+        done(null, property.value);
     });
+});
 """
 
 def writeS14_body():
     return """/**
 */
 
-        let args = {
-            tagKey: "S14",
-            x: value.x,
-            setValue: value.setValue,
-            byteCount: value.byteCount || 2
-        };
+let args = {
+    tagKey: "S14",
+    x: value.x,
+    setValue: value.setValue,
+    byteCount: value.byteCount || 2
+};
 
-        try {
-            let req = Device.makeWriteRequest(args);
-            req.done = r => done(null, r);
+try {
+    let req = Device.makeWriteRequest(args);
+    req.done = r => done(null, r);
 
-        Device.writeAndReadTag(req);
-        }
-        catch(e) {
-            done(e);
-        }
-        """
+Device.writeAndReadTag(req);
+}
+catch(e) {
+    done(e);
+}
+"""
 
 #####################
 #
@@ -2977,42 +3000,42 @@ def setR01_body():
     return """/**
 */
 
-    const tagPropName = "Rx";
-    let R01 = Device.convertToDec({ values: value }, -1);
-    Device.api.getProperty(tagPropName)
-        .then(property => {
-        property.value.R01 = R01;
-        Device.api.setProperty(tagPropName, {
-            value: property.value,
-            time: new Date().toISOString()
-        })
-        .then(property => {
-            done(null, property.value);
-        });
+const tagPropName = "Rx";
+let R01 = Device.convertToDec({ values: value }, -1);
+Device.api.getProperty(tagPropName)
+    .then(property => {
+    property.value.R01 = R01;
+    Device.api.setProperty(tagPropName, {
+        value: property.value,
+        time: new Date().toISOString()
+    })
+    .then(property => {
+        done(null, property.value);
     });
+});
 """
 
 def writeR01_body():
     return """/**
 */
 
-        let args = {
-            tagKey: "R01",
-            x: value.x,
-            setValue: value.setValue,
-            byteCount: value.byteCount || 2
-        };
+let args = {
+    tagKey: "R01",
+    x: value.x,
+    setValue: value.setValue,
+    byteCount: value.byteCount || 2
+};
 
-        try {
-            let req = Device.makeWriteRequest(args);
-            req.done = r => done(null, r);
+try {
+    let req = Device.makeWriteRequest(args);
+    req.done = r => done(null, r);
 
-        Device.writeAndReadTag(req);
-        }
-        catch(e) {
-            done(e);
-        }
-        """
+Device.writeAndReadTag(req);
+}
+catch(e) {
+    done(e);
+}
+"""
 
 #####################
 #
@@ -3058,23 +3081,23 @@ def writeS00_S01_S02_body():
     return """/**
 */
 
-        let args = {
-            tagKey: "S00",
-            x: value.x,
-            setValue: value.setValue,
-            byteCount: value.byteCount || 2
-        };
+let args = {
+    tagKey: "S00",
+    x: value.x,
+    setValue: value.setValue,
+    byteCount: value.byteCount || 2
+};
 
-        try {
-            let req = Device.makeWriteRequest(args);
-            req.done = r => done(null, r);
+try {
+    let req = Device.makeWriteRequest(args);
+    req.done = r => done(null, r);
 
-        Device.writeAndReadTag(req);
-        }
-        catch(e) {
-            done(e);
-        }
-        """
+Device.writeAndReadTag(req);
+}
+catch(e) {
+    done(e);
+}
+"""
 
 #####################
 #
@@ -3116,23 +3139,23 @@ def writeS09_S10_body():
     return """/**
 */
 
-        let args = {
-            tagKey: "S09",
-            x: value.x,
-            setValue: value.setValue,
-            byteCount: value.byteCount || 2
-        };
+let args = {
+    tagKey: "S09",
+    x: value.x,
+    setValue: value.setValue,
+    byteCount: value.byteCount || 2
+};
 
-        try {
-            let req = Device.makeWriteRequest(args);
-            req.done = r => done(null, r);
+try {
+    let req = Device.makeWriteRequest(args);
+    req.done = r => done(null, r);
 
-        Device.writeAndReadTag(req);
-        }
-        catch(e) {
-            done(e);
-        }
-        """
+Device.writeAndReadTag(req);
+}
+catch(e) {
+    done(e);
+}
+"""
 
 #####################
 #
@@ -3145,42 +3168,42 @@ def setS06_body():
     return """/**
 */
 
-    const tagPropName = "Sx";
-    let S06 = Device.convertToDec({ values: value }, -1);
-    Device.api.getProperty(tagPropName)
-        .then(property => {
-        property.value.S06 = S06;
-        Device.api.setProperty(tagPropName, {
-            value: property.value,
-            time: new Date().toISOString()
-        })
-        .then(property => {
-            done(null, property.value);
-        });
+const tagPropName = "Sx";
+let S06 = Device.convertToDec({ values: value }, -1);
+Device.api.getProperty(tagPropName)
+    .then(property => {
+    property.value.S06 = S06;
+    Device.api.setProperty(tagPropName, {
+        value: property.value,
+        time: new Date().toISOString()
+    })
+    .then(property => {
+        done(null, property.value);
     });
+});
 """
 
 def writeS06_body():
     return """/**
 */
 
-        let args = {
-            tagKey: "S06",
-            x: value.x,
-            setValue: value.setValue,
-            byteCount: value.byteCount || 2
-        };
+let args = {
+    tagKey: "S06",
+    x: value.x,
+    setValue: value.setValue,
+    byteCount: value.byteCount || 2
+};
 
-        try {
-            let req = Device.makeWriteRequest(args);
-            req.done = r => done(null, r);
+try {
+    let req = Device.makeWriteRequest(args);
+    req.done = r => done(null, r);
 
-        Device.writeAndReadTag(req);
-        }
-        catch(e) {
-            done(e);
-        }
-        """
+Device.writeAndReadTag(req);
+}
+catch(e) {
+    done(e);
+}
+"""
 #####################
 #
 #  S05
@@ -3191,42 +3214,42 @@ def setS05_body():
     return """/**
 */
 
-    const tagPropName = "Sx";
-    let S05 = Device.convertToDec({ values: value }, -1);
-    Device.api.getProperty(tagPropName)
-        .then(property => {
-        property.value.S05 = S05;
-        Device.api.setProperty(tagPropName, {
-            value: property.value,
-            time: new Date().toISOString()
-        })
-        .then(property => {
-            done(null, property.value);
-        });
+const tagPropName = "Sx";
+let S05 = Device.convertToDec({ values: value }, -1);
+Device.api.getProperty(tagPropName)
+    .then(property => {
+    property.value.S05 = S05;
+    Device.api.setProperty(tagPropName, {
+        value: property.value,
+        time: new Date().toISOString()
+    })
+    .then(property => {
+        done(null, property.value);
     });
+});
 """
 
 def writeS05_body():
     return """/**
 */
 
-        let args = {
-            tagKey: "S05",
-            x: value.x,
-            setValue: value.setValue,
-            byteCount: value.byteCount || 2
-        };
+let args = {
+    tagKey: "S05",
+    x: value.x,
+    setValue: value.setValue,
+    byteCount: value.byteCount || 2
+};
 
-        try {
-            let req = Device.makeWriteRequest(args);
-            req.done = r => done(null, r);
+try {
+    let req = Device.makeWriteRequest(args);
+    req.done = r => done(null, r);
 
-        Device.writeAndReadTag(req);
-        }
-        catch(e) {
-            done(e);
-        }
-        """
+Device.writeAndReadTag(req);
+}
+catch(e) {
+    done(e);
+}
+"""
 
 #####################
 #
@@ -3268,23 +3291,23 @@ def writeS07_S08_body():
     return """/**
 */
 
-        let args = {
-            tagKey: "S07",
-            x: value.x,
-            setValue: value.setValue,
-            byteCount: value.byteCount || 2
-        };
+let args = {
+    tagKey: "S07",
+    x: value.x,
+    setValue: value.setValue,
+    byteCount: value.byteCount || 2
+};
 
-        try {
-            let req = Device.makeWriteRequest(args);
-            req.done = r => done(null, r);
+try {
+    let req = Device.makeWriteRequest(args);
+    req.done = r => done(null, r);
 
-        Device.writeAndReadTag(req);
-        }
-        catch(e) {
-            done(e);
-        }
-        """
+Device.writeAndReadTag(req);
+}
+catch(e) {
+    done(e);
+}
+"""
 
 #####################
 #
@@ -3326,23 +3349,23 @@ def writeS12_S13_body():
     return """/**
 */
 
-        let args = {
-            tagKey: "S12",
-            x: value.x,
-            setValue: value.setValue,
-            byteCount: value.byteCount || 2
-        };
+let args = {
+    tagKey: "S12",
+    x: value.x,
+    setValue: value.setValue,
+    byteCount: value.byteCount || 2
+};
 
-        try {
-            let req = Device.makeWriteRequest(args);
-            req.done = r => done(null, r);
+try {
+    let req = Device.makeWriteRequest(args);
+    req.done = r => done(null, r);
 
-        Device.writeAndReadTag(req);
-        }
-        catch(e) {
-            done(e);
-        }
-        """
+Device.writeAndReadTag(req);
+}
+catch(e) {
+    done(e);
+}
+"""
 
 #####################
 #
@@ -3354,42 +3377,42 @@ def setS17_body():
     return """/**
 */
 
-    const tagPropName = "Sx";
-    let S17 = Device.convertToDec({ values: value }, -1);
-    Device.api.getProperty(tagPropName)
-        .then(property => {
-        property.value.S17 = S17.toString() + ' %';
-        Device.api.setProperty(tagPropName, {
-            value: property.value,
-            time: new Date().toISOString()
-        })
-        .then(property => {
-            done(null, property.value);
-        });
+const tagPropName = "Sx";
+let S17 = Device.convertToDec({ values: value }, -1);
+Device.api.getProperty(tagPropName)
+    .then(property => {
+    property.value.S17 = S17.toString() + ' %';
+    Device.api.setProperty(tagPropName, {
+        value: property.value,
+        time: new Date().toISOString()
+    })
+    .then(property => {
+        done(null, property.value);
     });
+});
 """
 
 def writeS17_body():
     return """/**
 */
 
-        let args = {
-            tagKey: "S17",
-            x: value.x,
-            setValue: value.setValue,
-            byteCount: value.byteCount || 2
-        };
+let args = {
+    tagKey: "S17",
+    x: value.x,
+    setValue: value.setValue,
+    byteCount: value.byteCount || 2
+};
 
-        try {
-            let req = Device.makeWriteRequest(args);
-            req.done = r => done(null, r);
+try {
+    let req = Device.makeWriteRequest(args);
+    req.done = r => done(null, r);
 
-        Device.writeAndReadTag(req);
-        }
-        catch(e) {
-            done(e);
-        }
-        """
+Device.writeAndReadTag(req);
+}
+catch(e) {
+    done(e);
+}
+"""
 
 #####################
 #
@@ -3402,42 +3425,42 @@ def setS16_body():
     return """/**
 */
 
-    const tagPropName = "Sx";
-    let S16 = Device.convertToDec({ values: value }, -1);
-    Device.api.getProperty(tagPropName)
-        .then(property => {
-        property.value.S16 = S16.toString() + ' %';
-        Device.api.setProperty(tagPropName, {
-            value: property.value,
-            time: new Date().toISOString()
-        })
-        .then(property => {
-            done(null, property.value);
-        });
+const tagPropName = "Sx";
+let S16 = Device.convertToDec({ values: value }, -1);
+Device.api.getProperty(tagPropName)
+    .then(property => {
+    property.value.S16 = S16.toString() + ' %';
+    Device.api.setProperty(tagPropName, {
+        value: property.value,
+        time: new Date().toISOString()
+    })
+    .then(property => {
+        done(null, property.value);
     });
+});
 """
 
 def writeS16_body():
     return """/**
 */
 
-        let args = {
-            tagKey: "S16",
-            x: value.x,
-            setValue: value.setValue,
-            byteCount: value.byteCount || 2
-        };
+let args = {
+    tagKey: "S16",
+    x: value.x,
+    setValue: value.setValue,
+    byteCount: value.byteCount || 2
+};
 
-        try {
-            let req = Device.makeWriteRequest(args);
-            req.done = r => done(null, r);
+try {
+    let req = Device.makeWriteRequest(args);
+    req.done = r => done(null, r);
 
-        Device.writeAndReadTag(req);
-        }
-        catch(e) {
-            done(e);
-        }
-        """
+Device.writeAndReadTag(req);
+}
+catch(e) {
+    done(e);
+}
+"""
 
 #####################
 #
@@ -3479,23 +3502,23 @@ def writeS03_S04_body():
     return """/**
 */
 
-        let args = {
-            tagKey: "S03",
-            x: value.x,
-            setValue: value.setValue,
-            byteCount: value.byteCount || 2
-        };
+let args = {
+    tagKey: "S03",
+    x: value.x,
+    setValue: value.setValue,
+    byteCount: value.byteCount || 2
+};
 
-        try {
-            let req = Device.makeWriteRequest(args);
-            req.done = r => done(null, r);
+try {
+    let req = Device.makeWriteRequest(args);
+    req.done = r => done(null, r);
 
-        Device.writeAndReadTag(req);
-        }
-        catch(e) {
-            done(e);
-        }
-        """
+Device.writeAndReadTag(req);
+}
+catch(e) {
+    done(e);
+}
+"""
 
 #####################
 #
@@ -3537,23 +3560,23 @@ def writeS18_S19_body():
     return """/**
 */
 
-        let args = {
-            tagKey: "S18",
-            x: value.x,
-            setValue: value.setValue,
-            byteCount: value.byteCount || 2
-        };
+let args = {
+    tagKey: "S18",
+    x: value.x,
+    setValue: value.setValue,
+    byteCount: value.byteCount || 2
+};
 
-        try {
-            let req = Device.makeWriteRequest(args);
-            req.done = r => done(null, r);
+try {
+    let req = Device.makeWriteRequest(args);
+    req.done = r => done(null, r);
 
-        Device.writeAndReadTag(req);
-        }
-        catch(e) {
-            done(e);
-        }
-        """
+Device.writeAndReadTag(req);
+}
+catch(e) {
+    done(e);
+}
+"""
 
 #####################
 #
@@ -3565,42 +3588,42 @@ def setS21_body():
     return """/**
 */
 
-    const tagPropName = "Sx";
-    let S21 = Device.convertToDec({ values: value }, -1);
-    Device.api.getProperty(tagPropName)
-        .then(property => {
-        property.value.S21 = S21.toString() + ' Seconds';
-        Device.api.setProperty(tagPropName, {
-            value: property.value,
-            time: new Date().toISOString()
-        })
-        .then(property => {
-            done(null, property.value);
-        });
+const tagPropName = "Sx";
+let S21 = Device.convertToDec({ values: value }, -1);
+Device.api.getProperty(tagPropName)
+    .then(property => {
+    property.value.S21 = S21.toString() + ' Seconds';
+    Device.api.setProperty(tagPropName, {
+        value: property.value,
+        time: new Date().toISOString()
+    })
+    .then(property => {
+        done(null, property.value);
     });
+});
 """
 
 def writeS21_body():
     return """/**
 */
 
-        let args = {
-            tagKey: "S21",
-            x: value.x,
-            setValue: value.setValue,
-            byteCount: value.byteCount || 2
-        };
+let args = {
+    tagKey: "S21",
+    x: value.x,
+    setValue: value.setValue,
+    byteCount: value.byteCount || 2
+};
 
-        try {
-            let req = Device.makeWriteRequest(args);
-            req.done = r => done(null, r);
+try {
+    let req = Device.makeWriteRequest(args);
+    req.done = r => done(null, r);
 
-        Device.writeAndReadTag(req);
-        }
-        catch(e) {
-            done(e);
-        }
-        """
+Device.writeAndReadTag(req);
+}
+catch(e) {
+    done(e);
+}
+"""
 
 #####################
 #
@@ -3612,42 +3635,42 @@ def setS20_body():
     return """/**
 */
 
-    const tagPropName = "Sx";
-    let S20 = Device.convertToDec({ values: value }, -1);
-    Device.api.getProperty(tagPropName)
-        .then(property => {
-        property.value.S20 = S20.toString() + ' Seconds';
-        Device.api.setProperty(tagPropName, {
-            value: property.value,
-            time: new Date().toISOString()
-        })
-        .then(property => {
-            done(null, property.value);
-        });
+const tagPropName = "Sx";
+let S20 = Device.convertToDec({ values: value }, -1);
+Device.api.getProperty(tagPropName)
+    .then(property => {
+    property.value.S20 = S20.toString() + ' Seconds';
+    Device.api.setProperty(tagPropName, {
+        value: property.value,
+        time: new Date().toISOString()
+    })
+    .then(property => {
+        done(null, property.value);
     });
+});
 """
 
 def writeS20_body():
     return """/**
 */
 
-        let args = {
-            tagKey: "S20",
-            x: value.x,
-            setValue: value.setValue,
-            byteCount: value.byteCount || 2
-        };
+let args = {
+    tagKey: "S20",
+    x: value.x,
+    setValue: value.setValue,
+    byteCount: value.byteCount || 2
+};
 
-        try {
-            let req = Device.makeWriteRequest(args);
-            req.done = r => done(null, r);
+try {
+    let req = Device.makeWriteRequest(args);
+    req.done = r => done(null, r);
 
-        Device.writeAndReadTag(req);
-        }
-        catch(e) {
-            done(e);
-        }
-        """
+Device.writeAndReadTag(req);
+}
+catch(e) {
+    done(e);
+}
+"""
 #####################
 #
 #  S22
@@ -3658,40 +3681,100 @@ def setS22_body():
     return """/**
 */
 
-    const tagPropName = "Sx";
-    let S22 = Device.convertToDec({ values: value }, -1);
-    Device.api.getProperty(tagPropName)
-        .then(property => {
-        property.value.S22 = S22;
-        Device.api.setProperty(tagPropName, {
-            value: property.value,
-            time: new Date().toISOString()
-        })
-        .then(property => {
-            done(null, property.value);
-        });
-    });
+const tagPropName = "Sx";
+let S22 = Device.convertToDec({ values: value }, -1);
+Device.api.getProperty(tagPropName)
+    .then(property => {
+    property.value.S22 = S22;
+    Device.api.setProperty(tagPropName, {
+        value: property.value,
+        time: new Date().toISOString()
+})
+.then(property => {
+    done(null, property.value);
+});
+});
 """
 
 def writeS22_body():
-    return """/**
+  return """/**
 */
 
-        let args = {
-            tagKey: "S22",
-            x: value.x,
-            setValue: value.setValue,
-            byteCount: value.byteCount || 2
-        };
+let args = {
+    tagKey: "S22",
+    x: value.x,
+    setValue: value.setValue,
+    byteCount: value.byteCount || 2
+};
 
-        try {
-            let req = Device.makeWriteRequest(args);
-            req.done = r => done(null, r);
+try {
+    let req = Device.makeWriteRequest(args);
+    req.done = r => done(null, r);
 
-        Device.writeAndReadTag(req);
-        }
-        catch(e) {
-            done(e);
-        }
-        """
+Device.writeAndReadTag(req);
+}
+catch(e) {
+    done(e);
+}
+"""
 
+#####################
+#
+#  ClockTimer
+#
+#####################
+def setClockTimer_body(timerNo):
+    return '''/**
+Bit mapped:
+-bit9..bit0:  10 bits, setpoint pressure [0.1bar], from 0.0bar=0 to 60.0bar=600 
+-bit14..bit10: 5 bits, delta pressure [0.1bar], from 0.2bar=2 to 3.0bar=30
+-bit19..bit15: 5 bits, on hour, from 0 to 23, 31 to disable this timer
+-bit25..bit20: 6 bits, on minute, from 0 to 59 -bit30..bit26: 5 bits, off hour, from 0 to 23
+-bit36..bit31: 6 bits, off minute, from 0 to 59
+-bit40..bit37: 4 bits, day of week, 0=monday, 1=tuesday, ..,6=sunday, 7 monday to friday, 8 saturday and sunday, 9 all days, 10 monday to saturday, 11 tuesday to thursday
+-bit42..bit41: 2 bits, priority set, from 0 to 3
+-bit47..bit43: 5 bits, always set to 0
+
+*/
+const tagPropName = "ClockTimer"''' + str(timerNo) + ''';
+
+let value = values.value;
+
+let first4BytesInDecimal = Device.convertToDec({value.slice(0,4)},-1);
+let last3BytesInDecimal = Device.convertToDec({value.slice(3,6)},-1);
+
+let clockTimer = {};
+let setPointPressure = (first4BytesInDecimal >> 22) / 10;
+clockTimer.setPointPressure = setPointPressure;
+
+let deltaPressure = ((first4BytesInDecimal >> 17) & 31) / 10;
+clockTimer.deltaPressure = deltaPressure;
+
+let onHour = ((first4BytesInDecimal >> 12) & 31);
+let onMinutes = ((first4BytesInDecimal >> 6) & 63);
+clockTimer.onTime = onHours.toString() + ":" + onMinutes.toString();
+
+let offHours = ((first4BytesInDecimal >> 1) & 31);
+let offMinutes = ((last3BytesInDecimal >> 11) & 63);
+clockTimer.offTime = offHours.toString() + ":" + offMinutes.toString();
+
+let daysOfWeek = ((last3BytesInDecimal >> 7) & 15);
+clockTimer.daysOfWeek = daysOfWeek;
+
+let prioritySet = ((last3BytesInDecimal >> 5) & 3);
+clockTimer.prioritySet = prioritySet;
+
+let startPressure = setPointPressure - deltaPressure;
+clockTimer.startPressure = startPressure;
+
+let stopPressure = setPointPressure + deltaPressure;
+clockTimer.stopPressure = stopPressure;
+
+Device.api.setProperty(tagPropName, {
+    value: clockTimer,
+    time: new Date().toISOString()
+ })
+ .then(property => {
+    done(null, property.value);
+ });
+'''
