@@ -2362,7 +2362,7 @@ let SlaveNumberOfLoadCompressorHours = Device.convertToDec({ values: value }, -1
 SlaveNumberOfLoadCompressorHours = SlaveNumberOfLoadCompressorHours / 60;
 Device.api.getProperty(tagPropName)
   .then(property => {
-    property.value.SlaveNumberOfLoadCompressorHours = SlaveNumberOfLoadCompressorHours.toString().toString() + " Hours";
+    property.value.SlaveNumberOfLoadCompressorHours = SlaveNumberOfLoadCompressorHours.toString() + " Hours";
     Device.api.setProperty(tagPropName, {
       value: property.value,
       time: new Date().toISOString()
