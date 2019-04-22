@@ -181,54 +181,14 @@ const requests = {
   SlavePriorityInS3_Comp1:          { request: "r,meth:setSlavePriorityInS3_Comp1,-,2,-,1,0x110D" },
   SlavePriorityInS3_Comp2:          { request: "r,meth:setSlavePriorityInS3_Comp2,-,2,-,1,0x120D" },
   SlavePriorityInS3_Comp3:          { request: "r,meth:setSlavePriorityInS3_Comp3,-,2,-,1,0x130D" },
-  SlaveUnloadTime_Comp0:            { request: "r,meth:setSlaveUnloadTime_Comp0,-,2,-,1,0x100E" },
-  SlaveUnloadTime_Comp1:            { request: "r,meth:setSlaveUnloadTime_Comp1,-,2,-,1,0x110E" },
-  SlaveUnloadTime_Comp2:            { request: "r,meth:setSlaveUnloadTime_Comp2,-,2,-,1,0x120E" },
-  SlaveUnloadTime_Comp3:            { request: "r,meth:setSlaveUnloadTime_Comp3,-,2,-,1,0x130E" },
-  SlaveSafetyTime_Comp0:            { request: "r,meth:setSlaveSafetyTime_Comp0,-,2,-,1,0x100F" },
-  SlaveSafetyTime_Comp1:            { request: "r,meth:setSlaveSafetyTime_Comp1,-,2,-,1,0x110F" },
-  SlaveSafetyTime_Comp2:            { request: "r,meth:setSlaveSafetyTime_Comp2,-,2,-,1,0x120F" },
-  SlaveSafetyTime_Comp3:            { request: "r,meth:setSlaveSafetyTime_Comp3,-,2,-,1,0x130F" },
-  SlaveStartsHour_Comp0:            { request: "r,meth:setSlaveStartsHour_Comp0,-,2,-,1,0x1010" },
-  SlaveStartsHour_Comp1:            { request: "r,meth:setSlaveStartsHour_Comp1,-,2,-,1,0x1110" },
-  SlaveStartsHour_Comp2:            { request: "r,meth:setSlaveStartsHour_Comp2,-,2,-,1,0x1210" },
-  SlaveStartsHour_Comp3:            { request: "r,meth:setSlaveStartsHour_Comp3,-,2,-,1,0x1310" },
-  SlaveAnalogInput_Comp0:           { request: "r,meth:setSlaveAnalogInput_Comp0,-,2,-,1,0x1011" },
-  SlaveAnalogInput_Comp1:           { request: "r,meth:setSlaveAnalogInput_Comp1,-,2,-,1,0x1111" },
-  SlaveAnalogInput_Comp2:           { request: "r,meth:setSlaveAnalogInput_Comp2,-,2,-,1,0x1211" },
-  SlaveAnalogInput_Comp3:           { request: "r,meth:setSlaveAnalogInput_Comp3,-,2,-,1,0x1311" },
-  SlaveExcludedForMaint_Comp0:      { request: "r,meth:setSlaveExcludedForMaint_Comp0,-,2,-,1,0x1012" },
-  SlaveExcludedForMaint_Comp1:      { request: "r,meth:setSlaveExcludedForMaint_Comp1,-,2,-,1,0x1112" },
-  SlaveExcludedForMaint_Comp2:      { request: "r,meth:setSlaveExcludedForMaint_Comp2,-,2,-,1,0x1212" },
-  SlaveExcludedForMaint_Comp3:      { request: "r,meth:setSlaveExcludedForMaint_Comp3,-,2,-,1,0x1312" },
-  SlaveEnableMaintenance_Comp0:     { request: "r,meth:setSlaveEnableMaintenance_Comp0,-,2,-,1,0x1013" },
-  SlaveEnableMaintenance_Comp1:     { request: "r,meth:setSlaveEnableMaintenance_Comp1,-,2,-,1,0x1113" },
-  SlaveEnableMaintenance_Comp2:     { request: "r,meth:setSlaveEnableMaintenance_Comp2,-,2,-,1,0x1213" },
-  SlaveEnableMaintenance_Comp3:     { request: "r,meth:setSlaveEnableMaintenance_Comp3,-,2,-,1,0x1313" },
-  SlaveChangeAirFilter_Comp0:       { request: "r,meth:setSlaveChangeAirFilter_Comp0,-,2,-,1,0x1014" },
-  SlaveChangeAirFilter_Comp1:       { request: "r,meth:setSlaveChangeAirFilter_Comp1,-,2,-,1,0x1114" },
-  SlaveChangeAirFilter_Comp2:       { request: "r,meth:setSlaveChangeAirFilter_Comp2,-,2,-,1,0x1214" },
-  SlaveChangeAirFilter_Comp3:       { request: "r,meth:setSlaveChangeAirFilter_Comp3,-,2,-,1,0x1314" },
-  SlaveChangeOilFilter_Comp0:       { request: "r,meth:setSlaveChangeOilFilter_Comp0,-,2,-,1,0x1015" },
-  SlaveChangeOilFilter_Comp1:       { request: "r,meth:setSlaveChangeOilFilter_Comp1,-,2,-,1,0x1115" },
-  SlaveChangeOilFilter_Comp2:       { request: "r,meth:setSlaveChangeOilFilter_Comp2,-,2,-,1,0x1215" },
-  SlaveChangeOilFilter_Comp3:       { request: "r,meth:setSlaveChangeOilFilter_Comp3,-,2,-,1,0x1315" },
-  SlaveChangeSeperatorFilter_Comp0: { request: "r,meth:setSlaveChangeSeperatorFilter_Comp0,-,2,-,1,0x1016" },
-  SlaveChangeSeperatorFilter_Comp1: { request: "r,meth:setSlaveChangeSeperatorFilter_Comp1,-,2,-,1,0x1116" },
-  SlaveChangeSeperatorFilter_Comp2: { request: "r,meth:setSlaveChangeSeperatorFilter_Comp2,-,2,-,1,0x1216" },
-  SlaveChangeSeperatorFilter_Comp3: { request: "r,meth:setSlaveChangeSeperatorFilter_Comp3,-,2,-,1,0x1316" },
-  SlaveChangeOil_Comp0:             { request: "r,meth:setSlaveChangeOil_Comp0,-,2,-,1,0x1017" },
-  SlaveChangeOil_Comp1:             { request: "r,meth:setSlaveChangeOil_Comp1,-,2,-,1,0x1117" },
-  SlaveChangeOil_Comp2:             { request: "r,meth:setSlaveChangeOil_Comp2,-,2,-,1,0x1217" },
-  SlaveChangeOil_Comp3:             { request: "r,meth:setSlaveChangeOil_Comp3,-,2,-,1,0x1317" },
-  SlaveCheckCompressor_Comp0:       { request: "r,meth:setSlaveCheckCompressor_Comp0,-,2,-,1,0x1018" },
-  SlaveCheckCompressor_Comp1:       { request: "r,meth:setSlaveCheckCompressor_Comp1,-,2,-,1,0x1118" },
-  SlaveCheckCompressor_Comp2:       { request: "r,meth:setSlaveCheckCompressor_Comp2,-,2,-,1,0x1218" },
-  SlaveCheckCompressor_Comp3:       { request: "r,meth:setSlaveCheckCompressor_Comp3,-,2,-,1,0x1318" },
-  SlaveBearingLubrication_Comp0:    { request: "r,meth:setSlaveBearingLubrication_Comp0,-,2,-,1,0x1019" },
-  SlaveBearingLubrication_Comp1:    { request: "r,meth:setSlaveBearingLubrication_Comp1,-,2,-,1,0x1119" },
-  SlaveBearingLubrication_Comp2:    { request: "r,meth:setSlaveBearingLubrication_Comp2,-,2,-,1,0x1219" },
-  SlaveBearingLubrication_Comp3:    { request: "r,meth:setSlaveBearingLubrication_Comp3,-,2,-,1,0x1319" },
+  C00x:            { request: "r,meth:setC00x,-,8,-,1,0x100E" },
+  C01x:            { request: "r,meth:setC01x,-,8,-,1,0x110E" },
+  C02x:            { request: "r,meth:setC02x,-,8,-,1,0x120E" },
+  C03x:            { request: "r,meth:setC03x,-,8,-,1,0x130E" },
+  M00x:      { request: "r,meth:setM00x,-,16,-,1,0x1012" },
+  M01x:      { request: "r,meth:setM01x,-,16,-,1,0x1112" },
+  M02x:      { request: "r,meth:setM02x,-,16,-,1,0x1212" },
+  M03x:      { request: "r,meth:setM03x,-,16,-,1,0x1312" },
   SlaveNumberOfTotalCompressorHours_Comp0:    { request: "r,meth:setSlaveNumberOfTotalCompressorHours_Comp0,-,4,-,1,0x101A" },
   SlaveNumberOfTotalCompressorHours_Comp1:    { request: "r,meth:setSlaveNumberOfTotalCompressorHours_Comp1,-,4,-,1,0x111A" },
   SlaveNumberOfTotalCompressorHours_Comp2:    { request: "r,meth:setSlaveNumberOfTotalCompressorHours_Comp2,-,4,-,1,0x121A" },
@@ -340,54 +300,14 @@ const requests = {
     SlavePriorityInS3_Comp1:                    { rprob: "SlavePriorityInS3_Comp1", rcmd: "r,meth:setSlavePriorityInS3_Comp1,-,2,-,0x110D", min: 1, max: 1, offset:"0x110D" },
     SlavePriorityInS3_Comp2:                    { rprob: "SlavePriorityInS3_Comp2", rcmd: "r,meth:setSlavePriorityInS3_Comp2,-,2,-,0x120D", min: 1, max: 1, offset:"0x120D" },
     SlavePriorityInS3_Comp3:                    { rprob: "SlavePriorityInS3_Comp3", rcmd: "r,meth:setSlavePriorityInS3_Comp3,-,2,-,0x130D", min: 1, max: 1, offset:"0x130D" },
-    SlaveUnloadTime_Comp0:                      { rprob: "SlaveUnloadTime_Comp0", rcmd: "r,meth:setSlaveUnloadTime_Comp0,-,2,-,0x100E", min: 1, max: 1, offset:"0x100E" },
-    SlaveUnloadTime_Comp1:                      { rprob: "SlaveUnloadTime_Comp1", rcmd: "r,meth:setSlaveUnloadTime_Comp1,-,2,-,0x110E", min: 1, max: 1, offset:"0x110E" },
-    SlaveUnloadTime_Comp2:                      { rprob: "SlaveUnloadTime_Comp2", rcmd: "r,meth:setSlaveUnloadTime_Comp2,-,2,-,0x120E", min: 1, max: 1, offset:"0x120E" },
-    SlaveUnloadTime_Comp3:                      { rprob: "SlaveUnloadTime_Comp3", rcmd: "r,meth:setSlaveUnloadTime_Comp3,-,2,-,0x130E", min: 1, max: 1, offset:"0x130E" },
-    SlaveSafetyTime_Comp0:                      { rprob: "SlaveSafetyTime_Comp0", rcmd: "r,meth:setSlaveSafetyTime_Comp0,-,2,-,0x100F", min: 1, max: 1, offset:"0x100F" },
-    SlaveSafetyTime_Comp1:                      { rprob: "SlaveSafetyTime_Comp1", rcmd: "r,meth:setSlaveSafetyTime_Comp1,-,2,-,0x110F", min: 1, max: 1, offset:"0x110F" },
-    SlaveSafetyTime_Comp2:                      { rprob: "SlaveSafetyTime_Comp2", rcmd: "r,meth:setSlaveSafetyTime_Comp2,-,2,-,0x120F", min: 1, max: 1, offset:"0x120F" },
-    SlaveSafetyTime_Comp3:                      { rprob: "SlaveSafetyTime_Comp3", rcmd: "r,meth:setSlaveSafetyTime_Comp3,-,2,-,0x130F", min: 1, max: 1, offset:"0x130F" },
-    SlaveStartsHour_Comp0:                      { rprob: "SlaveStartsHour_Comp0", rcmd: "r,meth:setSlaveStartsHour_Comp0,-,2,-,0x1010", min: 1, max: 1, offset:"0x1010" },
-    SlaveStartsHour_Comp1:                      { rprob: "SlaveStartsHour_Comp1", rcmd: "r,meth:setSlaveStartsHour_Comp1,-,2,-,0x1110", min: 1, max: 1, offset:"0x1110" },
-    SlaveStartsHour_Comp2:                      { rprob: "SlaveStartsHour_Comp2", rcmd: "r,meth:setSlaveStartsHour_Comp2,-,2,-,0x1210", min: 1, max: 1, offset:"0x1210" },
-    SlaveStartsHour_Comp3:                      { rprob: "SlaveStartsHour_Comp3", rcmd: "r,meth:setSlaveStartsHour_Comp3,-,2,-,0x1310", min: 1, max: 1, offset:"0x1310" },
-    SlaveAnalogInput_Comp0:                     { rprob: "SlaveAnalogInput_Comp0", rcmd: "r,meth:setSlaveAnalogInput_Comp0,-,2,-,0x1011", min: 1, max: 1, offset:"0x1011" },
-    SlaveAnalogInput_Comp1:                     { rprob: "SlaveAnalogInput_Comp1", rcmd: "r,meth:setSlaveAnalogInput_Comp1,-,2,-,0x1111", min: 1, max: 1, offset:"0x1111" },
-    SlaveAnalogInput_Comp2:                     { rprob: "SlaveAnalogInput_Comp2", rcmd: "r,meth:setSlaveAnalogInput_Comp2,-,2,-,0x1211", min: 1, max: 1, offset:"0x1211" },
-    SlaveAnalogInput_Comp3:                     { rprob: "SlaveAnalogInput_Comp3", rcmd: "r,meth:setSlaveAnalogInput_Comp3,-,2,-,0x1311", min: 1, max: 1, offset:"0x1311" },
-    SlaveExcludedForMaint_Comp0:                { rprob: "SlaveExcludedForMaint_Comp0", rcmd: "r,meth:setSlaveExcludedForMaint_Comp0,-,2,-,0x1012", min: 1, max: 1, offset:"0x1012" },
-    SlaveExcludedForMaint_Comp1:                { rprob: "SlaveExcludedForMaint_Comp1", rcmd: "r,meth:setSlaveExcludedForMaint_Comp1,-,2,-,0x1112", min: 1, max: 1, offset:"0x1112" },
-    SlaveExcludedForMaint_Comp2:                { rprob: "SlaveExcludedForMaint_Comp2", rcmd: "r,meth:setSlaveExcludedForMaint_Comp2,-,2,-,0x1212", min: 1, max: 1, offset:"0x1212" },
-    SlaveExcludedForMaint_Comp3:                { rprob: "SlaveExcludedForMaint_Comp3", rcmd: "r,meth:setSlaveExcludedForMaint_Comp3,-,2,-,0x1312", min: 1, max: 1, offset:"0x1312" },
-    SlaveEnableMaintenance_Comp0:               { rprob: "SlaveEnableMaintenance_Comp0", rcmd: "r,meth:setSlaveEnableMaintenance_Comp0,-,2,-,0x1013", min: 1, max: 1, offset:"0x1013" },
-    SlaveEnableMaintenance_Comp1:               { rprob: "SlaveEnableMaintenance_Comp1", rcmd: "r,meth:setSlaveEnableMaintenance_Comp1,-,2,-,0x1113", min: 1, max: 1, offset:"0x1113" },
-    SlaveEnableMaintenance_Comp2:               { rprob: "SlaveEnableMaintenance_Comp2", rcmd: "r,meth:setSlaveEnableMaintenance_Comp2,-,2,-,0x1213", min: 1, max: 1, offset:"0x1213" },
-    SlaveEnableMaintenance_Comp3:               { rprob: "SlaveEnableMaintenance_Comp3", rcmd: "r,meth:setSlaveEnableMaintenance_Comp3,-,2,-,0x1313", min: 1, max: 1, offset:"0x1313" },
-    SlaveChangeAirFilter_Comp0:                 { rprob: "SlaveChangeAirFilter_Comp0", rcmd: "r,meth:setSlaveChangeAirFilter_Comp0,-,2,-,0x1014", min: 1, max: 1, offset:"0x1014" },
-    SlaveChangeAirFilter_Comp1:                 { rprob: "SlaveChangeAirFilter_Comp1", rcmd: "r,meth:setSlaveChangeAirFilter_Comp1,-,2,-,0x1114", min: 1, max: 1, offset:"0x1114" },
-    SlaveChangeAirFilter_Comp2:                 { rprob: "SlaveChangeAirFilter_Comp2", rcmd: "r,meth:setSlaveChangeAirFilter_Comp2,-,2,-,0x1214", min: 1, max: 1, offset:"0x1214" },
-    SlaveChangeAirFilter_Comp3:                 { rprob: "SlaveChangeAirFilter_Comp3", rcmd: "r,meth:setSlaveChangeAirFilter_Comp3,-,2,-,0x1314", min: 1, max: 1, offset:"0x1314" },
-    SlaveChangeOilFilter_Comp0:                 { rprob: "SlaveChangeOilFilter_Comp0", rcmd: "r,meth:setSlaveChangeOilFilter_Comp0,-,2,-,0x1015", min: 1, max: 1, offset:"0x1015" },
-    SlaveChangeOilFilter_Comp1:                 { rprob: "SlaveChangeOilFilter_Comp1", rcmd: "r,meth:setSlaveChangeOilFilter_Comp1,-,2,-,0x1115", min: 1, max: 1, offset:"0x1115" },
-    SlaveChangeOilFilter_Comp2:                 { rprob: "SlaveChangeOilFilter_Comp2", rcmd: "r,meth:setSlaveChangeOilFilter_Comp2,-,2,-,0x1215", min: 1, max: 1, offset:"0x1215" },
-    SlaveChangeOilFilter_Comp3:                 { rprob: "SlaveChangeOilFilter_Comp3", rcmd: "r,meth:setSlaveChangeOilFilter_Comp3,-,2,-,0x1315", min: 1, max: 1, offset:"0x1315" },
-    SlaveChangeSeperatorFilter_Comp0:           { rprob: "SlaveChangeSeperatorFilter_Comp0", rcmd: "r,meth:setSlaveChangeSeperatorFilter_Comp0,-,2,-,0x1016", min: 1, max: 1, offset:"0x1016" },
-    SlaveChangeSeperatorFilter_Comp1:           { rprob: "SlaveChangeSeperatorFilter_Comp1", rcmd: "r,meth:setSlaveChangeSeperatorFilter_Comp1,-,2,-,0x1116", min: 1, max: 1, offset:"0x1116" },
-    SlaveChangeSeperatorFilter_Comp2:           { rprob: "SlaveChangeSeperatorFilter_Comp2", rcmd: "r,meth:setSlaveChangeSeperatorFilter_Comp2,-,2,-,0x1216", min: 1, max: 1, offset:"0x1216" },
-    SlaveChangeSeperatorFilter_Comp3:           { rprob: "SlaveChangeSeperatorFilter_Comp3", rcmd: "r,meth:setSlaveChangeSeperatorFilter_Comp3,-,2,-,0x1316", min: 1, max: 1, offset:"0x1316" },
-    SlaveChangeOil_Comp0:                       { rprob: "SlaveChangeOil_Comp0", rcmd: "r,meth:setSlaveChangeOil_Comp0,-,2,-,0x1017", min: 1, max: 1, offset:"0x1017" },
-    SlaveChangeOil_Comp1:                       { rprob: "SlaveChangeOil_Comp1", rcmd: "r,meth:setSlaveChangeOil_Comp1,-,2,-,0x1117", min: 1, max: 1, offset:"0x1117" },
-    SlaveChangeOil_Comp2:                       { rprob: "SlaveChangeOil_Comp2", rcmd: "r,meth:setSlaveChangeOil_Comp2,-,2,-,0x1217", min: 1, max: 1, offset:"0x1217" },
-    SlaveChangeOil_Comp3:                       { rprob: "SlaveChangeOil_Comp3", rcmd: "r,meth:setSlaveChangeOil_Comp3,-,2,-,0x1317", min: 1, max: 1, offset:"0x1317" },
-    SlaveCheckCompressor_Comp0:                 { rprob: "SlaveCheckCompressor_Comp0", rcmd: "r,meth:setSlaveCheckCompressor_Comp0,-,2,-,0x1018", min: 1, max: 1, offset:"0x1018" },
-    SlaveCheckCompressor_Comp1:                 { rprob: "SlaveCheckCompressor_Comp1", rcmd: "r,meth:setSlaveCheckCompressor_Comp1,-,2,-,0x1118", min: 1, max: 1, offset:"0x1118" },
-    SlaveCheckCompressor_Comp2:                 { rprob: "SlaveCheckCompressor_Comp2", rcmd: "r,meth:setSlaveCheckCompressor_Comp2,-,2,-,0x1218", min: 1, max: 1, offset:"0x1218" },
-    SlaveCheckCompressor_Comp3:                 { rprob: "SlaveCheckCompressor_Comp3", rcmd: "r,meth:setSlaveCheckCompressor_Comp3,-,2,-,0x1318", min: 1, max: 1, offset:"0x1318" },
-    SlaveBearingLubrication_Comp0:              { rprob: "SlaveBearingLubrication_Comp0", rcmd: "r,meth:setSlaveBearingLubrication_Comp0,-,2,-,0x1019", min: 1, max: 1, offset:"0x1019" },
-    SlaveBearingLubrication_Comp1:              { rprob: "SlaveBearingLubrication_Comp1", rcmd: "r,meth:setSlaveBearingLubrication_Comp1,-,2,-,0x1119", min: 1, max: 1, offset:"0x1119" },
-    SlaveBearingLubrication_Comp2:              { rprob: "SlaveBearingLubrication_Comp2", rcmd: "r,meth:setSlaveBearingLubrication_Comp2,-,2,-,0x1219", min: 1, max: 1, offset:"0x1219" },
-    SlaveBearingLubrication_Comp3:              { rprob: "SlaveBearingLubrication_Comp3", rcmd: "r,meth:setSlaveBearingLubrication_Comp3,-,2,-,0x1319", min: 1, max: 1, offset:"0x1319" },
+    C00:                      { rprob: "C00x", rcmd: "r,meth:setC00x,-,8,-,0x100E", min: 2, max: 5, offset:"0x100E" },
+    C01:                      { rprob: "C01x", rcmd: "r,meth:setC01x,-,8,-,0x110E", min: 2, max: 5, offset:"0x110E" },
+    C02:                      { rprob: "C02x", rcmd: "r,meth:setC02x,-,8,-,0x120E", min: 2, max: 5, offset:"0x120E" },
+    C03:                      { rprob: "C03x", rcmd: "r,meth:setC03x,-,8,-,0x130E", min: 2, max: 5, offset:"0x130E" },
+    M00:                { rprob: "M00x", rcmd: "r,meth:setM00x,-,16,-,0x1012", min: 0, max: 7, offset:"0x1012" },
+    M01:                { rprob: "M01x", rcmd: "r,meth:setM01x,-,16,-,0x1112", min: 0, max: 7, offset:"0x1112" },
+    M02:                { rprob: "M02x", rcmd: "r,meth:setM02x,-,16,-,0x1212", min: 0, max: 7, offset:"0x1212" },
+    M03:                { rprob: "M03x", rcmd: "r,meth:setM03x,-,16,-,0x1312", min: 0, max: 7, offset:"0x1312" },
     SlaveNumberOfTotalCompressorHours_Comp0:    { rprob: "SlaveNumberOfTotalCompressorHours_Comp0", rcmd: "r,meth:setSlaveNumberOfTotalCompressorHours_Comp0,-,4,-,0x101A", min: 1, max: 1, offset:"0x101A" , multiplier: [60] },
     SlaveNumberOfTotalCompressorHours_Comp1:    { rprob: "SlaveNumberOfTotalCompressorHours_Comp1", rcmd: "r,meth:setSlaveNumberOfTotalCompressorHours_Comp1,-,4,-,0x111A", min: 1, max: 1, offset:"0x111A" , multiplier: [60] },
     SlaveNumberOfTotalCompressorHours_Comp2:    { rprob: "SlaveNumberOfTotalCompressorHours_Comp2", rcmd: "r,meth:setSlaveNumberOfTotalCompressorHours_Comp2,-,4,-,0x121A", min: 1, max: 1, offset:"0x121A" , multiplier: [60] },
@@ -1760,546 +1680,116 @@ def writeSlavePriorityInS3_body(compressorNo):
   }"""
 #####################
 #
-#  SlaveUnloadTime
+#  C0Xx
 #
 #####################
-
-def setSlaveUnloadTime_body(compressorNo):
+def setC0Xx_body(compressorNo):
     return '''/**
 */
-const tagPropName = "SlaveUnloadTime_Comp''' + str(compressorNo) + '''";
-let SlaveUnloadTime = Device.convertToDec({ values: value }, -1);
-Device.api.getProperty(tagPropName)
-  .then(property => {
-    property.value.SlaveUnloadTime = SlaveUnloadTime.toString() + ' Sec';
-    Device.api.setProperty(tagPropName, {
-      value: property.value,
+const itemCount = 4;
+
+let C0''' + str(compressorNo) + '''x = {};
+for (var x = 0; x < itemCount; x++) {
+    C0''' + str(compressorNo) + '''x['C0''' + str(compressorNo) + '''_' + (x+2).toString()] = '-';
+}
+
+Device.api.log("info", "C0''' + str(compressorNo) + '''x: " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+        itemValue = itemValue.toString();
+        C0''' + str(compressorNo) + '''x['C0''' + str(compressorNo) + '''' + ((i/2)+2).toString()] = itemValue;
+    }
+    
+    Device.api.setProperty("C0''' + str(compressorNo) + '''x", {
+      value:  C0''' + str(compressorNo) + '''x,
       time: new Date().toISOString()
-    })
-    .then(property => {
-      done(null, property.value);
+      }).
+    then(property => {
+        done(null, property.value);
     });
-  });
+ });
 '''
 
-def writeSlaveUnloadTime_body(compressorNo):
+def writeC0Xx_body(compressorNo):
     return """/**
 */
 
-  let args = {
-      tagKey: "SlaveUnloadTime_Comp""" + str(compressorNo) +"""",
-      x: value.x,
-      setValue: value.setValue,
-      byteCount: value.byteCount || 2
-  };
+let args = {
+    tagKey: "C0 ''' + str(compressorNo) + '''x",
+    x: value.x,
+    setValue: value.setValue,
+    byteCount: value.byteCount || 2
+};
 
-  try {
-      let req = Device.makeWriteRequest(args);
-      req.done = r => done(null, r);
+try {
+    let req = Device.makeWriteRequest(args);
+    req.done = r => done(null, r);
 
-  Device.writeAndReadTag(req);
-  }
-  catch(e) {
-      done(e);
-  }"""
+Device.writeAndReadTag(req);
+}
+catch(e) {
+    done(e);
+}
+"""
 #####################
 #
-#  SlaveSafetyTime
+#  M0Xx
 #
 #####################
 
-def setSlaveSafetyTime_body(compressorNo):
+def setM0Xx_body(compressorNo):
     return '''/**
 */
-const tagPropName = "SlaveSafetyTime_Comp''' + str(compressorNo) + '''";
-let SlaveSafetyTime = Device.convertToDec({ values: value }, -1);
-Device.api.getProperty(tagPropName)
-  .then(property => {
-    property.value.SlaveSafetyTime = SlaveSafetyTime.toString() + ' min';
-    Device.api.setProperty(tagPropName, {
-      value: property.value,
+
+const itemCount = 8;
+
+let M0''' + str(compressorNo) + '''x = {};
+for (var x = 0; x < itemCount; x++) {
+    M0''' + str(compressorNo) + '''x['M0''' + str(compressorNo) + '''_' + (x).toString()] = '-';
+}
+
+Device.api.log("info", "M0''' + str(compressorNo) + '''x: " + value.toString())
+ .then(p => {
+    for (var i = 0; i < itemCount * 2; i+=2) {
+        let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
+
+        if (i > 2) itemValue = itemValue.toString() + " hours";
+        else itemValue = itemValue.toString();
+        M0''' + str(compressorNo) + '''x['M0''' + str(compressorNo) + '''' + ((i/2)).toString()] = itemValue;
+    }
+    
+    Device.api.setProperty("M0''' + str(compressorNo) + '''x", {
+      value:  M0''' + str(compressorNo) + '''x,
       time: new Date().toISOString()
-    })
-    .then(property => {
-      done(null, property.value);
+      }).
+    then(property => {
+        done(null, property.value);
     });
-  });
+ });
 '''
 
-def writeSlaveSafetyTime_body(compressorNo):
+def writeM0Xx_body(compressorNo):
     return """/**
 */
 
-  let args = {
-      tagKey: "SlaveSafetyTime_Comp""" + str(compressorNo) +"""",
-      x: value.x,
-      setValue: value.setValue,
-      byteCount: value.byteCount || 2
-  };
+let args = {
+    tagKey: "M0 ''' + str(compressorNo) + '''x",
+    x: value.x,
+    setValue: value.setValue,
+    byteCount: value.byteCount || 2
+};
 
-  try {
-      let req = Device.makeWriteRequest(args);
-      req.done = r => done(null, r);
+try {
+    let req = Device.makeWriteRequest(args);
+    req.done = r => done(null, r);
 
-  Device.writeAndReadTag(req);
-  }
-  catch(e) {
-      done(e);
-  }"""
-#####################
-#
-#  SlaveStartsHour
-#
-#####################
-
-def setSlaveStartsHour_body(compressorNo):
-    return '''/**
-*/
-const tagPropName = "SlaveStartsHour_Comp''' + str(compressorNo) + '''";
-let SlaveStartsHour = Device.convertToDec({ values: value }, -1);
-Device.api.getProperty(tagPropName)
-  .then(property => {
-    property.value.SlaveStartsHour = SlaveStartsHour.toString() + ' Sec';
-    Device.api.setProperty(tagPropName, {
-      value: property.value,
-      time: new Date().toISOString()
-    })
-    .then(property => {
-      done(null, property.value);
-    });
-  });
-'''
-
-def writeSlaveStartsHour_body(compressorNo):
-    return """/**
-*/
-
-  let args = {
-      tagKey: "SlaveStartsHour_Comp""" + str(compressorNo) +"""",
-      x: value.x,
-      setValue: value.setValue,
-      byteCount: value.byteCount || 2
-  };
-
-  try {
-      let req = Device.makeWriteRequest(args);
-      req.done = r => done(null, r);
-
-  Device.writeAndReadTag(req);
-  }
-  catch(e) {
-      done(e);
-  }"""
-
-#####################
-#
-#  SlaveAnalogInput
-#
-#####################
-
-def setSlaveAnalogInput_body(compressorNo):
-    return '''/**
-*/
-const tagPropName = "SlaveAnalogInput_Comp''' + str(compressorNo) + '''";
-let SlaveAnalogInput = Device.convertToDec({ values: value }, -1);
-if (SlaveAnalogInput == 0) SlaveAnalogInput = "0/10V";
-else{ SlaveAnalogInput = "4/20mA"; }
-Device.api.getProperty(tagPropName)
-  .then(property => {
-    property.value.SlaveAnalogInput = SlaveAnalogInput;
-    Device.api.setProperty(tagPropName, {
-      value: property.value,
-      time: new Date().toISOString()
-    })
-    .then(property => {
-      done(null, property.value);
-    });
-  });
-'''
-
-def writeSlaveAnalogInput_body(compressorNo):
-    return """/**
-*/
-
-  let args = {
-      tagKey: "SlaveAnalogInput_Comp""" + str(compressorNo) +"""",
-      x: value.x,
-      setValue: value.setValue,
-      byteCount: value.byteCount || 2
-  };
-
-  try {
-      let req = Device.makeWriteRequest(args);
-      req.done = r => done(null, r);
-
-  Device.writeAndReadTag(req);
-  }
-  catch(e) {
-      done(e);
-  }"""
-
-#####################
-#
-#  SlaveExcludedForMaint
-#
-#####################
-
-def setSlaveExcludedForMaint_body(compressorNo):
-    return '''/**
-*/
-const tagPropName = "SlaveExcludedForMaint_Comp''' + str(compressorNo) + '''";
-let SlaveExcludedForMaint = Device.convertToDec({ values: value }, -1);
-if (SlaveExcludedForMaint == 0) SlaveExcludedForMaint = "Controlled by Logik200";
-else{ SlaveExcludedForMaint = "Forced to Work With Local Transducer"; }
-Device.api.getProperty(tagPropName)
-  .then(property => {
-    property.value.SlaveExcludedForMaint = SlaveExcludedForMaint.toString();
-    Device.api.setProperty(tagPropName, {
-      value: property.value,
-      time: new Date().toISOString()
-    })
-    .then(property => {
-      done(null, property.value);
-    });
-  });
-'''
-
-def writeSlaveExcludedForMaint_body(compressorNo):
-    return """/**
-*/
-
-  let args = {
-      tagKey: "SlaveExcludedForMaint_Comp""" + str(compressorNo) +"""",
-      x: value.x,
-      setValue: value.setValue,
-      byteCount: value.byteCount || 2
-  };
-
-  try {
-      let req = Device.makeWriteRequest(args);
-      req.done = r => done(null, r);
-
-  Device.writeAndReadTag(req);
-  }
-  catch(e) {
-      done(e);
-  }"""
-
-#####################
-#
-#  SlaveEnableMaintenance
-#
-#####################
-
-def setSlaveEnableMaintenance_body(compressorNo):
-    return '''/**
-*/
-const tagPropName = "SlaveEnableMaintenance_Comp''' + str(compressorNo) + '''";
-let SlaveEnableMaintenance = Device.convertToDec({ values: value }, -1);
-if (SlaveEnableMaintenance == 0) SlaveEnableMaintenance = "Maintenance Disabled";
-else{ SlaveEnableMaintenance = "Maintenance Enabled"; }
-Device.api.getProperty(tagPropName)
-  .then(property => {
-    property.value.SlaveEnableMaintenance = SlaveEnableMaintenance.toString();
-    Device.api.setProperty(tagPropName, {
-      value: property.value,
-      time: new Date().toISOString()
-    })
-    .then(property => {
-      done(null, property.value);
-    });
-  });
-'''
-
-def writeSlaveEnableMaintenance_body(compressorNo):
-    return """/**
-*/
-
-  let args = {
-      tagKey: "SlaveEnableMaintenance_Comp""" + str(compressorNo) +"""",
-      x: value.x,
-      setValue: value.setValue,
-      byteCount: value.byteCount || 2
-  };
-
-  try {
-      let req = Device.makeWriteRequest(args);
-      req.done = r => done(null, r);
-
-  Device.writeAndReadTag(req);
-  }
-  catch(e) {
-      done(e);
-  }"""
-
-#####################
-#
-#  SlaveChangeAirFilter
-#
-#####################
-
-def setSlaveChangeAirFilter_body(compressorNo):
-    return '''/**
-*/
-const tagPropName = "SlaveChangeAirFilter_Comp''' + str(compressorNo) + '''";
-let SlaveChangeAirFilter = Device.convertToDec({ values: value }, -1);
-Device.api.getProperty(tagPropName)
-  .then(property => {
-    property.value.SlaveChangeAirFilter = SlaveChangeAirFilter.toString() + "hours";
-    Device.api.setProperty(tagPropName, {
-      value: property.value,
-      time: new Date().toISOString()
-    })
-    .then(property => {
-      done(null, property.value);
-    });
-  });
-'''
-
-def writeSlaveChangeAirFilter_body(compressorNo):
-    return """/**
-*/
-
-  let args = {
-      tagKey: "SlaveChangeAirFilter_Comp""" + str(compressorNo) +"""",
-      x: value.x,
-      setValue: value.setValue,
-      byteCount: value.byteCount || 2
-  };
-
-  try {
-      let req = Device.makeWriteRequest(args);
-      req.done = r => done(null, r);
-
-  Device.writeAndReadTag(req);
-  }
-  catch(e) {
-      done(e);
-  }"""
-
-#####################
-#
-#  SlaveChangeOilFilter
-#
-#####################
-
-def setSlaveChangeOilFilter_body(compressorNo):
-    return '''/**
-*/
-const tagPropName = "SlaveChangeOilFilter_Comp''' + str(compressorNo) + '''";
-let SlaveChangeOilFilter = Device.convertToDec({ values: value }, -1);
-Device.api.getProperty(tagPropName)
-  .then(property => {
-    property.value.SlaveChangeOilFilter = SlaveChangeOilFilter.toString() + "hours";
-    Device.api.setProperty(tagPropName, {
-      value: property.value,
-      time: new Date().toISOString()
-    })
-    .then(property => {
-      done(null, property.value);
-    });
-  });
-'''
-
-def writeSlaveChangeOilFilter_body(compressorNo):
-    return """/**
-*/
-
-  let args = {
-      tagKey: "SlaveChangeOilFilter_Comp""" + str(compressorNo) +"""",
-      x: value.x,
-      setValue: value.setValue,
-      byteCount: value.byteCount || 2
-  };
-
-  try {
-      let req = Device.makeWriteRequest(args);
-      req.done = r => done(null, r);
-
-  Device.writeAndReadTag(req);
-  }
-  catch(e) {
-      done(e);
-  }"""
-
-#####################
-#
-#  SlaveChangeSeperatorFilter
-#
-#####################
-
-def setSlaveChangeSeperatorFilter_body(compressorNo):
-    return '''/**
-*/
-const tagPropName = "SlaveChangeSeperatorFilter_Comp''' + str(compressorNo) + '''";
-let SlaveChangeSeperatorFilter = Device.convertToDec({ values: value }, -1);
-Device.api.getProperty(tagPropName)
-  .then(property => {
-    property.value.SlaveChangeSeperatorFilter = SlaveChangeSeperatorFilter.toString() + "hours";
-    Device.api.setProperty(tagPropName, {
-      value: property.value,
-      time: new Date().toISOString()
-    })
-    .then(property => {
-      done(null, property.value);
-    });
-  });
-'''
-
-def writeSlaveChangeSeperatorFilter_body(compressorNo):
-    return """/**
-*/
-
-  let args = {
-      tagKey: "SlaveChangeSeperatorFilter_Comp""" + str(compressorNo) +"""",
-      x: value.x,
-      setValue: value.setValue,
-      byteCount: value.byteCount || 2
-  };
-
-  try {
-      let req = Device.makeWriteRequest(args);
-      req.done = r => done(null, r);
-
-  Device.writeAndReadTag(req);
-  }
-  catch(e) {
-      done(e);
-  }"""
-
-#####################
-#
-#  SlaveChangeOil
-#
-#####################
-
-def setSlaveChangeOil_body(compressorNo):
-    return '''/**
-*/
-const tagPropName = "SlaveChangeOil_Comp''' + str(compressorNo) + '''";
-let SlaveChangeOil = Device.convertToDec({ values: value }, -1);
-Device.api.getProperty(tagPropName)
-  .then(property => {
-    property.value.SlaveChangeOil = SlaveChangeOil.toString() + "hours";
-    Device.api.setProperty(tagPropName, {
-      value: property.value,
-      time: new Date().toISOString()
-    })
-    .then(property => {
-      done(null, property.value);
-    });
-  });
-'''
-
-def writeSlaveChangeOil_body(compressorNo):
-    return """/**
-*/
-
-  let args = {
-      tagKey: "SlaveChangeOil_Comp""" + str(compressorNo) +"""",
-      x: value.x,
-      setValue: value.setValue,
-      byteCount: value.byteCount || 2
-  };
-
-  try {
-      let req = Device.makeWriteRequest(args);
-      req.done = r => done(null, r);
-
-  Device.writeAndReadTag(req);
-  }
-  catch(e) {
-      done(e);
-  }"""
-#####################
-#
-#  SlaveCheckCompressor
-#
-#####################
-
-def setSlaveCheckCompressor_body(compressorNo):
-    return '''/**
-*/
-const tagPropName = "SlaveCheckCompressor_Comp''' + str(compressorNo) + '''";
-let SlaveCheckCompressor = Device.convertToDec({ values: value }, -1);
-Device.api.getProperty(tagPropName)
-  .then(property => {
-    property.value.SlaveCheckCompressor = SlaveCheckCompressor.toString() + "hours";
-    Device.api.setProperty(tagPropName, {
-      value: property.value,
-      time: new Date().toISOString()
-    })
-    .then(property => {
-      done(null, property.value);
-    });
-  });
-'''
-
-def writeSlaveCheckCompressor_body(compressorNo):
-    return """/**
-*/
-
-  let args = {
-      tagKey: "SlaveCheckCompressor_Comp""" + str(compressorNo) +"""",
-      x: value.x,
-      setValue: value.setValue,
-      byteCount: value.byteCount || 2
-  };
-
-  try {
-      let req = Device.makeWriteRequest(args);
-      req.done = r => done(null, r);
-
-  Device.writeAndReadTag(req);
-  }
-  catch(e) {
-      done(e);
-  }"""
-
-#####################
-#
-#  SlaveBearingLubrication
-#
-#####################
-
-def setSlaveBearingLubrication_body(compressorNo):
-    return '''/**
-*/
-const tagPropName = "SlaveBearingLubrication_Comp''' + str(compressorNo) + '''";
-let SlaveBearingLubrication = Device.convertToDec({ values: value }, -1);
-Device.api.getProperty(tagPropName)
-  .then(property => {
-    property.value.SlaveBearingLubrication = SlaveBearingLubrication.toString() + "hours";
-    Device.api.setProperty(tagPropName, {
-      value: property.value,
-      time: new Date().toISOString()
-    })
-    .then(property => {
-      done(null, property.value);
-    });
-  });
-'''
-
-def writeSlaveBearingLubrication_body(compressorNo):
-    return """/**
-*/
-
-  let args = {
-      tagKey: "SlaveBearingLubrication_Comp""" + str(compressorNo) +"""",
-      x: value.x,
-      setValue: value.setValue,
-      byteCount: value.byteCount || 2
-  };
-
-  try {
-      let req = Device.makeWriteRequest(args);
-      req.done = r => done(null, r);
-
-  Device.writeAndReadTag(req);
-  }
-  catch(e) {
-      done(e);
-  }"""
+Device.writeAndReadTag(req);
+}
+catch(e) {
+    done(e);
+}
+"""
 
 #####################
 #
