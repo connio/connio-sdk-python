@@ -1698,7 +1698,7 @@ Device.api.log("info", "C0''' + str(compressorNo) + '''x: " + value.toString())
     for (var i = 0; i < itemCount * 2; i+=2) {
         let itemValue = Device.convertToDec({ values: value.slice(i,i+2) }, -1);
         itemValue = itemValue.toString();
-        C0''' + str(compressorNo) + '''x['C0''' + str(compressorNo) + '''' + ((i/2)+2).toString()] = itemValue;
+        C0''' + str(compressorNo) + '''x['C0''' + str(compressorNo) + '''_' + ((i/2)+2).toString()] = itemValue;
     }
     
     Device.api.setProperty("C0''' + str(compressorNo) + '''x", {
@@ -1712,11 +1712,11 @@ Device.api.log("info", "C0''' + str(compressorNo) + '''x: " + value.toString())
 '''
 
 def writeC0Xx_body(compressorNo):
-    return """/**
+    return '''/**
 */
 
 let args = {
-    tagKey: "C0 ''' + str(compressorNo) + '''x",
+    tagKey: "C0''' + str(compressorNo) + '''x",
     x: value.x,
     setValue: value.setValue,
     byteCount: value.byteCount || 2
@@ -1731,7 +1731,7 @@ Device.writeAndReadTag(req);
 catch(e) {
     done(e);
 }
-"""
+'''
 #####################
 #
 #  M0Xx
@@ -1756,7 +1756,7 @@ Device.api.log("info", "M0''' + str(compressorNo) + '''x: " + value.toString())
 
         if (i > 2) itemValue = itemValue.toString() + " hours";
         else itemValue = itemValue.toString();
-        M0''' + str(compressorNo) + '''x['M0''' + str(compressorNo) + '''' + ((i/2)).toString()] = itemValue;
+        M0''' + str(compressorNo) + '''x['M0''' + str(compressorNo) + '''_' + ((i/2)).toString()] = itemValue;
     }
     
     Device.api.setProperty("M0''' + str(compressorNo) + '''x", {
@@ -1770,11 +1770,11 @@ Device.api.log("info", "M0''' + str(compressorNo) + '''x: " + value.toString())
 '''
 
 def writeM0Xx_body(compressorNo):
-    return """/**
+    return '''/**
 */
 
 let args = {
-    tagKey: "M0 ''' + str(compressorNo) + '''x",
+    tagKey: "M0''' + str(compressorNo) + '''x",
     x: value.x,
     setValue: value.setValue,
     byteCount: value.byteCount || 2
@@ -1789,7 +1789,7 @@ Device.writeAndReadTag(req);
 catch(e) {
     done(e);
 }
-"""
+'''
 
 #####################
 #
