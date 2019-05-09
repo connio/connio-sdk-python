@@ -1,5 +1,6 @@
 # ~~ Utility/Helper methods ~~
 #
+# common
 # startStop(start or stop)
 # sendCommand()
 # init(inverterModel)
@@ -19,6 +20,149 @@
 # getHistMtbf
 # getHistEstimPowerConsumption()
 # getHistEstimEnergyConsumption()
+
+
+#
+#
+#
+def common_body():
+    return """/** @type {Object.<string, string|number>} */
+const DEFAULT_MAINTENANCE_COST_LIST = {
+  unit: 'USD',
+  airFilterChange: 0.0,
+  oilChange: 0.0,
+  compressorCheck: 0.0,
+  oilFilterChange: 0.0,
+  separatorFilterChange: 0.0,
+  bearingLubrication: 0.0,
+};
+
+/** @type {string} */
+const Aggregator = {
+  SUM: 'sum',
+};
+
+/** @type {string} */
+const Connectivity = {
+  OFFLINE: 'offline',
+  ONLINE_ACTIVE: 'online-active',
+  ONLINE_INACTIVE: 'online-inactive',
+};
+
+/** @enum {string} */
+const Property = {
+  ACTIVE: 'active',
+  COMPRESSOR_STATE: 'compressorState',
+  CONNECTION_STATUS: 'connectionStatus',
+  DRIVE: 'driveMeasures',
+  ICON: 'icon',
+  LAST_ALARMS: 'lastAlarms',
+  LAST_WARNINGS: 'lastWarnings',
+  LOGIKA_FIRMWARE_VERSION: 'cfgLogikaFwVersion',
+  LOGIKA_MODEL: 'cfgLogikaModel',
+  MAINTENANCE_COST_LIST: 'maintenanceCostList',
+  MAINTENANCE_COUNTERS: 'maintCounters',
+  MAINTENANCE_CYCLES: 'cfgMaintCycles',
+  MODBUS_SETTINGS: 'modbus_settings',
+  MOTOR_CURRENT: 'motorCurrent',
+  MOTOR_FREQUENCY: 'motorFrequency',
+  MOTOR_SPEED: 'motorSpeed',
+  NBR_OF_ALARMS: 'nbrOfAlarms',
+  NBR_OF_WARNINGS: 'nbrOfWarnings',
+  POWERCUT_STOPS: 'powercutStops',
+  PRESSURE: 'workingPressure',
+  SERIAL_NUMBER: 'cfgSerialNumber',
+  STATE: 'state',
+  TEMPERATURE: 'screwTemperature',
+  WARRANTY_END_DATE: 'warrantyExpiryDate',
+  WARRANTY_EXPIRY_DATE: 'warrantyExpiryDate',
+};
+
+/** @enum {string} */
+const Context = {
+  COST_OF_KWH: 'costOfkWh',
+  COST_OF_RUNNING: 'costOfRunning',
+  ENERGY: 'energy',
+  MAINTENANCE: 'maintenance',
+  MTBF: 'mtbf',
+  MTTR: 'mttr',
+  OEE: 'oee',
+  POWER: 'power',
+  STOPPAGES: 'stoppages',
+};
+
+/**
+ * {@link https://github.com/lodash/lodash/blob/4.17.10/lodash.js#L11972 Lodash#isNil}
+ * @param {any} x
+ * @returns {boolean}
+ */
+const isNil = (x) => x == null;
+
+/**
+ * @param {any} x
+ * @returns {boolean}
+ */
+const isNull = (x) => x === null;
+
+/**
+ * @param {*} x
+ * @returns {boolean}
+ */
+const isNumber = (x) => typeof x === 'number';
+
+/**
+ * @param {*} x
+ * @returns {boolean}
+ */
+const isString = (x) => typeof x === 'string';
+
+/**
+ * @param {string} name
+ * @param {any} [defaultValue]
+ * @return {Promise<any>}
+ */
+async function getPropertyValue(name, defaultValue) {
+  const { value = defaultValue } = await Device.api.getProperty(name);
+
+  return isNull(value) ? defaultValue : value;
+}
+
+/**
+ * @param {string} x
+ * @returns {boolean}
+ */
+const checkIsOffline = (x) => x === Connectivity.OFFLINE;
+
+/**
+ * @param {any} [x]
+ * @param {any} [defaultValue]
+ * @returns {any}
+ */
+function withDefaultValue(x, defaultValue) {
+  if (isNil(x)) {
+    return defaultValue;
+  }
+
+  return x;
+}
+
+return {
+  DEFAULT_MAINTENANCE_COST_LIST,
+
+  Aggregator,
+  Connectivity,
+  Context,
+  Property,
+
+  checkIsOffline,
+  getPropertyValue,
+  isNil,
+  isNull,
+  isNumber,
+  isString,
+  withDefaultValue,
+};
+"""
 
 #
 #
@@ -73,74 +217,102 @@ catch(e) {
 #
 def getInit_body():
     return """/**
-  Initialize device `state` property with default values
+ * @namespace BaseLogikaProfile
+ *
+ * @public
+ * @function init
+ * @memberof BaseLogikaProfile
+ * @desc Initialize device `state` property with default values
+ * @param {Object} value
+ * @param {boolean} value.hasInverter
+ * @param {number} value.warrantyInMonth
+ * @param {string} value.icon
+ * @param {{ value: number, unit: string }} value.elecCost
+ * @returns
+ *
+ * @requires Device/common
+ *
+ * @example value
+ * {
+ *   "hasInverter": true,
+ *   "warrantyInMonth": 12,
+ *   "icon": "inversys-15-plus-depolu.png",
+ *   "elecCost": {
+ *     "value": 0,  // cost of electricity KWh
+ *     "unit": "USD"
+ *   }
+ * }
+ */
 
-  @value:
-  { 
-    "hasInverter": true, 
-    "warrantyInMonth": 12,
-    "icon": "inversys-15-plus-depolu.png",
-    "elecCost": {
-        "value": 0,     //cost of electricity KWh
-        "unit": "USD"
-    }
-   }
-*/
+const { Property, DEFAULT_MAINTENANCE_COST_LIST } = Device.common();
 
-const defaultWarrantyInMonth = 12;
+/** @type {string} */
+const DEFAULT_ICON = 'dk-default.png';
 
-const defaultElecCost = { value: 0, unit: 'USD' };
+/** @type {number} */
+const DEFAULT_WARRANTY_IN_MONTH = 12;
 
-const defaultMaintCosts = { 
-    currencySymbol: "$",
-    currency: "USD",
-    airFilterChange: 0.0,
-    oilChange: 0.0,  
-    compressorCheck: 0.0, 
-    oilFilterChange: 0.0, 
-    separatorFilterChange : 0.0, 
-    bearingLubrication: 0.0     
+/** @type {{ value: number, unit: string }} */
+const DEFAULT_ELECTRICITY_COST = {
+  value: 0,
+  unit: 'USD',
 };
 
-let warrantyInMonth, hasInverter, elecCost;
+let warrantyInMonth = void 0;
+let hasInverter = void 0;
+let elecCost = void 0;
 
-({hasInverter, warrantyInMonth, elecCost} = value);
+({ hasInverter, warrantyInMonth, elecCost } = value);
 
-let settings = Device.fetchModbusSettings(hasInverter);
+const modbusSettings = Device.fetchModbusSettings(hasInverter);
 
-let state = Device.getEmptyState(elecCost || defaultElecCost);
-state.hasInverter = hasInverter || false;
+const state = Object.assign(
+  Device.getEmptyState(elecCost || DEFAULT_ELECTRICITY_COST),
+  {
+    hasInverter: !!hasInverter,
+  },
+);
 
-let now = new Date();
-let warrantyExpiry = new Date(now.setMonth(now.getMonth() + (warrantyInMonth || defaultWarrantyInMonth)));
+const now = new Date();
+const nowISO = now.toISOString();
+const warrantyExpiry = new Date(
+  now.setMonth(now.getMonth() + (warrantyInMonth || DEFAULT_WARRANTY_IN_MONTH)),
+);
 
-Device.api.setProperty("modbus_settings", {
-  value: settings,
-  time: new Date().toISOString()
-}).
-then(() => Device.api.setProperty('icon', {
-    value: value.icon || "dk-default.png",
-    time: new Date().toISOString()
-})).
-then(() => Device.api.setProperty('warrantyExpiryDate', {
-    value: warrantyExpiry.toISOString(),
-    time: new Date().toISOString()
-})).
-then(() => Device.api.setProperty('maintenanceCostList', {
-        value: defaultMaintCosts,
-        time: new Date().toISOString()
-})).
-then(() => Device.getCompressorInfo()).
-then(st => {
-    // Merge device info into state
-    Object.assign(state, st);
-    
-    Device.api.setProperty('state', {
-        value: state,
-        time: new Date().toISOString()
-    }).
-    then(property => done(null, property.value));
-});
+Device.api
+  .setProperty(Property.MODBUS_SETTINGS, {
+    value: modbusSettings,
+    time: nowISO,
+  })
+  .then(() =>
+    Device.api.setProperty(Property.ICON, {
+      value: value.icon || DEFAULT_ICON,
+      time: nowISO,
+    }),
+  )
+  .then(() =>
+    Device.api.setProperty(Property.WARRANTY_EXPIRY_DATE, {
+      value: warrantyExpiry.toISOString(),
+      time: nowISO,
+    }),
+  )
+  .then(() =>
+    Device.api.setProperty(Property.MAINTENANCE_COST_LIST, {
+      value: DEFAULT_MAINTENANCE_COST_LIST,
+      time: nowISO,
+    }),
+  )
+  .then(Device.getCompressorInfo)
+  .then((compressorInfo) => {
+    /** @desc Merge device info into state  */
+    Object.assign(state, compressorInfo);
+
+    return Device.api.setProperty(Property.STATE, {
+      value: state,
+      time: nowISO,
+    });
+  })
+  .then((property) => done(null, property.value));
 """
 
 #
@@ -148,50 +320,163 @@ then(st => {
 #
 def getEmptyState_body():
     return """/**
-    Creates an empty state for this device
-    @value {{ value, unit }} cost of electricity KWh
-*/
-return {        
-    costOfkWh: {
-        value: value.value,
-        unit: value.unit,
-    },
-    warnings: { last: [], asOf: "2019-01-01T00:00:00Z", total: [ 0, 0, 0, 0 ] },
-    alarms: { last: [], asOf: "2019-01-01T00:00:00Z", total: [ 0, 0, 0, 0 ] },
-    pressure: { value: 0, unit: "bar", average: [ 0, 0, 0, 0 ] },    
-    temperature: { value: 0, unit: "°C", average: [ 0, 0, 0, 0 ] },
-    maintenance: { upcoming: [
-                { maintenance: "Bearing Lubrication", cost: 0, hours: 0, days: 0 },
-                { maintenance: "Air Filter Change", cost: 0, hours: 0, days: 0 },
-                { maintenance: "Oil Filter Change", cost: 0, hours: 0, days: 0 },
-                { maintenance: "Oil Change", cost: 0, hours: 0, days: 0 },
-                { maintenance: "Seperator Filter Change", cost: 0, hours: 0, days: 0 },
-                { maintenance: "Compressor Check", cost: 0, hours: 0, days: 0 }
-            ]
-    },
-    stoppages: { planned: [ 0, 0, 0, 0 ], unplanned: [ 0, 0, 0, 0 ], powercut: [ 0, 0, 0, 0 ] },
-    loadRatio: { average: [ 0, 0, 0, 0 ], current: 0, unit: "%" },
-    energy: { value: [ 0, 0, 0, 0 ], unit: "kWh" },        
-    unplannedStoppageHours: [ 0, 0, 0, 0 ],
-    loadRunningHours: [ 0, 0, 0, 0 ],        
-    power: { value: [ 0, 0, 0, 0 ], unit: "kW" },                
-    costOfRunning: { value: [ 0, 0, 0, 0 ], unit: "USD"},
-    idleRunningHours: [ 0, 0, 0, 0 ],
-    plannedStoppageHours: [ 0, 0, 0, 0 ],
-    unplannedStoppageHours: [ 0, 0, 0, 0 ],
-    loadRunningHours: [ 0, 0, 0, 0 ],
-    totalHours: { last: 0, asOf: "2019-01-01T00:00:00.000Z", average: [ 0, 0, 0, 0 ] },
-    totalLoadHours: { last: 0, asOf: "2019-01-01T00:00:00.000Z", average: [ 0, 0, 0, 0 ] },    
-    oee: { availability: [ 0, 0, 0, 0 ], performance: [ 0, 0, 0, 0 ], quality: [ 0, 0, 0, 0 ], average: [ 0, 0, 0, 0 ], unit: '%' },
-    mtbf: { average: [ 0, 0, 0, 0 ], unit: 'h' },
-    mttr: { average: [ 0, 0, 0, 0 ], unit: 'h' },
-    hasInverter: false, 
-    motorSpeed: { current: 0, average: [ 0, 0, 0, 0 ], unit: 'RPM' },
-    motorFrequency: { current: 0, average: [ 0, 0, 0, 0 ], unit: 'Hz' },
-    motorCurrent: { current: 0, average: [ 0, 0, 0, 0 ], unit: 'A' },
-    status: {
-        code: 0,
-    },
+ * @namespace BaseLogikaProfile
+ *
+ * @protected
+ * @function getEmptyState
+ * @memberof BaseLogikaProfile
+ * @desc Creates an empty state for this device
+ * @param {{ value: number, unit: string }} value cost of electricity KWh
+ * @returns {Object}
+ */
+
+/** @type {number[]} */
+const DEFAULT_ARRAY = [0, 0, 0, 0];
+
+/** @type {number} */
+const DEFAULT_VALUE = 0;
+
+/** @enum {string} */
+const PropertyUnit = {
+  COST_OF_RUNNING: 'USD',
+  ENERGY: 'kWh',
+  LOAD_RATIO: '%',
+  MOTOR_CURRENT: 'A',
+  MOTOR_FREQUENCY: 'Hz',
+  MOTOR_SPEED: 'RPM',
+  MTBF: 'h',
+  MTTR: 'h',
+  OEE: '%',
+  POWER: 'kW',
+  PRESSURE: 'bar',
+  TEMPERATURE: '°C',
+};
+
+/** @enum {string} */
+const Maintenance = {
+  AIR_FILTER_CHANGE: 'Air Filter Change',
+  BEARING_LUBRICATION: 'Bearing Lubrication',
+  COMPRESSOR_CHECK: 'Compressor Check',
+  OIL_CHANGE: 'Oil Change',
+  OIL_FILTER_CHANGE: 'Oil Filter Change',
+  SEPERATOR_FILTER_CHANGE: 'Seperator Filter Change',
+};
+
+/**
+ * @param {string} unit
+ * @returns {{ current: number, unit: string, average: number[] }}
+ */
+function makeEmptyProperty(unit) {
+  return {
+    current: DEFAULT_VALUE,
+    unit,
+    average: DEFAULT_ARRAY,
+  };
+}
+
+/**
+ * @param {string} unit
+ * @returns {{ unit: string, average: number[] }}
+ */
+function makeEmptyAverageProperty(unit) {
+  return {
+    unit,
+    average: DEFAULT_ARRAY,
+  };
+}
+
+/**
+ * @param {string} unit
+ * @returns {{ unit: string, total: number[] }}
+ */
+function makeEmptyTotalProperty(unit) {
+  return {
+    unit,
+    total: DEFAULT_ARRAY,
+  };
+}
+
+/**
+ * @returns {{ last: Array, asOf: string, total: number[] }}
+ */
+function makeEmptyTotal() {
+  return {
+    last: [],
+    asOf: '2019-01-01T00:00:00Z',
+    total: DEFAULT_ARRAY,
+  };
+}
+
+/**
+ * @returns {{ last: number, asOf: string, average: number[] }}
+ */
+function makeEmptyAverage() {
+  return {
+    last: DEFAULT_VALUE,
+    asOf: '2019-01-01T00:00:00.000Z',
+    average: DEFAULT_ARRAY,
+  };
+}
+
+/**
+ * @param {string} maintenance
+ * @returns {{ maintenance: string, cost: number, hours: number, days: number }}
+ */
+function makeMaintenance(maintenance) {
+  return {
+    maintenance,
+    cost: DEFAULT_VALUE,
+    hours: DEFAULT_VALUE,
+    days: DEFAULT_VALUE,
+  };
+}
+
+return {
+  costOfkWh: value,
+  warnings: makeEmptyTotal(),
+  alarms: makeEmptyTotal(),
+  pressure: makeEmptyProperty(PropertyUnit.PRESSURE),
+  temperature: makeEmptyProperty(PropertyUnit.TEMPERATURE),
+  maintenance: {
+    upcoming: [
+      makeMaintenance(Maintenance.BEARING_LUBRICATION),
+      makeMaintenance(Maintenance.AIR_FILTER_CHANGE),
+      makeMaintenance(Maintenance.OIL_FILTER_CHANGE),
+      makeMaintenance(Maintenance.OIL_CHANGE),
+      makeMaintenance(Maintenance.SEPERATOR_FILTER_CHANGE),
+      makeMaintenance(Maintenance.COMPRESSOR_CHECK),
+    ],
+  },
+  stoppages: {
+    planned: DEFAULT_ARRAY,
+    unplanned: DEFAULT_ARRAY,
+    powercut: DEFAULT_ARRAY,
+  },
+  loadRatio: makeEmptyProperty(PropertyUnit.LOAD_RATIO),
+  energy: makeEmptyTotalProperty(PropertyUnit.ENERGY),
+  unplannedStoppageHours: DEFAULT_ARRAY,
+  loadRunningHours: DEFAULT_ARRAY,
+  power: makeEmptyAverageProperty(PropertyUnit.POWER),
+  costOfRunning: makeEmptyTotalProperty(PropertyUnit.COST_OF_RUNNING),
+  idleRunningHours: DEFAULT_ARRAY,
+  plannedStoppageHours: DEFAULT_ARRAY,
+  unplannedStoppageHours: DEFAULT_ARRAY,
+  loadRunningHours: DEFAULT_ARRAY,
+  totalHours: makeEmptyAverage(),
+  totalLoadHours: makeEmptyAverage(),
+  oee: {
+    availability: DEFAULT_ARRAY,
+    performance: DEFAULT_ARRAY,
+    quality: DEFAULT_ARRAY,
+    average: DEFAULT_ARRAY,
+    unit: PropertyUnit.OEE,
+  },
+  mtbf: makeEmptyAverageProperty(PropertyUnit.MTBF),
+  mttr: makeEmptyAverageProperty(PropertyUnit.MTTR),
+  hasInverter: false,
+  status: {
+    code: 0,
+  },
 };
 """
 
@@ -342,74 +627,122 @@ Device.readTag(req);
 #
 def getCompressorInfo_body():
     return """/**
-  Build a view of compressor details.
-*/
-const serNumPropName        = "cfgSerialNumber";
-const modelPropName         = "cfgLogikaModel";
-const fwVerPropName         = "cfgLogikaFwVersion";
-const compStatePropName     = "compressorState";
-const connStatusPropName    = "connectionStatus";
-const activityPropName      = "active";
-const warrantyEndDatePropName   = "warrantyExpiryDate";
-const WarrantyPeriod        = 60;
+ * @namespace BaseLogikaProfile
+ *
+ * @public
+ * @async
+ * @function getCompressorInfo
+ * @memberof BaseLogikaProfile
+ * @desc Build a view of compressor details
+ * @param {number} value Warranty period
+ * @returns {Promise<Object>}
+ *
+ * @requires Device/common
+ */
 
+const { getPropertyValue, Property } = Device.common();
+
+/** @type {number} */
+const WARRANTY_PERIOD = 60;
+
+/** @type {string} */
+const EMPTY_VALUE = '—';
+
+/** @type {{ code: number }} */
+const EMPTY_STATUS = { code: 0 };
+
+/**
+ * @param {Date} date1
+ * @param {Date} date2
+ * @returns {number}
+ */
 function calcDateDiff(date1, date2) {
-    var diff = Math.floor(date1.getTime() - date2.getTime());
-    var day = 1000 * 60 * 60 * 24;
+  const diff = Math.floor(date1.getTime() - date2.getTime());
+  const day = 1000 * 60 * 60 * 24;
 
-    var days = Math.floor(diff/day);
-    var months = Math.floor(days/31);
-    var years = Math.floor(months/12);
+  const days = Math.floor(diff / day);
+  const months = Math.floor(days / 31);
+  const years = Math.floor(months / 12);
 
-    return months;
+  return months;
 }
 
-async function f(warrantyPeriod) {    
-    if (Device.customIds && !Device.customIds.sn) {
-        Device.customIds.sn = await Device.api.getProperty(serNumPropName).then(p=>p.value || "-");
-    }
-    
-    let logika_model = await Device.api.getProperty(modelPropName).then(p=>p.value  || "-");
-    let logika_release = await Device.api.getProperty(fwVerPropName).then(p=>p.value  || "-");
-    
-    let status = await Device.api.getProperty(compStatePropName).then(p=>p.value  || "-");
-    let connection = await Device.api.getProperty(connStatusPropName).then(p=>p.value  || "-");
-    let active = await Device.api.getProperty(activityPropName).then(p=>p.value  || "-");
-    
-    let connectivity = "offline";
-    if (connection === "online" && active == "active") {
-        connectivity = "online-active";
-    }
-    else if (connection === "online") {
-        connectivity = "online-inactive";
-    }
-    
-    let now = new Date();
-    let defaultWarrantyExpiry = new Date(now.setMonth(now.getMonth() + warrantyPeriod));
+/**
+ * @param {number} warrantyPeriod
+ * @returns {{ endsInMonths: number, periodInMonths: number }}
+ */
+async function getWarranty(warrantyPeriod) {
+  const now = new Date();
 
-    let warrantyExpiry = await Device.api.getProperty(warrantyEndDatePropName).then(p => p.value ? Date.parse(p.value) : defaultWarrantyExpiry.toISOString());
-    let timeToWarranty = calcDateDiff(new Date(warrantyExpiry), new Date());
-    
-    // In case that we use a counter to decrement the warranty time
-    if (timeToWarranty < 0) {
-        timeToWarranty = 0;
-    }
-    
-    let device = {
-        id: Device.id,
-        name: Device.name,
-        friendlyName: Device.friendlyName,
-        customIds: Device.customIds || { sn: await Device.api.getProperty(serNumPropName).then(p=>p.value || "-") },
-        logikaModel: logika_model,
-        logikaRelease: logika_release,
-        connectivity: connectivity,
-        status: status,
-        warrantyEnd: timeToWarranty + " months",
-        warranty: { endsInMonths: timeToWarranty, periodInMonths: warrantyPeriod },
+  const defaultWarrantyExpiry = new Date(
+    now.setMonth(now.getMonth() + warrantyPeriod),
+  );
+
+  const warrantyExpiry = await Device.api
+    .getProperty(Property.WARRANTY_END_DATE)
+    .then((p) =>
+      p.value ? Date.parse(p.value) : defaultWarrantyExpiry.toISOString(),
+    );
+
+  let timeToWarranty = calcDateDiff(new Date(warrantyExpiry), new Date());
+
+  /** @desc In case that we use a counter to decrement the warranty time */
+  if (timeToWarranty < 0) {
+    timeToWarranty = 0;
+  }
+
+  return {
+    endsInMonths: timeToWarranty,
+    periodInMonths: warrantyPeriod,
+  };
+}
+
+/**
+ * @async
+ * @param {number} warrantyPeriod
+ * @returns {Promise<Object>}
+ */
+async function main(warrantyPeriod = WARRANTY_PERIOD) {
+  if (!Device.customIds || (Device.customIds && !Device.customIds.sn)) {
+    const sn = await getPropertyValue(Property.SERIAL_NUMBER, EMPTY_VALUE);
+
+    Device.customIds = {
+      ...Device.customIds,
+      sn,
     };
-    return device;
+  }
+
+  const [
+    logikaModel,
+    logikaRelease,
+    status,
+    icon,
+    warranty,
+    connectivity,
+  ] = await Promise.all([
+    getPropertyValue(Property.LOGIKA_MODEL, EMPTY_VALUE),
+    getPropertyValue(Property.LOGIKA_FIRMWARE_VERSION, EMPTY_VALUE),
+    getPropertyValue(Property.COMPRESSOR_STATE, EMPTY_STATUS),
+    getPropertyValue(Property.ICON),
+    getWarranty(warrantyPeriod),
+    Device.getConnectivity(),
+  ]);
+
+  return {
+    id: Device.id,
+    name: Device.name,
+    friendlyName: Device.friendlyName,
+    customIds: Device.customIds,
+    connectivity,
+    icon,
+    logikaModel,
+    logikaRelease,
+    status,
+    warranty,
+  };
 }
-return Promise.resolve(f(value || WarrantyPeriod));
+
+return main(value);
 """
 
 #
@@ -417,246 +750,284 @@ return Promise.resolve(f(value || WarrantyPeriod));
 #
 def getDashboard_body():
     return """/**
-*  Build the default dashboard view of the compressor.
-*  Some information must be populated by calling `preaggregate()` method ahead of time.
-*/
+ * @namespace BaseLogikaProfile
+ *
+ * @public
+ * @function getDashboard
+ * @description
+ * Build the default dashboard view of the compressor.
+ * Some information must be populated by calling `preaggregate()` method ahead of time.
+ * @param {{ unit: string, value: number }} value costOfkWh
+ * @returns {void}
+ *
+ * @requires Device/common
+ */
 
-/** @desc Logika-Base */
-const PRESSURE_PROPERTY = 'workingPressure';
-/** @desc Logika-Base */
-const TEMPERATURE_PROPERTY = 'screwTemperature';
-/** @desc Logika-Base */
-const COMPRESSOR_STATE_PROPERTY = 'compressorState';
-/** @desc Logika-Base */
-const DRIVE_PROPERTY = 'driveMeasures';
+const { checkIsOffline, withDefaultValue, Property } = Device.common();
 
+/** @type {number} */
+const DEFAULT_PROPERTY_VALUE = 0;
 
-/** @desc Logika-Base */
-const STATE_PROPERTY = 'state';
+/**
+ *
+ * @param {Object} params
+ * @param {any} [params.value]
+ * @param {Object} [params.meta={}]
+ * @param {{ unit?: { symbol?: string }}} [params.meta.measurement]
+ * @param {{ min?: number, max?: number }} [params.meta.boundaries]
+ * @returns {{ value: number, unit: string, range: { min: number, max: number }}}
+ */
+function makeUIProperty({ value, meta: { measurement, boundaries } = {} }) {
+  const _value = withDefaultValue(value, DEFAULT_PROPERTY_VALUE);
 
-const OFFLINE = 'offline';
+  const unit = measurement && measurement.unit && measurement.unit.symbol;
 
+  const range = boundaries && {
+    min: (boundaries && boundaries.min) || 0,
+    max: (boundaries && boundaries.max) || 100,
+  };
+
+  return {
+    current: _value,
+    unit,
+    range,
+  };
+}
+
+/**
+ * @async
+ * @param {Object} context
+ * @returns {Object}
+ */
 async function main(context) {
-    Object.assign(context, {
-        costOfkWh: value,
-    });
-    
-    // Acquire temperature and pressure values in parallel
-    let [pressureProp, temperatureProp, compressorStateProp, driveProp, periods] = await Promise.all([
-       Device.api.getProperty(PRESSURE_PROPERTY),
-       Device.api.getProperty(TEMPERATURE_PROPERTY),
-       Device.api.getProperty(COMPRESSOR_STATE_PROPERTY),
-       context.hasInverter ? Device.api.getProperty(DRIVE_PROPERTY) : Promise.resolve(undefined),
-       Device.processCompressorStates(),
-    ]);
-    
-    context.periods = periods;
+  Object.assign(context, {
+    costOfkWh: value,
+  });
 
-    context.pressure.value = pressureProp.value || 0;
-    context.pressure.unit = pressureProp.meta.measurement && pressureProp.meta.measurement.unit && pressureProp.meta.measurement.unit.symbol;
+  const requests = [
+    Device.getCompressorInfo(),
+    Device.api.getProperty(Property.PRESSURE),
+    Device.api.getProperty(Property.TEMPERATURE),
+  ];
 
-    if (pressureProp.meta.boundaries) {
-        context.pressure.range = {
-            min: pressureProp.meta.boundaries.min,
-            max: pressureProp.meta.boundaries.max,
-        };
-    }
-    
-    context.temperature.value = temperatureProp.value || 0;
-    context.temperature.unit = temperatureProp.meta.measurement && temperatureProp.meta.measurement.unit && temperatureProp.meta.measurement.unit.symbol;
+  if (context.hasInverter) {
+    requests.push(
+      Device.api.getProperty(Property.DRIVE),
+      Device.api.getProperty(Property.MOTOR_SPEED),
+      Device.api.getProperty(Property.MOTOR_FREQUENCY),
+      Device.api.getProperty(Property.MOTOR_CURRENT),
+    );
+  }
 
-    if (temperatureProp.meta.boundaries) {
-        context.temperature.range = {
-            min: temperatureProp.meta.boundaries.min,
-            max: temperatureProp.meta.boundaries.max,
-        };
-    }
-    else {
-        context.temperature.range = {
-            min: 0,
-            max: 100,
-        };
-    }
+  const [
+    compressorInfo,
+    pressure,
+    temperature,
 
-    // Inverter motor information
-    if (driveProp && driveProp.value) {
-        context.motorSpeed.current = driveProp.value.rpm || 0;
-        context.motorFrequency.current = driveProp.value.frequency || 0;
-        context.motorCurrent.current = driveProp.value.current || 0;
-    }
+    drive,
+    motorSpeed,
+    motorFrequency,
+    motorCurrent,
+  ] = await Promise.all(requests);
 
-    // Call the methods below in parallel.
-    // These methods do not have any dependence on other method output.
-    let results = await Promise.all([
-        Device.getCompressorInfo(),
-        Device.queryWarningAlarmSummary(context),
-    ]);
-    
-    // Clean all periods
-    context.periods = undefined;
-    
-    // Merge results into context
-    results.forEach(result => Object.assign(context, result));
-    
-    return {
-        ...context,
-        
-        /** @desc Reset current values for offline compressor */
-        pressure: {
-            ...context.pressure,
-            value: context.connectivity === OFFLINE ? 0 : context.pressure.value,
-        },
-        temperature: {
-            ...context.temperature,
-            value: context.connectivity === OFFLINE ? 0 : context.temperature.value,
-        },
+  const isOffline = checkIsOffline(compressorInfo.connectivity);
+
+  context.pressure = {
+    ...context.pressure,
+    ...makeUIProperty(pressure),
+  };
+
+  context.temperature = {
+    ...context.temperature,
+    ...makeUIProperty(temperature),
+  };
+
+  Object.assign(context, {
+    ...compressorInfo,
+
+    /** @desc A leftover from `preaggregate → processCompressorStates` */
+    periods: void 0,
+
+    /** @desc Unused / deprecated fields */
+    idleRunningHours: void 0,
+    loadRunningHours: void 0,
+    plannedStoppageHours: void 0,
+    totalHours: void 0,
+    totalLoadHours: void 0,
+    unplannedStoppageHours: void 0,
+
+    /**
+     * @desc Reset current values for offline compressor
+     */
+    pressure: {
+      ...context.pressure,
+      current: isOffline ? DEFAULT_PROPERTY_VALUE : context.pressure.current,
+    },
+    temperature: {
+      ...context.temperature,
+      current: isOffline ? DEFAULT_PROPERTY_VALUE : context.temperature.current,
+    },
+  });
+
+  /** @desc Inverter motor information */
+  if (drive) {
+    context.motorSpeed = {
+      ...context.motorSpeed,
+      ...makeUIProperty({
+        value: drive.value && drive.value.rpm,
+        ...motorSpeed,
+      }),
     };
-};
 
-Device.api.getProperty(STATE_PROPERTY)
- .then(property => property.value || Device.getEmptyView())
- .then(context => main(context))
- .then(context => done(null, context));
+    context.motorFrequency = {
+      ...context.motorFrequency,
+      ...makeUIProperty({
+        value: drive.value && drive.value.frequency,
+        ...motorFrequency,
+      }),
+    };
+
+    context.motorCurrent = {
+      ...context.motorCurrent,
+      ...makeUIProperty({
+        value: drive.value && drive.value.current,
+        ...motorCurrent,
+      }),
+    };
+
+    Object.assign(context, {
+      /** @desc Reset current values for offline compressor */
+      motorSpeed: {
+        ...context.motorSpeed,
+        current: isOffline
+          ? DEFAULT_PROPERTY_VALUE
+          : context.motorSpeed.current,
+      },
+      motorFrequency: {
+        ...context.motorFrequency,
+        current: isOffline
+          ? DEFAULT_PROPERTY_VALUE
+          : context.motorFrequency.current,
+      },
+      motorCurrent: {
+        ...context.motorCurrent,
+        current: isOffline
+          ? DEFAULT_PROPERTY_VALUE
+          : context.motorCurrent.current,
+      },
+    });
+  }
+
+  return context;
+}
+
+Device.api
+  .getProperty(Property.STATE)
+  .then((property) => property.value || Device.getEmptyState(value))
+  .then(main)
+  .then((context) => done(null, context));
 """
 
 #
 #
 #
-def getDashboard_OLD_body():
-    return """/**
-*  Build the default dashboard view of the compressor.
-*  Some information must be populated by calling `preaggregate()` method ahead of time.
-*/
-/** @desc Logika-Base */
-const PRESSURE_PROPERTY = 'workingPressure';
-/** @desc Logika-Base */
-const TEMPERATURE_PROPERTY = 'screwTemperature';
-/** @desc Logika-Base */
-const STATE_PROPERTY = 'state';
-
-const OFFLINE = 'offline';
-
-async function main(context) {
-    Object.assign(context, {
-        costOfkWh: value,
-    });
-
-    // Acquire temperature and pressure values in parallel
-    let [pressureProp, temperatureProp] = await Promise.all([
-       Device.api.getProperty(PRESSURE_PROPERTY),
-       Device.api.getProperty(TEMPERATURE_PROPERTY)
-    ]);
-
-    context.pressure.value = pressureProp.value || 0;
-    context.pressure.unit = pressureProp.meta.measurement && pressureProp.meta.measurement.unit && pressureProp.meta.measurement.unit.symbol;
-
-    if (pressureProp.meta.boundaries) {
-        context.pressure.range = {
-            min: pressureProp.meta.boundaries.min,
-            max: pressureProp.meta.boundaries.max,
-        };
-    }
-    else {
-        // in case that no boundary has been provided
-        context.temperature.range = {
-            min: 0,
-            max: 100,
-        };
-    }
-    
-    context.temperature.value = temperatureProp.value || 0;
-    context.temperature.unit = temperatureProp.meta.measurement && temperatureProp.meta.measurement.unit && temperatureProp.meta.measurement.unit.symbol;
-
-    if (temperatureProp.meta.boundaries) {
-        context.temperature.range = {
-            min: temperatureProp.meta.boundaries.min,
-            max: temperatureProp.meta.boundaries.max,
-        };
-    }
-    else {
-        // in case that no boundary has been provided
-        context.temperature.range = {
-            min: 0,
-            max: 100,
-        };
-    }
-
-    // Call the methods below in parallel.
-    // These methods do not have any dependence on other method output.
-    let results = await Promise.all([
-        Device.getCompressorInfo(),
-        Device.queryWarningAlarmSummary(context),
-        Device.queryTimeToMaintenance(context),
-        Device.hasInverter(context),
-    ]);
-    
-    // Merge results into context
-    results.forEach(result => Object.assign(context, result));
-    
-    return {
-        ...context,
-        
-        /** @desc Reset current values for offline compressor */
-        pressure: {
-            ...context.pressure,
-            value: context.connectivity === OFFLINE ? 0 : context.pressure.value,
-        },
-        temperature: {
-            ...context.temperature,
-            value: context.connectivity === OFFLINE ? 0 : context.temperature.value,
-        },
-    };
-};
-
-Device.api.getProperty(STATE_PROPERTY)
- .then(property => property.value || Device.getEmptyView())
- .then(main)
- .then(context => Device.api.setProperty(STATE_PROPERTY, { value: context, time: new Date().toISOString() }))
- .then(property => done(null, property.value));
-"""
-
 def getLatestValues_body():
     return """/**
-*  Returns the most recent values of compressor pressure and temperature.
-*/
-const PRESSURE_PROPERTY     = 'workingPressure';
-const TEMPERATURE_PROPERTY  = 'screwTemperature';
-const DRIVE_PROPERTY        = 'driveMeasures';
+ * @namespace BaseLogikaProfile
+ *
+ * @public
+ * @async
+ * @function getLatestValues
+ * @memberof BaseLogikaProfile
+ * @description
+ * Returns the most recent values of compressor pressure and temperature.
+ * @returns {void}
+ *
+ * @requires Device/common
+ */
 
+const { getPropertyValue, checkIsOffline, Property } = Device.common();
 
-async function getValues() {
-    let state = await Device.api.getProperty("state").then(prop => prop.value);
-    
-    let calls = [
-        Device.api.getProperty(PRESSURE_PROPERTY), 
-        Device.api.getProperty(TEMPERATURE_PROPERTY)
-    ];
-    
-    // Get inverter info if compressor comes with inverter
-    if (state.hasInverter) {
-        req.push(Device.api.getProperty(DRIVE_PROPERTY));
-    }
-    
-    let [pressureProp, temperatureProp, driveProp] = await Promise.all(calls);
-    
-    const result = {
-        pressure: pressureProp.value || 0,
-        temperature: temperatureProp.value || 0,
-    };
+/** @type {number} */
+const DEFAULT_PROPERTY_VALUE = 0;
 
-    // Inverter motor information - if any
-    if (driveProp && driveProp.value) {
-        result.motorSpeed = { current: driveProp.value.rpm || 0 };
-        result.motorFrequency = { current: driveProp.value.frequency || 0 };
-        result.motorCurrent = { current: driveProp.value.current || 0 };
-    }
+/**
+ *
+ * @param {Object} params
+ * @param {string} params.property
+ * @param {any} params.defaultValue
+ * @param {boolean} [params.isOffline=false]
+ * @returns {Promise<any>}
+ */
+async function getLatestValue({ property, defaultValue, isOffline = false }) {
+  if (isOffline) {
+    return defaultValue;
+  }
 
-    return done(null, result);
-};
+  const value = await getPropertyValue(property, defaultValue);
 
-getValues();
+  return value;
+}
+
+(async function main() {
+  const [state, connectivity] = await Promise.all([
+    getPropertyValue(Property.STATE),
+    Device.getConnectivity(),
+  ]);
+
+  const isOffline = checkIsOffline(connectivity);
+
+  const requests = [
+    getLatestValue({
+      property: Property.PRESSURE,
+      defaultValue: DEFAULT_PROPERTY_VALUE,
+      isOffline,
+    }),
+    getLatestValue({
+      property: Property.TEMPERATURE,
+      defaultValue: DEFAULT_PROPERTY_VALUE,
+      isOffline,
+    }),
+  ];
+
+  /** @desc Get inverter info if compressor comes with inverter */
+  if (state.hasInverter) {
+    requests.push(
+      getLatestValue({
+        property: Property.DRIVE,
+        defaultValue: {
+          rpm: DEFAULT_PROPERTY_VALUE,
+          frequency: DEFAULT_PROPERTY_VALUE,
+          current: DEFAULT_PROPERTY_VALUE,
+        },
+        isOffline,
+      }),
+    );
+  }
+
+  const [pressure, temperature, driveMeasures] = await Promise.all(requests);
+
+  const result = {
+    pressure,
+    temperature,
+  };
+
+  /** @desc Inverter motor information - if any */
+  if (driveMeasures) {
+    Object.assign(result, {
+      motorSpeed: driveMeasures.rpm,
+      motorFrequency: driveMeasures.frequency,
+      motorCurrent: driveMeasures.current,
+    });
+  }
+
+  return done(null, result);
+})();
 """
 
+#
+#
+#
 def getHistOEE_body():
     return """/**
 *  Gets historical OEE
@@ -718,6 +1089,9 @@ Device.processCompressorStates().then(periods => {
 });
 """
 
+#
+#
+#
 def getHistMtbf_body():
     return """/**
  * Gets historical Mean time between failures
@@ -781,6 +1155,9 @@ Device.processCompressorStates().then(periods => {
 });
 """
 
+#
+#
+#
 def getHistMttr_body():
     return """/**
 * Gets historical MTtr values
@@ -842,6 +1219,9 @@ Device.processCompressorStates().then(periods => {
 });
 """
 
+#
+#
+#
 def getHistEstimPowerConsumption_body():
     return """/**
 *  Returns the historical power consumption values based on the given query.
@@ -905,6 +1285,9 @@ Device.processCompressorStates().then(periods => {
 });
 """
 
+#
+#
+#
 def getHistEstimEnergyConsumption_body():
     return """/**
 *  Returns the historical energy consumption values based on the given query.

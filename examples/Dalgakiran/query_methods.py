@@ -13,11 +13,7 @@
 # calculateAll
 # showOEE 
 # 
-# queryEstimEnergyConsumption   - OBSOLETED
-# queryEstimPowerConsumption    - OBSOLETED
-# queryStoppages                - OBSOLETED
-# queryEstimCostOfRunning       - OBSOLETED
-# queryOEE                      - OBSOLETED
+# getConnectivity
 #
 
 #
@@ -42,35 +38,49 @@ return q;
 #
 def queryAggregates_body():
     return """/**
-    Queries 4 different stats for given property
-*/
-function cleanse(r) {
-    if (r.results && r.results.length > 0 && r.results[0].values && r.results[0].values.length > 0) {
-        return r.results[0].values[0].v;
-    }
-    return undefined;
+ * @namespace BaseLogikaProfile
+ *
+ * @private
+ * @async
+ * @function queryAggregates
+ * @memberof BaseLogikaProfile
+ * @desc Queries 4 different stats for given property
+ * @param {{ agg: string, pname: string }} value
+ * @returns {Promise<Array>}
+ */
+
+/**
+ * @private
+ * @param {{ results: { values: { v: any }[] }[] }} response
+ * @returns {any}
+ */
+function extractValue(response) {
+  if (
+    response.results &&
+    response.results.length &&
+    response.results[0].values &&
+    response.results[0].values.length
+  ) {
+    return response.results[0].values[0].v;
+  }
+
+  return void 0;
 }
 
-let resultSet = [];
-let q = Device.buildAggregateQueries(value.agg);
+/**
+ * @async
+ * @param {{ agg: string, pname: string }} value
+ * @returns {Promise<Array>}
+ */
+async function main(value) {
+  const queries = Device.buildAggregateQueries(value.agg);
+  const requests = queries.map((q) => Device.api.readData(value.pname, q));
+  const responses = await Promise.all(requests);
 
-return Device.api.readData(value.pname, q[0])
-    .then(r0 => { 
-        resultSet.push(cleanse(r0));
-        return Device.api.readData(value.pname, q[1]); 
-     })
-    .then(r1 => { 
-        resultSet.push(cleanse(r1));
-        return Device.api.readData(value.pname, q[2]);
-     })
-    .then(r2 => {
-        resultSet.push(cleanse(r2));
-        return Device.api.readData(value.pname, q[3]);
-     })
-     .then(r3 => { 
-        resultSet.push(cleanse(r3));
-        return resultSet;
-    });
+  return responses.map(extractValue);
+}
+
+return main(value);
 """
 
 #
@@ -78,67 +88,130 @@ return Device.api.readData(value.pname, q[0])
 #
 def queryPropertySummary_body():
     return """/**
-  Builds a summary/stats view of the given property from the timeseries database.
-*/
-async function f() {
-    
-    // Acquire property definition and historical data in parallel
-    let [prop, stats] = await Promise.all([
-        Device.api.getProperty(value.pname),
-        Device.queryAggregates({ pname: value.pname, agg: value.agg })
-    ]);
+ * @namespace BaseLogikaProfile
+ *
+ * @protected
+ * @async
+ * @function queryPropertySummary
+ * @memberof BaseLogikaProfile
+ * @description
+ * Builds a summary/stats view of the given property from the timeseries database
+ * @param {Object} value
+ * @param {string} value.pname
+ * @param {string} value.agg
+ * @param {string} value.unit
+ * @param {string} value.asContextMember
+ * @param {string} value.fname
+ * @returns {Promise<Object>}
+ */
 
-    let result = {
-        value: prop.value,
-        current: prop.value, // to fix the discrepency between pressure/temp  and inverter values
-        unit: value.unit
+/**
+ * @async
+ * @param {Object} value
+ * @param {string} value.pname
+ * @param {string} value.agg
+ * @param {string} value.unit
+ * @param {string} value.asContextMember
+ * @param {string} [value.fname="average"]
+ * @returns {Object}
+ */
+async function main(value) {
+  /** @desc Acquire property definition and historical data in parallel */
+  const [prop, stats] = await Promise.all([
+    Device.api.getProperty(value.pname),
+    Device.queryAggregates({ pname: value.pname, agg: value.agg }),
+  ]);
+
+  const result = {
+    current: prop.value,
+    unit: value.unit,
+    /** @desc default field name is "average" */
+    [value.fname || 'average']: stats.map((i) => i),
+  };
+
+  /**
+   * @description
+   * Result may be requested as a member of a context object
+   * such as in getDashboardParallel
+   */
+  if (value.asContextMember) {
+    return {
+      [value.asContextMember]: result,
     };
-    
-    //default field name is `average`
-    result[value.fname || 'average'] = stats.map(i => i);
-    
-    // Result may be requested as a member of a context object
-    // such as in getDashboardParallel.
-    if (value.asContextMember) {
-        let context = {};
-        context[value.asContextMember] = result;
-        return context;
-    }
-    
-    return result;
+  }
+
+  return result;
 }
 
-return Promise.resolve(f());
+return main(value);
 """
 
 def queryWarningAlarmSummary_body():
     return """/**
+ * @namespace BaseLogikaProfile
+ *
+ * @protected
+ * @async
+ * @function queryWarningAlarmSummary
+ * @returns {Promise<Object>}
+ *
+ * @requires Device/common
+ */
 
-*/
-async function f() {
-    let context = value;
-    
-    let nbrOfAlarms = await Device.queryPropertySummary({ pname: "nbrOfAlarms", agg: "sum", unit: "#", fname: 'total' });
-    let nbrOfWarnings = await Device.queryPropertySummary({ pname: "nbrOfWarnings", agg: "sum", unit: "#", fname: 'total' });
-    
-    let lastAlarmsProp = await Device.api.getProperty("lastAlarms");
-    let lastWarningsProp = await Device.api.getProperty("lastWarnings");
-    
-    let lastAlarmItems = [];
-    if (lastAlarmsProp.value)
-        lastAlarmItems = lastAlarmsProp.value.items || [];
-        
-    let lastWarningItems = [];
-    if (lastWarningsProp.value)
-        lastWarningItems = lastWarningsProp.value.items || [];
-    
-    context['alarms'] = { last: lastAlarmItems, asOf: lastAlarmsProp.time, total: nbrOfAlarms.total.map(i => i || 0) };
-    context['warnings'] = { last: lastWarningItems, asOf: lastWarningsProp.time, total: nbrOfWarnings.total.map(i => i || 0) };
-    
-    return context;
+const { Aggregator, Property } = Device.common();
+
+/**
+ * @async
+ * @returns {Object}
+ */
+async function main() {
+  const requests = [
+    Device.queryAggregates({
+      pname: Property.NBR_OF_ALARMS,
+      agg: Aggregator.SUM,
+    }),
+    Device.queryAggregates({
+      pname: Property.NBR_OF_WARNINGS,
+      agg: Aggregator.SUM,
+    }),
+    Device.api.getProperty(Property.LAST_ALARMS),
+    Device.api.getProperty(Property.LAST_WARNINGS),
+  ];
+
+  const [
+    nbrOfAlarms,
+    nbrOfWarnings,
+    lastAlarms,
+    lastWarnings,
+  ] = await Promise.all(requests);
+
+  let lastAlarmItems = [];
+
+  if (lastAlarms.value) {
+    lastAlarmItems = lastAlarms.value.items || [];
+  }
+
+  let lastWarningItems = [];
+
+  if (lastWarnings.value) {
+    lastWarningItems = lastWarnings.value.items || [];
+  }
+
+  return {
+    alarms: {
+      last: lastAlarmItems,
+      asOf: lastAlarms.time || new Date().toISOString(),
+      total: nbrOfAlarms.map((x) => x || 0),
+    },
+    warnings: {
+      last: lastWarningItems,
+      asOf: lastWarnings.time || new Date().toISOString(),
+      total: nbrOfWarnings.map((x) => x || 0),
+    },
+  };
 }
 
-return Promise.resolve(f());
+return main();
 """
 
 #
@@ -146,85 +219,149 @@ return Promise.resolve(f());
 #
 def queryTimeToMaintenance_body():
     return """/**
-  @param value is the context
-*/
-const maintCostsPropName    = "maintenanceCostList";
-const maintCountersPropName = "maintCounters";
-const maintCyclesPropName   = "cfgMaintCycles";
+ * @namespace BaseLogikaProfile
+ *
+ * @private
+ * @async
+ * @function queryTimeToMaintenance
+ * @memberof BaseLogikaProfile
+ * @param {Object} value context
+ * @return {Promise<Object>}
+ *
+ * @requires Device/common
+ */
 
-async function f() {
-    let context = value;
-    
-    let defaultMaintCosts = { 
-        currencySymbol: "$",
-        currency: "USD",
-        airFilterChange: 0.0,
-        oilChange: 0.0,  
-        compressorCheck: 0.0, 
-        oilFilterChange: 0.0, 
-        separatorFilterChange : 0.0, 
-        bearingLubrication: 0.0     
-    };
-    
-    let defaultCycles = { 
-        airFilterChange: 2997,
-        oilChange: 3000,  
-        compressorCheck: 3000, 
-        oilFilterChange: 3000, 
-        separatorFilterChange : 6000, 
-        bearingLubrication: 29999     
-    };
-    
-    let mcost = await Device.api.getProperty(maintCostsPropName).then(p=>p.value) || defaultMaintCosts;
-    let mCycles = await Device.api.getProperty(maintCyclesPropName).then(p=>p.value) || defaultCycles;
-    
-    let plannedMaintenanceList = [         
-        { maintenance: "Bearing Lubrication", cost: mcost.bearingLubrication, hours: 0, days: undefined, cycle: Math.ceil(mCycles.bearingLubrication / 24) },
-        { maintenance: "Air Filter Change", cost: mcost.airFilterChange, hours: 0, days: undefined, cycle: Math.ceil(mCycles.airFilterChange / 24) },
-        { maintenance: "Oil Filter Change", cost: mcost.oilFilterChange, hours: 0, days: undefined, cycle: Math.ceil(mCycles.oilFilterChange / 24) },
-        { maintenance: "Oil Change", cost: mcost.oilChange, hours: 0, days: undefined, cycle: Math.ceil(mCycles.oilChange / 24) },
-        { maintenance: "Seperator Filter Change", cost: mcost.separatorFilterChange, hours: 0, days: undefined, cycle: Math.ceil(mCycles.separatorFilterChange / 24) },
-        { maintenance: "Compressor Check", cost: mcost.compressorCheck, hours: 0, days: undefined, cycle: Math.ceil(mCycles.compressorCheck / 24) }
-    ];
+const {
+  getPropertyValue,
+  Context,
+  Property,
+  DEFAULT_MAINTENANCE_COST_LIST,
+} = Device.common();
 
-    // Hours left until the next maintenances by category
-    let mCounters = await Device.api.getProperty(maintCountersPropName).then(p=>p.value);
-    
-    if ( mCounters ) {
-        let hoursToBearingLub        = (mCycles.bearingLubrication - mCounters.bearingLubrication);
-        let hoursToAirFilterChange   = (mCycles.airFilterChange    - mCounters.airFilterChange);
-        let hoursToOilFilterChange   = (mCycles.oilFilterChange    - mCounters.oilFilterChange);
-        let hoursToOilChange         = (mCycles.oilChange          - mCounters.oilChange);
-        let hoursToSepFilterChange   = (mCycles.separatorFilterChange - mCounters.separatorFilterChange);
-        let hoursToCompressorCheck   = (mCycles.compressorCheck    - mCounters.compressorCheck);
-        
-        plannedMaintenanceList[0].hours = hoursToBearingLub;
-        plannedMaintenanceList[0].days = Math.ceil(hoursToBearingLub / 24.0);
-        plannedMaintenanceList[1].hours = hoursToAirFilterChange;
-        plannedMaintenanceList[1].days = Math.ceil(hoursToAirFilterChange / 24.0);
-        plannedMaintenanceList[2].hours = hoursToOilFilterChange;
-        plannedMaintenanceList[2].days = Math.ceil(hoursToOilFilterChange / 24.0);
-        plannedMaintenanceList[3].hours = hoursToOilChange;
-        plannedMaintenanceList[3].days = Math.ceil(hoursToOilChange / 24.0);
-        plannedMaintenanceList[4].hours = hoursToSepFilterChange;
-        plannedMaintenanceList[4].days = Math.ceil(hoursToSepFilterChange / 24.0);
-        plannedMaintenanceList[5].hours = hoursToCompressorCheck;
-        plannedMaintenanceList[5].days = Math.ceil(hoursToCompressorCheck / 24.0);
-        
-        // sort the list ascending - next maintenance
-        plannedMaintenanceList.sort(function(a, b) {
-            return a.hours - b.hours;
-        });
-    }
-    
-    context['maintenance'] = {
-        currencySymbol: mcost.currencySymbol,
-        unit: mcost.currency,
-        upcoming: plannedMaintenanceList
-    };    
-    return context;
+/** @type {Object.<string, number>} */
+const DEFAULT_MAINTENANCE_CYCLES = {
+  airFilterChange: 2997,
+  oilChange: 3000,
+  compressorCheck: 3000,
+  oilFilterChange: 3000,
+  separatorFilterChange: 6000,
+  bearingLubrication: 29999,
+};
+
+/** @enum {Object.<string, { id: string, name: string}>} */
+const Maintenance = {
+  BEARING_LUBRICATION: {
+    id: 'bearingLubrication',
+    name: 'Bearing Lubrication',
+  },
+  AIR_FILTER_CHANGE: {
+    id: 'airFilterChange',
+    name: 'Air Filter Change',
+  },
+  OIL_FILTER_CHANGE: {
+    name: 'Oil Filter Change',
+    id: 'oilFilterChange',
+  },
+  OIL_CHANGE: {
+    name: 'Oil Change',
+    id: 'oilChange',
+  },
+  SEPERATOR_FILTER_CHANGE: {
+    name: 'Seperator Filter Change',
+    id: 'separatorFilterChange',
+  },
+  COMPRESSOR_CHECK: {
+    name: 'Compressor Check',
+    id: 'compressorCheck',
+  },
+};
+
+/** @type {{ name: string, id: string }[]} */
+const MAINTENANCE_LIST = Object.values(Maintenance);
+
+/**
+ * @private
+ * @param {{ costs: Object, cycles: Object, counters: Object}} params
+ * @returns {(maintenance: string) => { cost: number, cycle: number } }
+ */
+function extractMaintenanceParams({ costs, cycles, counters }) {
+  return function(maintenance) {
+    return {
+      cost: costs[maintenance],
+      cycle: cycles[maintenance],
+      counters: counters && counters[maintenance],
+    };
+  };
 }
-return Promise.resolve(f());
+
+/**
+ * @private
+ * @param {Object} params
+ * @param {string} params.name
+ * @param {number} params.cost
+ * @param {number} params.cycle
+ * @param {number} [params.counters]
+ * @returns {{ maintenance: string, cost: number, hours: number, days: number|void, cycle: number }}
+ */
+function makeMaintenance({ name, cost, cycle, counters }) {
+  const hours = counters ? cycle - counters : 0;
+  const days = counters ? Math.ceil(hours / 24) : void 0;
+
+  return {
+    maintenance: name,
+    cost,
+    hours,
+    days,
+    cycle: Math.ceil(cycle / 24),
+  };
+}
+
+/**
+ * @async
+ * @param {Object} context
+ * @returns {Object}
+ */
+async function main(context) {
+  const requests = [
+    getPropertyValue(
+      Property.MAINTENANCE_COST_LIST,
+      DEFAULT_MAINTENANCE_COST_LIST,
+    ),
+    getPropertyValue(Property.MAINTENANCE_CYCLES, DEFAULT_MAINTENANCE_CYCLES),
+    getPropertyValue(Property.MAINTENANCE_COUNTERS),
+  ];
+
+  const [
+    { unit, ...costs },
+    cycles,
+    /** @desc Hours left until the next maintenances by category */
+    counters,
+  ] = await Promise.all(requests);
+
+  const extractParams = extractMaintenanceParams({
+    costs,
+    cycles,
+    counters,
+  });
+
+  const upcomingMaintenanceList = MAINTENANCE_LIST.map(({ id, name }) =>
+    makeMaintenance({
+      name,
+      ...extractParams(id),
+    }),
+  );
+
+  context[Context.MAINTENANCE] = {
+    unit,
+    upcoming: counters
+      ? upcomingMaintenanceList.sort((x, y) => x.hours - y.hours)
+      : upcomingMaintenanceList,
+  };
+
+  return context;
+}
+
+return main(value);
 """
 
 #
@@ -302,47 +439,100 @@ return Promise.all([totalHoursMaxP, totalHoursMinP, totalLoadHoursMaxP, totalLoa
 #
 def preaggregate_body():
     return """/**
-*/
-async function f(context) {
-    
-    let getInverterData = Promise.resolve(undefined);
-    if (context.hasInverter) {
-        getInverterData = Promise.all([
-            Device.queryPropertySummary({ pname: "motorSpeed", agg: "avg", unit: "rpm", asContextMember: 'motorSpeed' }),
-            Device.queryPropertySummary({ pname: "motorCurrent", agg: "avg", unit: "A", asContextMember: 'motorCurrent' }),
-            Device.queryPropertySummary({ pname: "motorFrequency", agg: "avg", unit: "Hz", asContextMember: 'motorFrequency' }),
-        ]);
-    }
-    
-    // Call the methods below in parallel.
-    // These methods do not have any dependence on other method output.
-    let results = await Promise.all([
-        Device.queryPropertySummary({ pname: "workingPressure", agg: "avg", unit: "bar", asContextMember: 'pressure' }),
-        Device.queryPropertySummary({ pname: "screwTemperature", agg: "avg", unit: "°C", asContextMember: 'temperature' }),
-        getInverterData,
-        Device.queryLoadRatio(context),
-        // Calculates average OEE, MTtr, MTbf, Energy Consumption, Power Consumption, Cost of Running 
-        // and stoppages for 24hr, 7 days, 30 days and 1 year
-        Device.processCompressorStates().then(periods => { 
-            context.periods = periods; 
-            Device.calculateAll(context)
-        }),
-        Device.queryTimeToMaintenance(context),
-    ]);
-    
-    // Merge results into context
-    results.forEach(result => Object.assign(context, result));
-        
-    return context;
-};
+ * @namespace BaseLogikaProfile
+ *
+ * @public
+ * @function preaggregate
+ * @memberof BaseLogikaProfile
+ * @returns {void}
+ */
 
-Device.api.getProperty("state")  
- .then( prop => prop.value || Device.getEmptyView() )
- .then( context => f(context) )
- .then( context => Device.api.setProperty("state", { value: context, time: new Date().toISOString() }) )
- .then( property => done(null, null) );
+/**
+ * @async
+ * @param {Object} context
+ * @returns {Promise<Object>} Modified context
+ */
+async function main(context) {
+  const requests = [
+    Device.queryPropertySummary({
+      pname: 'workingPressure',
+      agg: 'avg',
+      unit: 'bar',
+      asContextMember: 'pressure',
+    }),
+    Device.queryPropertySummary({
+      pname: 'screwTemperature',
+      agg: 'avg',
+      unit: '°C',
+      asContextMember: 'temperature',
+    }),
+    Device.queryLoadRatio(context),
+    /**
+     * @description
+     * Calculates average OEE, MTtr, MTbf, Energy Consumption, Power Consumption, Cost of Running
+     * and stoppages for 24hr, 7 days, 30 days and 1 year
+     */
+    Device.processCompressorStates().then((periods) => {
+      context.periods = periods;
+
+      Device.calculateAll(context);
+    }),
+    Device.queryTimeToMaintenance(context),
+    Device.queryWarningAlarmSummary(),
+  ];
+
+  if (context.hasInverter) {
+    requests.push(
+      Device.queryPropertySummary({
+        pname: 'motorSpeed',
+        agg: 'avg',
+        unit: 'rpm',
+        asContextMember: 'motorSpeed',
+      }),
+      Device.queryPropertySummary({
+        pname: 'motorCurrent',
+        agg: 'avg',
+        unit: 'A',
+        asContextMember: 'motorCurrent',
+      }),
+      Device.queryPropertySummary({
+        pname: 'motorFrequency',
+        agg: 'avg',
+        unit: 'Hz',
+        asContextMember: 'motorFrequency',
+      }),
+    );
+  }
+
+  /**
+   * @description
+   * Call the methods below in parallel.
+   * These methods do not have any dependence on other method output.
+   */
+  const results = await Promise.all(requests);
+
+  /** @desc Merge results into context */
+  results.forEach((result) => Object.assign(context, result));
+
+  return context;
+}
+
+Device.api
+  .getProperty('state')
+  .then((property) => property.value || Device.getEmptyState())
+  .then(main)
+  .then((context) =>
+    Device.api.setProperty('state', {
+      value: context,
+      time: new Date().toISOString(),
+    }),
+  )
+  .then(() => done(null, null));
 """
 
+#
+#
+#
 def processCompressorStates_body():
     return """/**
 * This method processes compressor states and calculate operation times (i.e idle/load running, number of unplanned stops, etc..)
@@ -536,172 +726,205 @@ return Device.api.readData('compressorState', q)
   });
 """
 
+#
+#
+#
 def calculateAll_body():
     return """/**
-  Calculates average OEE, MTtr, MTbf, Energy Consumption, Power Consumption, Cost of Running 
-  and stoppages for 24hr, 7 days, 30 days and 1 year
-*/
-
-/**
- * {@link https://github.com/lodash/lodash/blob/4.17.10/lodash.js#L11972 Lodash#isNil}
- * @param {*} x
- * @returns {boolean}
+ * @namespace BaseLogikaProfile
+ *
+ * @private
+ * @async
+ * @function calculateAll
+ * @memberof BaseLogikaProfile
+ * @description
+ * Calculates average OEE, MTtr, MTbf, Energy Consumption, Power Consumption, Cost of Running
+ * and stoppages for 24hr, 7 days, 30 days and 1 year
+ * @param {Object} value
+ * @returns {Promise<Object>}
+ *
+ * @requires Devices/common
  */
-const isNil = x => x == null;
 
-/**
- * @param {*} x
- * @returns {boolean}
- */
-const isNumber = x => typeof x === 'number';
-
-/**
- * @param {*} x
- * @returns {boolean}
- */
-const isString = x => typeof x === 'string';
+const { isNil, isNumber, isString, Context, Property } = Device.common();
 
 /**
  * @param {{ value: number, unit: string}} x
  * @returns {boolean}
  */
-const validateCostOfkWhType = x => {
- if (isNil(x)) return false;
- 
- if (!isNumber(x.value) || !isString(x.unit)) return false;
- 
- return true;
-}
+const validateCostOfkWhType = (x) => {
+  if (isNil(x)) return false;
+
+  if (!isNumber(x.value) || !isString(x.unit)) return false;
+
+  return true;
+};
 
 /**
  * @desc Default value of "costOfkWh"
  * @type {{ value: number, unit: string }}
  */
 const COST_OF_KWH = {
-    value: 0.0,
-    unit: '',
+  value: 0.0,
+  unit: '',
 };
-    
-function calc(periods, nbrOfDays, quality, perf) {
-    let unplannedStops  = 0;
-    let plannedStops    = 0;
-    let idleRunningDur  = 0;
-    let loadRunningDur  = 0;
-    let unplannedDur    = 0;
-    
-    let offset = Math.max((periods.length - nbrOfDays), 0);
-    for (let i = 0; (i+offset) < periods.length; i++) {
-        let p = periods[i+offset];
-        // do not count overlapping states twice
-        // except the very first one
-        unplannedStops  += (i == 0 ? Math.ceil(p.unplannedStops) : Math.floor(p.unplannedStops));
-        plannedStops    += (i == 0 ? Math.ceil(p.plannedStops) : Math.floor(p.plannedStops));
-        idleRunningDur  += p.idleRunningDur;
-        loadRunningDur  += p.loadRunningDur;
-        unplannedDur    += p.unplannedDur;
-    }
-    
-    let Lt = idleRunningDur + loadRunningDur + unplannedDur;
-    let Wt = idleRunningDur + loadRunningDur;
-    
-    return {
-        OEE: Math.min(100, ((Wt / Lt * quality * perf) * 100)),
-        Availability: Math.min(100, (Wt / Lt * 100)),
-        MTbf: (unplannedStops == 0 ? NaN : (Lt / unplannedStops)),
-        MTtr: (unplannedStops == 0 ? NaN : (unplannedDur / unplannedStops)),
-        idleRunningDur: idleRunningDur,
-        loadRunningDur: loadRunningDur,
-        unplannedStops: unplannedStops,
-        plannedStops: plannedStops
-        
-    }
-}
-
 
 /**
- *
- */ 
-async function f(context) {
-    const ENERGY_CONSUMPTION_CONSTANT = 10.0 * 1.2;
-    const ENERGY_IDLE_CONSUMPTION_RATIO = 0.27;
-    
-    const IDLE_PWR_MULTIPLIER = ENERGY_CONSUMPTION_CONSTANT * ENERGY_IDLE_CONSUMPTION_RATIO;
-    const LOAD_PWR_MULTIPLIER = ENERGY_CONSUMPTION_CONSTANT;
-    
-    let p24hr = calc(context.periods, 1, 1, 1);
-    let p7days = calc(context.periods, 7, 1, 1);
-    let p30days = calc(context.periods, 30, 1, 1);
-    let p1year = calc(context.periods, 365, 1, 1);
-    
-    context['oee'] = {
-        performance: [ 100, 100, 100, 100 ],
-        quality: [ 100, 100, 100, 100 ],
-        availability: [ p24hr.Availability, p7days.Availability, p30days.Availability, p1year.Availability ],
-        average: [ p24hr.OEE, p7days.OEE, p30days.OEE, p1year.OEE ],
-        unit: '%'
-    };
-    
-    context['mtbf'] = {
-        average: [ p24hr.MTbf, p7days.MTbf, p30days.MTbf, p1year.MTbf ],
-        unit: 'h'
-    };
-    
-    context['mttr'] = {
-        average: [ p24hr.MTtr, p7days.MTtr, p30days.MTtr, p1year.MTtr ],
-        unit: 'h'
-    };
-    
-    context['energy'] = {
-        value: [ 
-            p24hr.loadRunningDur * LOAD_PWR_MULTIPLIER + p24hr.idleRunningDur * IDLE_PWR_MULTIPLIER,
-            p7days.loadRunningDur * LOAD_PWR_MULTIPLIER + p7days.idleRunningDur * IDLE_PWR_MULTIPLIER,
-            p30days.loadRunningDur * LOAD_PWR_MULTIPLIER + p30days.idleRunningDur * IDLE_PWR_MULTIPLIER,
-            p1year.loadRunningDur * LOAD_PWR_MULTIPLIER + p1year.idleRunningDur * IDLE_PWR_MULTIPLIER,
-        ],
-        unit: 'kWh'
-    };
-    
-    context['power'] = {
-        value: [
-            (p24hr.loadRunningDur * LOAD_PWR_MULTIPLIER + p24hr.idleRunningDur * IDLE_PWR_MULTIPLIER) / (p24hr.loadRunningDur + p24hr.idleRunningDur),
-            (p7days.loadRunningDur * LOAD_PWR_MULTIPLIER + p7days.idleRunningDur * IDLE_PWR_MULTIPLIER) / (p7days.loadRunningDur + p7days.idleRunningDur),
-            (p30days.loadRunningDur * LOAD_PWR_MULTIPLIER + p30days.idleRunningDur * IDLE_PWR_MULTIPLIER) / (p30days.loadRunningDur + p30days.idleRunningDur),
-            (p1year.loadRunningDur * LOAD_PWR_MULTIPLIER + p1year.idleRunningDur * IDLE_PWR_MULTIPLIER) / (p1year.loadRunningDur + p1year.idleRunningDur),
-        ],
-        unit: 'kW'
-    };
-    
-    const costOfkWh = validateCostOfkWhType(value['costOfkWh']) ? value['costOfkWh'] : COST_OF_KWH;;
-    
-    context['costOfRunning'] = {
-        value: context.energy.value.map(i => i * costOfkWh.value),
-        unit: costOfkWh.unit
-    };
-    
-    let powercutCounts = await Device.queryAggregates({ pname: "powercutStops", agg: "count" });
-    
-    context["stoppages"] = {
-        planned:  [
-            p24hr.plannedStops, 
-            p7days.plannedStops, 
-            p30days.plannedStops, 
-            p1year.plannedStops
-        ],
-        unplanned: [
-            p24hr.unplannedStops, 
-            p7days.unplannedStops, 
-            p30days.unplannedStops, 
-            p1year.unplannedStops
-        ],
-        powercut: powercutCounts.map(i => i || 0)
-    };
-    
-    return context;
+ * @param {any} periods
+ * @param {any} nbrOfDays
+ * @param {any} quality
+ * @param {any} perf
+ * @returns {Object}
+ */
+function calc(periods, nbrOfDays, quality, perf) {
+  let unplannedStops = 0;
+  let plannedStops = 0;
+  let idleRunningDur = 0;
+  let loadRunningDur = 0;
+  let unplannedDur = 0;
+
+  let offset = Math.max(periods.length - nbrOfDays, 0);
+
+  for (let i = 0; i + offset < periods.length; i++) {
+    let p = periods[i + offset];
+    // do not count overlapping states twice
+    // except the very first one
+    unplannedStops +=
+      i == 0 ? Math.ceil(p.unplannedStops) : Math.floor(p.unplannedStops);
+    plannedStops +=
+      i == 0 ? Math.ceil(p.plannedStops) : Math.floor(p.plannedStops);
+    idleRunningDur += p.idleRunningDur;
+    loadRunningDur += p.loadRunningDur;
+    unplannedDur += p.unplannedDur;
+  }
+
+  let Lt = idleRunningDur + loadRunningDur + unplannedDur;
+  let Wt = idleRunningDur + loadRunningDur;
+
+  return {
+    OEE: Math.min(100, (Wt / Lt) * quality * perf * 100),
+    Availability: Math.min(100, (Wt / Lt) * 100),
+    MTbf: unplannedStops == 0 ? NaN : Lt / unplannedStops,
+    MTtr: unplannedStops == 0 ? NaN : unplannedDur / unplannedStops,
+    idleRunningDur: idleRunningDur,
+    loadRunningDur: loadRunningDur,
+    unplannedStops: unplannedStops,
+    plannedStops: plannedStops,
+  };
 }
 
-return Promise.resolve(f(value));
+/**
+ * @async
+ * @param {Object} context
+ * @returns {Object}
+ */
+async function main(context) {
+  const ENERGY_CONSUMPTION_CONSTANT = 10.0 * 1.2;
+  const ENERGY_IDLE_CONSUMPTION_RATIO = 0.27;
+
+  const IDLE_PWR_MULTIPLIER =
+    ENERGY_CONSUMPTION_CONSTANT * ENERGY_IDLE_CONSUMPTION_RATIO;
+  const LOAD_PWR_MULTIPLIER = ENERGY_CONSUMPTION_CONSTANT;
+
+  let p24hr = calc(context.periods, 1, 1, 1);
+  let p7days = calc(context.periods, 7, 1, 1);
+  let p30days = calc(context.periods, 30, 1, 1);
+  let p1year = calc(context.periods, 365, 1, 1);
+
+  context[Context.OEE] = {
+    performance: [100, 100, 100, 100],
+    quality: [100, 100, 100, 100],
+    availability: [
+      p24hr.Availability,
+      p7days.Availability,
+      p30days.Availability,
+      p1year.Availability,
+    ],
+    average: [p24hr.OEE, p7days.OEE, p30days.OEE, p1year.OEE],
+    unit: '%',
+  };
+
+  context[Context.MTBF] = {
+    average: [p24hr.MTbf, p7days.MTbf, p30days.MTbf, p1year.MTbf],
+    unit: 'h',
+  };
+
+  context[Context.MTTR] = {
+    average: [p24hr.MTtr, p7days.MTtr, p30days.MTtr, p1year.MTtr],
+    unit: 'h',
+  };
+
+  context[Context.ENERGY] = {
+    total: [
+      p24hr.loadRunningDur * LOAD_PWR_MULTIPLIER +
+        p24hr.idleRunningDur * IDLE_PWR_MULTIPLIER,
+      p7days.loadRunningDur * LOAD_PWR_MULTIPLIER +
+        p7days.idleRunningDur * IDLE_PWR_MULTIPLIER,
+      p30days.loadRunningDur * LOAD_PWR_MULTIPLIER +
+        p30days.idleRunningDur * IDLE_PWR_MULTIPLIER,
+      p1year.loadRunningDur * LOAD_PWR_MULTIPLIER +
+        p1year.idleRunningDur * IDLE_PWR_MULTIPLIER,
+    ],
+    unit: 'kWh',
+  };
+
+  context[Context.POWER] = {
+    average: [
+      (p24hr.loadRunningDur * LOAD_PWR_MULTIPLIER +
+        p24hr.idleRunningDur * IDLE_PWR_MULTIPLIER) /
+        (p24hr.loadRunningDur + p24hr.idleRunningDur),
+      (p7days.loadRunningDur * LOAD_PWR_MULTIPLIER +
+        p7days.idleRunningDur * IDLE_PWR_MULTIPLIER) /
+        (p7days.loadRunningDur + p7days.idleRunningDur),
+      (p30days.loadRunningDur * LOAD_PWR_MULTIPLIER +
+        p30days.idleRunningDur * IDLE_PWR_MULTIPLIER) /
+        (p30days.loadRunningDur + p30days.idleRunningDur),
+      (p1year.loadRunningDur * LOAD_PWR_MULTIPLIER +
+        p1year.idleRunningDur * IDLE_PWR_MULTIPLIER) /
+        (p1year.loadRunningDur + p1year.idleRunningDur),
+    ],
+    unit: 'kW',
+  };
+
+  const costOfkWh = validateCostOfkWhType(value[Context.COST_OF_KWH])
+    ? value[Context.COST_OF_KWH]
+    : COST_OF_KWH;
+
+  context[Context.COST_OF_RUNNING] = {
+    total: context[Context.ENERGY].total.map((i) => i * costOfkWh.value),
+    unit: costOfkWh.unit,
+  };
+
+  const powercutCounts = await Device.queryAggregates({
+    pname: Property.POWERCUT_STOPS,
+    agg: 'count',
+  });
+
+  context[Context.STOPPAGES] = {
+    planned: [
+      p24hr.plannedStops,
+      p7days.plannedStops,
+      p30days.plannedStops,
+      p1year.plannedStops,
+    ],
+    unplanned: [
+      p24hr.unplannedStops,
+      p7days.unplannedStops,
+      p30days.unplannedStops,
+      p1year.unplannedStops,
+    ],
+    powercut: powercutCounts.map((i) => i || 0),
+  };
+
+  return context;
+}
+
+return main(value);
 """
 
+#
+#
+#
 def showOEE_body():
     return """/**
 * Enter number of days to display OEE for each day and the aggregated OEE
@@ -762,322 +985,76 @@ Device.processCompressorStates().then(periods => {
 });
 """
 
-##############################
-###
-###
-### OBSOLETED FUNCTIONS ######
-###
-###
-##############################
-
 #
 #
 #
-def queryEstimEnergyConsumption_OLD_body():
+def getConnectivity_body():
     return """/**
-@param value is the context
-*/
-let context = value;
-
-const ENERGY_CONSUMPTION_CONSTANT = 10.0 * 1.2;
-const ENERGY_IDLE_CONSUMPTION_RATIO = 0.27;
-
-const IDLE_PWR_MULTIPLIER = ENERGY_CONSUMPTION_CONSTANT * ENERGY_IDLE_CONSUMPTION_RATIO;
-const LOAD_PWR_MULTIPLIER = ENERGY_CONSUMPTION_CONSTANT;
-
-/*
- * Formula:
- *  x =  
- *   (load_running_hours_total * LOAD_PWR_MULTIPLIER) + (idle_running_hours_total * IDLE_PWR_MULTIPLIER)
+ * @namespace BaseLogikaProfile
  *
- *  result = x
- */
-
-let estimatedEnergyAvg = [];
-
-// For 4 periods: 24h, 7d, 1m, 1y 
-for (let i = 0; i < 4; i++) {
-   let x = context.loadRunningHours[i] * LOAD_PWR_MULTIPLIER + context.idleRunningHours[i] * IDLE_PWR_MULTIPLIER;
-   estimatedEnergyAvg.push(x);
-}
-
-context['energy'] = {
-    value: estimatedEnergyAvg.map(i => i || 0),
-    unit: 'kWh'
-};
-
-return context;
-"""
-
-#
-#
-#
-def queryEstimPowerConsumption_OLD_body():
-    return """/**
-  @param value is the context
-*/
-let context = value;
-
-const IDLE_RUNNING = 10;
-const LOAD_RUNNING = 11;
-
-const ENERGY_CONSUMPTION_CONSTANT = 10.0 * 1.1;
-const ENERGY_IDLE_CONSUMPTION_RATIO = 0.27;
-
-const IDLE_PWR_MULTIPLIER = ENERGY_CONSUMPTION_CONSTANT * ENERGY_IDLE_CONSUMPTION_RATIO;
-const LOAD_PWR_MULTIPLIER = ENERGY_CONSUMPTION_CONSTANT;
-
-/*
- * Formula:
- *  x =  
- *   (load_running_hours_total * LOAD_PWR_MULTIPLIER) + (idle_running_hours_total * IDLE_PWR_MULTIPLIER)
- *  y = 
- *   (load_running_hours_totol + idle_running_hours_total)
+ * @private
+ * @async
+ * @function getLatestValues
+ * @memberof BaseLogikaProfile
+ * @returns {Promise<string>}
  *
- *  result = x / y;
+ * @requires Device/common
  */
 
-let estimatedPowerUsageAvg = [];
+const { getPropertyValue, Property } = Device.common();
 
-// For 4 periods: 24h, 7d, 1m, 1y 
-for (let i = 0; i < 4; i++) {
-   let x = context.loadRunningHours[i] * LOAD_PWR_MULTIPLIER + context.idleRunningHours[i] * IDLE_PWR_MULTIPLIER;
-   let y = context.loadRunningHours[i] + context.idleRunningHours[i];
-   estimatedPowerUsageAvg.push(x/y);
-}
-
-context['power'] = {
-    value: estimatedPowerUsageAvg.map(i => i),
-    unit: 'kW'
+/** @enum {string} */
+const Connectivity = {
+  OFFLINE: 'offline',
+  ONLINE_ACTIVE: 'online-active',
+  ONLINE_INACTIVE: 'online-inactive',
 };
 
-return context;
-"""
+/** @enum {string} */
+const Connection = {
+  ONLINE: 'online',
+  OFFLINE: 'offline',
+};
 
-#
-#
-#
-def queryStoppages_OLD_body():
-    return """/**
-  @param value is the context
-*/
-let context = value;
+/** @enum {string} */
+const Activity = {
+  ACTIVE: 'active',
+  INACTIVE: 'inactive',
+};
 
-return Promise.all([
-    Device.queryAggregates({ pname: "plannedStops", agg: "count" }),
-    Device.queryAggregates({ pname: "unplannedStops", agg: "count" }),
-    Device.queryAggregates({ pname: "powercutStops", agg: "count" })
-]).then(results => {
-    context["stoppages"] = {
-        planned:  results[0].map(i => i || 0),
-        unplanned: results[1].map(i => i || 0),
-        powercut: results[2].map(i => i || 0)
-    };
-    return context;
-});
-"""
-
-#
-#
-#
-def queryEstimCostOfRunning_OLD_body():
-    return """/**
- * {@link https://github.com/lodash/lodash/blob/4.17.10/lodash.js#L11972 Lodash#isNil}
- * @param {*} x
- * @returns {boolean}
- */
-const isNil = x => x == null;
+/** @type {string} */
+const EMPTY_VALUE = '—';
 
 /**
- * @param {*} x
- * @returns {boolean}
+ * @param {Object} params
+ * @param {string} params.connection
+ * @param {string} params.activity
+ * @returns {string}
  */
-const isNumber = x => typeof x === 'number';
+function getConnectivity({ connection, activity }) {
+  if (connection === Connection.ONLINE && activity === Activity.ACTIVE) {
+    return Connectivity.ONLINE_ACTIVE;
+  } else if (connection === Connection.ONLINE) {
+    return Connectivity.ONLINE_INACTIVE;
+  }
 
-/**
- * @param {*} x
- * @returns {boolean}
- */
-const isString = x => typeof x === 'string';
-
-/**
- * @param {{ value: number, unit: string}} x
- * @returns {boolean}
- */
-const validateCostOfkWhType = x => {
- if (isNil(x)) return false;
- 
- if (!isNumber(x.value) || !isString(x.unit)) return false;
- 
- return true;
+  return Connectivity.OFFLINE;
 }
 
 /**
- * @desc Default value of "costOfkWh"
- * @type {{ value: number, unit: string }}
+ * @async
+ * @returns {Promise<string>}
  */
-const COST_OF_KWH = {
-    value: 0.0,
-    unit: '',
-};
+async function main() {
+  const requests = [
+    getPropertyValue(Property.CONNECTION_STATUS, EMPTY_VALUE),
+    getPropertyValue(Property.ACTIVE, EMPTY_VALUE),
+  ];
 
-async function f() {
-    let context = value;
+  const [connection, active] = await Promise.all(requests);
 
-    const costOfkWh = validateCostOfkWhType(value['costOfkWh']) ? value['costOfkWh'] : COST_OF_KWH;;
-
-    context['costOfRunning'] = {
-        value: context.energy.value.map(i => i * costOfkWh.value),
-        unit: costOfkWh.unit
-    };   
-    return context;
-}
-return Promise.resolve(f());
-"""
-
-#
-#
-#
-def queryOEE_OLD_body():
-    return """/**
- * @param value is the context
- * 
- * 
- * Availability = Wt / Lt where Wt is Working Time, Lt is Loaded Time
- * 
- * Lt (Loaded Time) = Load Running Duration + Idle Running Duration + Unplanned stopages Duration
- *
- * Wt (Working Time) = Load Running Duration + Idle Running Duration
- *
- * OEE = A x Perf x Q
- * 
- * MTbf = Lt / Nbr of unplanned stoppages
- * 
- * MTtr = Unplanned stoppages / Nbr of unplanned stoppages
- */
-
-let context = value;
-const perf  = 1;
-const quality = 1;
-
-let oee = [];
-let mtbf = [];
-let mttr = [];
-
-let availability = 1;
-
-let durationCeiling = [24, 24 * 7, 24 * 30, 24 * 365];
-
-// For 4 periods: 24h, 7d, 1m, 1y 
-for (let i = 0; i < 4; i++) {
-   
-   // Make sure not to exceed period duration if state duration is longer 
-   let ceiling = durationCeiling[i];
-   
-   let Lt = Math.min(context.loadRunningHours[i], ceiling) + Math.min(context.idleRunningHours[i], ceiling) + Math.min(context.unplannedStoppageHours[i], ceiling);
-   let Wt = Math.min(context.loadRunningHours[i], ceiling) + Math.min(context.idleRunningHours[i], ceiling);
-
-   availability = Wt / Lt;
-   
-   oee.push(availability * perf * quality);
-   
-  let mtbfi = Lt / context.stoppages.unplanned[i];
-  mtbf.push(mtbfi);
-   
-  let mttri = Math.min(context.unplannedStoppageHours[i], ceiling) / context.stoppages.unplanned[i];
-  mttr.push(mttri)
+  return getConnectivity({ connection, activity: active });
 }
 
-context['oee'] = {
-    performance: [ 1, 1, 1, 1 ],
-    quality: [ 1, 1, 1, 1 ],
-    average: oee.map(i => i * 100 || 0),
-    unit: '%'
-};
-
-context['mtbf'] = {
-    average: mtbf.map(i => i || 0),
-    unit: 'h'
-};
-
-context['mttr'] = {
-    average: mttr.map(i => i || 0),
-    unit: 'h'
-};
-
-return context;
-"""
-#
-#
-#
-def preaggregate_OLD_body():
-    return """/**
-*/
-/**
-*/
-async function f(context) {
-    // Call the methods below in parallel.
-    // These methods do not have any dependence on other method output.
-    let results = await Promise.all([
-    	Device.queryPropertySummary({ pname: "idleRunningMinutes", agg: "sum", unit: "min", fname: 'total', asContextMember: '_idleMinutes' }),
-    	Device.queryPropertySummary({ pname: "loadRunningMinutes", agg: "sum", unit: "min", fname: 'total', asContextMember: '_loadMinutes' }),
-    	Device.queryPropertySummary({ pname: "unplannedStopsMinutes", agg: "sum", unit: "min", fname: 'total', asContextMember: '_unplndStopMinutes' }),
-    	Device.queryPropertySummary({ pname: "plannedStopsMinutes", agg: "sum", unit: "min", fname: 'total', asContextMember: '_plndStopMinutes' }),
-        Device.queryPropertySummary({ pname: "workingPressure", agg: "avg", unit: "bar", asContextMember: 'pressure' }),
-        Device.queryPropertySummary({ pname: "screwTemperature", agg: "avg", unit: "°C", asContextMember: 'temperature' }),
-    ]);
-    
-    // Merge results into context
-    results.forEach(result => Object.assign(context, result));
-    
-    // Get compressor state to add duration of the current state to timings
-    let compressorStateProp = await Device.api.getProperty("compressorState");
-    if (compressorStateProp.value) {
-        let stateTypes = Device.fetchCompressorStateTypes();
-        
-        let deltaInMinutes = (Date.now() - Date.parse(compressorStateProp.time)) / (1000 * 60);
-        
-        if (stateTypes.LOAD_RUNNING.includes(compressorStateProp.value.code) && context._loadMinutes) {
-            context._loadMinutes.total[0] =  (context._loadMinutes.total[0] || 0) + deltaInMinutes;
-        }
-        else if (stateTypes.IDLE_RUNNING.includes(compressorStateProp.value.code) && context._idleMinutes) {
-            context._idleMinutes.total[0] =  (context._idleMinutes.total[0] || 0) + deltaInMinutes;
-        }
-        else if (stateTypes.UNPLANNED_STOPPAGES.includes(compressorStateProp.value.code) && context._unplndStopMinutes) {
-            context._unplndStopMinutes.total[0] =  (context._unplndStopMinutes.total[0] || 0) + deltaInMinutes;
-        }
-        else if (stateTypes.PLANNED_STOPPAGES.includes(compressorStateProp.value.code) && context._plndStopMinutes) {
-            context._plndStopMinutes.total[0] =  (context._plndStopMinutes.total[0] || 0) + deltaInMinutes;
-        }
-    }
-    
-    // Perform calculations using intermediary fields and place them into context
-    context.idleRunningHours = context._idleMinutes ? context._idleMinutes.total.map(i => (i || 0) / 60.0) : 0;
-    context.loadRunningHours = context._loadMinutes ? context._loadMinutes.total.map(i => (i || 0) / 60.0) : 0;
-    context.unplannedStoppageHours = context._unplndStopMinutes ? context._unplndStopMinutes.total.map(i => (i || 0) / 60.0) : 0;
-    context.plannedStoppageHours = context._plndStopMinutes ? context._plndStopMinutes.total.map(i => (i || 0) / 60.0) : 0;
-   
-    
-    // Call the methods below in parallel.
-    // These methods are dependent on the data produced by previously called methods.
-    results = await Promise.all([
-        Device.queryEstimEnergyConsumption(context),
-        Device.queryEstimPowerConsumption(context),
-        //Device.queryUsageHours(context),
-        Device.queryLoadRatio(context),
-        Device.queryStoppages(context),
-        Device.queryEstimCostOfRunning(context),
-        Device.queryOEE(context),
-    ]);
-
-    // Merge results into context
-    results.forEach(result => Object.assign(context, result));
-    return context;
-};
-
-Device.api.getProperty("state")
- .then( prop => prop.value || Device.getEmptyView() )
- .then( context => f(context) )
- .then( context => Device.api.setProperty("state", { value: context, time: new Date().toISOString() }) )
- .then( property => done(null, null) );
+return main();
 """
