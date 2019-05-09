@@ -1938,7 +1938,7 @@ Device.api.log("debug", tagPropName + ": " + value.toString())
   .then(property => {
     property.value.S12 = Sx[S12];
     property.value.S13 = Sx[S13];
-    property.value.S144 = Sx[S14];
+    property.value.S14 = Sx[S14];
     Device.api.setProperty(tagPropName, {
       value: property.value,
       time: new Date().toISOString()

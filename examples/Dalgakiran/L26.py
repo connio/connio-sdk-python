@@ -66,9 +66,9 @@ return { list: [
  { byteNo: 7, type: 'warning', bit: Math.pow(2,6), code: 'A54', label: "Check Compressor" },
  { byteNo: 7, type: 'warning', bit: Math.pow(2,7), code: 'A55', label: "Check Bearings" },
  //
- { byteNo: 8, type: 'alarm', bit: Math.pow(2,5), code: 'A60', label: "Drive Fault" },
- { byteNo: 8, type: 'warning', bit: Math.pow(2,6), code: 'A61', label: "Drive Warning" },
- { byteNo: 8, type: 'alarm', bit: Math.pow(2,7), code: 'A62', label: "Drive No Communication" } 
+ { byteNo: 8, type: 'alarm', bit: Math.pow(2,4), code: 'A60', label: "Drive Fault" },
+ { byteNo: 8, type: 'warning', bit: Math.pow(2,5), code: 'A61', label: "Drive Warning" },
+ { byteNo: 8, type: 'alarm', bit: Math.pow(2,6), code: 'A62', label: "Drive No Communication" } 
 ],
 blackOutCode: 'A18' };
 """
