@@ -181,14 +181,14 @@ const requests = {
   SlavePriorityInS3_Comp1:          { request: "r,meth:setSlavePriorityInS3_Comp1,-,2,-,1,0x110D" },
   SlavePriorityInS3_Comp2:          { request: "r,meth:setSlavePriorityInS3_Comp2,-,2,-,1,0x120D" },
   SlavePriorityInS3_Comp3:          { request: "r,meth:setSlavePriorityInS3_Comp3,-,2,-,1,0x130D" },
-  C00x:            { request: "r,meth:setC00x,-,8,-,1,0x100E" },
-  C01x:            { request: "r,meth:setC01x,-,8,-,1,0x110E" },
-  C02x:            { request: "r,meth:setC02x,-,8,-,1,0x120E" },
-  C03x:            { request: "r,meth:setC03x,-,8,-,1,0x130E" },
-  M00x:      { request: "r,meth:setM00x,-,16,-,1,0x1012" },
-  M01x:      { request: "r,meth:setM01x,-,16,-,1,0x1112" },
-  M02x:      { request: "r,meth:setM02x,-,16,-,1,0x1212" },
-  M03x:      { request: "r,meth:setM03x,-,16,-,1,0x1312" },
+  C0x_Comp0:            { request: "r,meth:setC00x,-,8,-,1,0x100E" },
+  C0x_Comp1:            { request: "r,meth:setC01x,-,8,-,1,0x110E" },
+  C0x_Comp2:            { request: "r,meth:setC02x,-,8,-,1,0x120E" },
+  C0x_Comp3:            { request: "r,meth:setC03x,-,8,-,1,0x130E" },
+  M0x_Comp0:      { request: "r,meth:setM00x,-,16,-,1,0x1012" },
+  M0x_Comp1:      { request: "r,meth:setM01x,-,16,-,1,0x1112" },
+  M0x_Comp2:      { request: "r,meth:setM02x,-,16,-,1,0x1212" },
+  M0x_Comp3:      { request: "r,meth:setM03x,-,16,-,1,0x1312" },
   SlaveNumberOfTotalCompressorHours_Comp0:    { request: "r,meth:setSlaveNumberOfTotalCompressorHours_Comp0,-,4,-,1,0x101A" },
   SlaveNumberOfTotalCompressorHours_Comp1:    { request: "r,meth:setSlaveNumberOfTotalCompressorHours_Comp1,-,4,-,1,0x111A" },
   SlaveNumberOfTotalCompressorHours_Comp2:    { request: "r,meth:setSlaveNumberOfTotalCompressorHours_Comp2,-,4,-,1,0x121A" },
@@ -300,14 +300,14 @@ const requests = {
     SlavePriorityInS3_Comp1:                    { rprob: "SlavePriorityInS3_Comp1", rcmd: "r,meth:setSlavePriorityInS3_Comp1,-,2,-,0x110D", min: 1, max: 1, offset:"0x110D" },
     SlavePriorityInS3_Comp2:                    { rprob: "SlavePriorityInS3_Comp2", rcmd: "r,meth:setSlavePriorityInS3_Comp2,-,2,-,0x120D", min: 1, max: 1, offset:"0x120D" },
     SlavePriorityInS3_Comp3:                    { rprob: "SlavePriorityInS3_Comp3", rcmd: "r,meth:setSlavePriorityInS3_Comp3,-,2,-,0x130D", min: 1, max: 1, offset:"0x130D" },
-    C00:                      { rprob: "C00x", rcmd: "r,meth:setC00x,-,8,-,0x100E", min: 2, max: 5, offset:"0x100E" },
-    C01:                      { rprob: "C01x", rcmd: "r,meth:setC01x,-,8,-,0x110E", min: 2, max: 5, offset:"0x110E" },
-    C02:                      { rprob: "C02x", rcmd: "r,meth:setC02x,-,8,-,0x120E", min: 2, max: 5, offset:"0x120E" },
-    C03:                      { rprob: "C03x", rcmd: "r,meth:setC03x,-,8,-,0x130E", min: 2, max: 5, offset:"0x130E" },
-    M00:                { rprob: "M00x", rcmd: "r,meth:setM00x,-,16,-,0x1012", min: 0, max: 7, offset:"0x1012" },
-    M01:                { rprob: "M01x", rcmd: "r,meth:setM01x,-,16,-,0x1112", min: 0, max: 7, offset:"0x1112" },
-    M02:                { rprob: "M02x", rcmd: "r,meth:setM02x,-,16,-,0x1212", min: 0, max: 7, offset:"0x1212" },
-    M03:                { rprob: "M03x", rcmd: "r,meth:setM03x,-,16,-,0x1312", min: 0, max: 7, offset:"0x1312" },
+    C0x_Comp0:                                  { rprob: "C00x", rcmd: "r,meth:setC00x,-,8,-,0x100E", min: 2, max: 5, offset:"0x100E" },
+    C0x_Comp1:                                  { rprob: "C01x", rcmd: "r,meth:setC01x,-,8,-,0x110E", min: 2, max: 5, offset:"0x110E" },
+    C0x_Comp2:                                  { rprob: "C02x", rcmd: "r,meth:setC02x,-,8,-,0x120E", min: 2, max: 5, offset:"0x120E" },
+    C0x_Comp3:                                  { rprob: "C03x", rcmd: "r,meth:setC03x,-,8,-,0x130E", min: 2, max: 5, offset:"0x130E" },
+    M0x_Comp0:                                  { rprob: "M00x", rcmd: "r,meth:setM00x,-,16,-,0x1012", min: 0, max: 7, offset:"0x1012" },
+    M0x_Comp1:                                  { rprob: "M01x", rcmd: "r,meth:setM01x,-,16,-,0x1112", min: 0, max: 7, offset:"0x1112" },
+    M0x_Comp2:                                  { rprob: "M02x", rcmd: "r,meth:setM02x,-,16,-,0x1212", min: 0, max: 7, offset:"0x1212" },
+    M0x_Comp3:                                  { rprob: "M03x", rcmd: "r,meth:setM03x,-,16,-,0x1312", min: 0, max: 7, offset:"0x1312" },
     SlaveNumberOfTotalCompressorHours_Comp0:    { rprob: "SlaveNumberOfTotalCompressorHours_Comp0", rcmd: "r,meth:setSlaveNumberOfTotalCompressorHours_Comp0,-,4,-,0x101A", min: 1, max: 1, offset:"0x101A" , multiplier: [60] },
     SlaveNumberOfTotalCompressorHours_Comp1:    { rprob: "SlaveNumberOfTotalCompressorHours_Comp1", rcmd: "r,meth:setSlaveNumberOfTotalCompressorHours_Comp1,-,4,-,0x111A", min: 1, max: 1, offset:"0x111A" , multiplier: [60] },
     SlaveNumberOfTotalCompressorHours_Comp2:    { rprob: "SlaveNumberOfTotalCompressorHours_Comp2", rcmd: "r,meth:setSlaveNumberOfTotalCompressorHours_Comp2,-,4,-,0x121A", min: 1, max: 1, offset:"0x121A" , multiplier: [60] },
@@ -1278,12 +1278,12 @@ Device.api.getProperty(tagPropName)
   });
 '''
 
-def writeSlaveControllerType_body(compressorNo):
+def writeSlaveControllerType_body():
     return """/**
 */
-
+  let compNo = value.compNo;
   let args = {
-      tagKey: "SlaveControllerType_Comp""" + str(compressorNo) +"""",
+      tagKey: "SlaveControllerType_Comp" + String(compNo),
       x: value.x,
       setValue: value.setValue,
       byteCount: value.byteCount || 2
@@ -1323,12 +1323,12 @@ Device.api.getProperty(tagPropName)
   });
 '''
 
-def writeSlaveSelenoidDelay_body(compressorNo):
+def writeSlaveSelenoidDelay_body():
     return """/**
 */
-
+  let compNo = value.compNo;
   let args = {
-      tagKey: "SlaveSelenoidDelay_Comp""" + str(compressorNo) +"""",
+      tagKey: "SlaveSelenoidDelay_Comp" + String(compNo),
       x: value.x,
       setValue: value.setValue,
       byteCount: value.byteCount || 2
@@ -1368,12 +1368,12 @@ Device.api.getProperty(tagPropName)
   });
 '''
 
-def writeSlaveAirFlow_body(compressorNo):
+def writeSlaveAirFlow_body():
     return """/**
 */
-
+  let compNo = value.compNo;
   let args = {
-      tagKey: "SlaveAirFlow_Comp""" + str(compressorNo) +"""",
+      tagKey: "SlaveAirFlow_Comp" + String(compNo),
       x: value.x,
       setValue: value.setValue,
       byteCount: value.byteCount || 2
@@ -1436,12 +1436,12 @@ Device.api.getProperty(tagPropName)
   });
 '''
 
-def writeSlaveNominalPower_body(compressorNo):
+def writeSlaveNominalPower_body():
     return """/**
 */
-
+  let compNo = value.compNo;
   let args = {
-      tagKey: "SlaveNominalPower_Comp""" + str(compressorNo) +"""",
+      tagKey: "SlaveNominalPower_Comp" + String(compNo),
       x: value.x,
       setValue: value.setValue,
       byteCount: value.byteCount || 2
@@ -1481,12 +1481,12 @@ Device.api.getProperty(tagPropName)
   });
 '''
 
-def writeSlaveUnloadPower_body(compressorNo):
+def writeSlaveUnloadPower_body():
     return """/**
 */
-
+  let compNo = value.compNo;
   let args = {
-      tagKey: "SlaveUnloadPower_Comp""" + str(compressorNo) +"""",
+      tagKey: "SlaveUnloadPower_Comp" + String(compNo),
       x: value.x,
       setValue: value.setValue,
       byteCount: value.byteCount || 2
@@ -1526,12 +1526,12 @@ Device.api.getProperty(tagPropName)
   });
 '''
 
-def writeSlavePriorityInS0_body(compressorNo):
+def writeSlavePriorityInS0_body():
     return """/**
 */
-
+  let compNo = value.compNo;
   let args = {
-      tagKey: "SlavePriorityInS0_Comp""" + str(compressorNo) +"""",
+      tagKey: "SlavePriorityInS0_Comp" + String(compNo),
       x: value.x,
       setValue: value.setValue,
       byteCount: value.byteCount || 2
@@ -1570,12 +1570,12 @@ Device.api.getProperty(tagPropName)
   });
 '''
 
-def writeSlavePriorityInS1_body(compressorNo):
+def writeSlavePriorityInS1_body():
     return """/**
 */
-
+  let compNo = value.compNo;
   let args = {
-      tagKey: "SlavePriorityInS1_Comp""" + str(compressorNo) +"""",
+      tagKey: "SlavePriorityInS1_Comp" + String(compNo),
       x: value.x,
       setValue: value.setValue,
       byteCount: value.byteCount || 2
@@ -1614,12 +1614,12 @@ Device.api.getProperty(tagPropName)
   });
 '''
 
-def writeSlavePriorityInS2_body(compressorNo):
+def writeSlavePriorityInS2_body():
     return """/**
 */
-
+  compNo = value.compNo;
   let args = {
-      tagKey: "SlavePriorityInS2_Comp""" + str(compressorNo) +"""",
+      tagKey: "SlavePriorityInS2_Comp" + String(compNo),
       x: value.x,
       setValue: value.setValue,
       byteCount: value.byteCount || 2
@@ -1658,12 +1658,12 @@ Device.api.getProperty(tagPropName)
   });
 '''
 
-def writeSlavePriorityInS3_body(compressorNo):
+def writeSlavePriorityInS3_body():
     return """/**
 */
-
+  let compNo = value.compNo;
   let args = {
-      tagKey: "SlavePriorityInS3_Comp""" + str(compressorNo) +"""",
+      tagKey: "SlavePriorityInS3_Comp" + String(compNo),
       x: value.x,
       setValue: value.setValue,
       byteCount: value.byteCount || 2
@@ -1711,12 +1711,12 @@ Device.api.log("info", "C0''' + str(compressorNo) + '''x: " + value.toString())
  });
 '''
 
-def writeC0Xx_body(compressorNo):
+def writeC0Xx_body():
     return '''/**
 */
-
+let compNo = value.compressorNo;
 let args = {
-    tagKey: "C0''' + str(compressorNo) + '''x",
+    tagKey: "C0x_Comp" + String(compNo),
     x: value.x,
     setValue: value.setValue,
     byteCount: value.byteCount || 2
@@ -1769,12 +1769,12 @@ Device.api.log("info", "M0''' + str(compressorNo) + '''x: " + value.toString())
  });
 '''
 
-def writeM0Xx_body(compressorNo):
+def writeM0Xx_body():
     return '''/**
 */
-
+let compNo = value.compressorNo;
 let args = {
-    tagKey: "M0''' + str(compressorNo) + '''x",
+    tagKey: "M0x_Comp" + String(compNo),
     x: value.x,
     setValue: value.setValue,
     byteCount: value.byteCount || 2
@@ -1816,12 +1816,12 @@ Device.api.getProperty(tagPropName)
   });
 '''
 
-def writeSlaveNumberOfTotalCompressorHours_body(compressorNo):
+def writeSlaveNumberOfTotalCompressorHours_body():
     return """/**
 */
-
+  let compNo = value.compressorNo;
   let args = {
-      tagKey: "SlaveNumberOfTotalCompressorHours_Comp""" + str(compressorNo) +"""",
+      tagKey: "SlaveNumberOfTotalCompressorHours_Comp" + String(compNo),
       x: value.x,
       setValue: value.setValue,
       byteCount: value.byteCount || 2
@@ -1862,12 +1862,12 @@ Device.api.getProperty(tagPropName)
   });
 '''
 
-def writeSlaveNumberOfLoadCompressorHours_body(compressorNo):
+def writeSlaveNumberOfLoadCompressorHours_body():
     return """/**
 */
-
+  let compNo = value.compressorNo;
   let args = {
-      tagKey: "SlaveNumberOfLoadCompressorHours_Comp""" + str(compressorNo) +"""",
+      tagKey: "SlaveNumberOfLoadCompressorHours_Comp" + String(compNo),
       x: value.x,
       setValue: value.setValue,
       byteCount: value.byteCount || 2
@@ -1892,11 +1892,12 @@ def writeSlaveNumberOfLoadCompressorHours_body(compressorNo):
 def setSlaveMaintCounters_body(compressorNo):
     return """/**
   24 bytes = long (4 byte) * 6
-*/
+ */
+let compNo = value.compressorNo;
 
-const maintCountersPropName = 'SlaveMaintCounters_Comp +"""+ str(compressorNo) + """';
-const maintLogPropName      = 'SlaveMaintenanceLog_Comp +"""+ str(compressorNo) + """';
-const maintCostsPropName    = 'SlaveMaintenanceCostList_Comp +"""+ str(compressorNo) + """';
+const maintCountersPropName = 'SlaveMaintCounters_Comp"""+ str(compressorNo) + """';
+const maintLogPropName      = 'SlaveMaintenanceLog_Comp"""+ str(compressorNo) + """';
+const maintCostsPropName    = 'SlaveMaintenanceCostList_Comp"""+ str(compressorNo) + """';
 
 const maintTypes = [
   "airFilterChange",
@@ -3275,3 +3276,17 @@ Device.api.setProperty(tagPropName, {
     done(null, property.value);
  });
 '''
+
+def readSlaveTagIntoProperty_body(pname):
+    return """/**
+
+*/
+let pname = '""" + pname + """';
+let compNo = value.compressorNo;
+pname = pname + "_Comp" + String(compNo);
+
+Device.readTagByPropKey(
+    { requestKey: pname,
+      done: r => done(null, r)
+});
+"""
