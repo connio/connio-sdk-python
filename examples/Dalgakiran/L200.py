@@ -1206,15 +1206,19 @@ def setSlaveFwVersion_body(compressorNo):
     return '''/**
     value: [ 3, 1 ] => "1.3"
     */
-    (async function f(major, minor) {
-        let releaseNo = major.toString() + "." + minor.toString();
+  (async function f(major, minor) {
+      let releaseNo = major.toString() + "." + minor.toString();
+      if (!property.value){property.value = {}}
+      await Device.api.getProperty("SlaveFwVersions").then( property => {
+          property.value.SlaveFwVersion_Comp'''+ str(compressorNo) + ''' = releaseNo;
+          Device.api.setProperty("SlaveFwVersions", {
+              value: property.value,
+              time: new Date().toISOString()
+          });
         
-        await Device.api.setProperty("SlaveFwVersion_Comp''' + str(compressorNo) + '''", {
-            value: releaseNo,
-            time: new Date().toISOString()
-        });    
-        done(null, releaseNo);    
-    })(value[0], value[1]);
+      });
+      done(null, releaseNo);    
+  })(value[0], value[1]);
     '''
 
 #####################
@@ -1233,10 +1237,13 @@ let code = Device.convertToDec({ values: value, default: -1 });
 if (code >= 0 && code < table.length) {
   state = table[code];
   
-  Device.api.getProperty("slaveControllerState_Comp''' + str(compressorNo) + '''").then( stateProp => {
+  Device.api.getProperty("slaveControllerStates").then( property => {
+    if (!property.value){property.value = {}}
+    let stateProp = property.slaveControllerState_Comp''' + str(compressorNo) + '''
     if (!stateProp.value || state.code !== stateProp.value.code) {
-        Device.api.setProperty("slaveControllerState_Comp''' + str(compressorNo) + '''", {
-            value: state,
+        property.value.slaveControllerState_Comp''' + str(compressorNo) + ''' = state;
+        Device.api.setProperty("slaveControllerStates", {
+            value: property.value,
             time: new Date().toISOString()
         })
         .then(property => {
@@ -1261,13 +1268,15 @@ else {
 def setSlaveControllerType_body(compressorNo):
     return '''/**
 */
-const tagPropName = "SlaveControllerType_Comp''' + str(compressorNo) + '''";
+const tagPropName = "SlaveControllerTypes";
 let SlaveControllerType = Device.convertToDec({ values: value }, -1);
 if (SlaveControllerType == 1) SlaveControllerType = "Slave";
 else{SlaveControllerType = "Logik";}
+
 Device.api.getProperty(tagPropName)
   .then(property => {
-    property.value.SlaveControllerType = SlaveControllerType;
+    if (!property.value){property.value = {}}
+    property.value.slaveControllerType_Comp''' + str(compressorNo) + ''' = SlaveControllerType;
     Device.api.setProperty(tagPropName, {
       value: property.value,
       time: new Date().toISOString()
@@ -1308,11 +1317,12 @@ def writeSlaveControllerType_body():
 def setSlaveSelenoidDelay_body(compressorNo):
     return '''/**
 */
-const tagPropName = "SlaveSelenoidDelay_Comp''' + str(compressorNo) + '''";
+const tagPropName = "SlaveSelenoidDelays";
 let SlaveSelenoidDelay = Device.convertToDec({ values: value }, -1);
 Device.api.getProperty(tagPropName)
   .then(property => {
-    property.value.SlaveSelenoidDelay = SlaveSelenoidDelay.toString() + ' sec';
+    if (!property.value){property.value = {}}
+    property.value.SlaveSelenoidDelay_Comp'''+ str(compressorNo)+''' = SlaveSelenoidDelay.toString() + ' sec';
     Device.api.setProperty(tagPropName, {
       value: property.value,
       time: new Date().toISOString()
@@ -1352,12 +1362,13 @@ def writeSlaveSelenoidDelay_body():
 def setSlaveAirFlow_body(compressorNo):
     return '''/**
 */
-const tagPropName = "SlaveAirFlow_Comp''' + str(compressorNo) + '''";
+const tagPropName = "SlaveAirFlows";
 let SlaveAirFlow = Device.convertToDec({ values: value }, -1);
 SlaveAirFlow = SlaveAirFlow / 10;
 Device.api.getProperty(tagPropName)
   .then(property => {
-    property.value.SlaveAirFlow = SlaveAirFlow.toString() + ' Liters/min';
+    if (!property.value){property.value = {}}
+    property.value.SlaveAirFlow_Comp'''+ str(compressorNo)+''' = SlaveAirFlow.toString() + ' Liters/min';
     Device.api.setProperty(tagPropName, {
       value: property.value,
       time: new Date().toISOString()
@@ -1398,11 +1409,12 @@ def writeSlaveAirFlow_body():
 def setSlaveRelativeSpeed_body(compressorNo):
     return '''/**
 */
-const tagPropName = "SlaveRelativeSpeed_Comp''' + str(compressorNo) + '''";
+const tagPropName = "SlaveRelativeSpeeds";
 let SlaveRelativeSpeed = Device.convertToDec({ values: value }, -1);
 Device.api.getProperty(tagPropName)
   .then(property => {
-    property.value.SlaveRelativeSpeed = SlaveRelativeSpeed.toString();
+    if (!property.value){property.value = {}}
+    property.value.SlaveRelativeSpeed_Comp'''+ str(compressorNo)+''' = SlaveRelativeSpeed.toString();
     Device.api.setProperty(tagPropName, {
       value: property.value,
       time: new Date().toISOString()
@@ -1421,11 +1433,12 @@ Device.api.getProperty(tagPropName)
 def setSlaveNominalPower_body(compressorNo):
     return '''/**
 */
-const tagPropName = "SlaveNominalPower_Comp''' + str(compressorNo) + '''";
+const tagPropName = "SlaveNominalPowers";
 let SlaveNominalPower = Device.convertToDec({ values: value }, -1);
 Device.api.getProperty(tagPropName)
   .then(property => {
-    property.value.SlaveNominalPower = SlaveNominalPower.toString() + ' kW';
+    if (!property.value){property.value = {}}
+    property.value.SlaveNominalPower_Comp'''+ str(compressorNo)+''' = SlaveNominalPower.toString() + ' kW';
     Device.api.setProperty(tagPropName, {
       value: property.value,
       time: new Date().toISOString()
@@ -1466,11 +1479,12 @@ def writeSlaveNominalPower_body():
 def setSlaveUnloadPower_body(compressorNo):
     return '''/**
 */
-const tagPropName = "SlaveUnloadPower_Comp''' + str(compressorNo) + '''";
+const tagPropName = "SlaveUnloadPowers";
 let SlaveUnloadPower = Device.convertToDec({ values: value }, -1);
 Device.api.getProperty(tagPropName)
   .then(property => {
-    property.value.SlaveUnloadPower = SlaveUnloadPower.toString() + ' kW';
+    if (!property.value){property.value = {}}
+    property.value.SlaveUnloadPower_Comp'''+ str(compressorNo)+''' = SlaveUnloadPower.toString() + ' kW';
     Device.api.setProperty(tagPropName, {
       value: property.value,
       time: new Date().toISOString()
@@ -1511,11 +1525,12 @@ def writeSlaveUnloadPower_body():
 def setSlavePriorityInS0_body(compressorNo):
     return '''/**
 */
-const tagPropName = "SlavePriorityInS0_Comp''' + str(compressorNo) + '''";
+const tagPropName = "SlavePriorityInS0s";
 let SlavePriorityInS0 = Device.convertToDec({ values: value }, -1);
 Device.api.getProperty(tagPropName)
   .then(property => {
-    property.value.SlavePriorityInS0 = SlavePriorityInS0.toString();
+    if (!property.value){property.value = {}}
+    property.value.SlavePriorityInS0_Comp'''+str(compressorNo)+''' = SlavePriorityInS0.toString();
     Device.api.setProperty(tagPropName, {
       value: property.value,
       time: new Date().toISOString()
@@ -1555,11 +1570,12 @@ def writeSlavePriorityInS0_body():
 def setSlavePriorityInS1_body(compressorNo):
     return '''/**
 */
-const tagPropName = "SlavePriorityInS1_Comp''' + str(compressorNo) + '''";
+const tagPropName = "SlavePriorityInS1s";
 let SlavePriorityInS1 = Device.convertToDec({ values: value }, -1);
 Device.api.getProperty(tagPropName)
   .then(property => {
-    property.value.SlavePriorityInS1 = SlavePriorityInS1.toString();
+    if (!property.value){property.value = {}}
+    property.value.SlavePriorityInS1_Comp'''+ str(compressorNo)+''' = SlavePriorityInS1.toString();
     Device.api.setProperty(tagPropName, {
       value: property.value,
       time: new Date().toISOString()
@@ -1599,11 +1615,12 @@ def writeSlavePriorityInS1_body():
 def setSlavePriorityInS2_body(compressorNo):
     return '''/**
 */
-const tagPropName = "SlavePriorityInS2_Comp''' + str(compressorNo) + '''";
+const tagPropName = "SlavePriorityInS2s";
 let SlavePriorityInS2 = Device.convertToDec({ values: value }, -1);
 Device.api.getProperty(tagPropName)
   .then(property => {
-    property.value.SlavePriorityInS2 = SlavePriorityInS2.toString();
+    if (!property.value){property.value = {}}
+    property.value.SlavePriorityInS2_Comp'''+ str(compressorNo)+''' = SlavePriorityInS2.toString();
     Device.api.setProperty(tagPropName, {
       value: property.value,
       time: new Date().toISOString()
@@ -1643,11 +1660,12 @@ def writeSlavePriorityInS2_body():
 def setSlavePriorityInS3_body(compressorNo):
     return '''/**
 */
-const tagPropName = "SlavePriorityInS3_Comp''' + str(compressorNo) + '''";
+const tagPropName = "SlavePriorityInS3s";
 let SlavePriorityInS3 = Device.convertToDec({ values: value }, -1);
 Device.api.getProperty(tagPropName)
   .then(property => {
-    property.value.SlavePriorityInS3 = SlavePriorityInS3.toString();
+    if (!property.value){property.value = {}}
+    property.value.SlavePriorityInS3_Comp'''+str(compressorNo) +''' = SlavePriorityInS3.toString();
     Device.api.setProperty(tagPropName, {
       value: property.value,
       time: new Date().toISOString()
@@ -1700,14 +1718,19 @@ Device.api.log("info", "C0''' + str(compressorNo) + '''x: " + value.toString())
         itemValue = itemValue.toString();
         C0''' + str(compressorNo) + '''x['C0''' + str(compressorNo) + '''_' + ((i/2)+2).toString()] = itemValue;
     }
-    
-    Device.api.setProperty("C0''' + str(compressorNo) + '''x", {
-      value:  C0''' + str(compressorNo) + '''x,
+
+Device.api.getProperty("C0xs")
+  .then(property => {
+    if (!property.value){property.value = {}}
+    property.value.C0''' + str(compressorNo) + '''x = C0''' + str(compressorNo) + '''x
+    Device.api.setProperty("C0xs", {
+      value:  property.value,
       time: new Date().toISOString()
       }).
     then(property => {
         done(null, property.value);
     });
+  });
  });
 '''
 
@@ -1758,14 +1781,19 @@ Device.api.log("info", "M0''' + str(compressorNo) + '''x: " + value.toString())
         else itemValue = itemValue.toString();
         M0''' + str(compressorNo) + '''x['M0''' + str(compressorNo) + '''_' + ((i/2)).toString()] = itemValue;
     }
-    
+  Device.api.getProperty("M0xs")
+  .then(property => {
+    if (!property.value){property.value = {}}
+    property.value.M0''' + str(compressorNo) + '''x = M0''' + str(compressorNo) + '''x;
+
     Device.api.setProperty("M0''' + str(compressorNo) + '''x", {
-      value:  M0''' + str(compressorNo) + '''x,
+      value:  property.value,
       time: new Date().toISOString()
       }).
     then(property => {
         done(null, property.value);
     });
+  });
  });
 '''
 
@@ -1800,12 +1828,13 @@ catch(e) {
 def setSlaveNumberOfTotalCompressorHours_body(compressorNo):
     return '''/**
 */
-const tagPropName = "SlaveNumberOfTotalCompressorHours_Comp''' + str(compressorNo) + '''";
+const tagPropName = "SlaveNumberOfTotalCompressorHours";
 let SlaveNumberOfTotalCompressorHours = Device.convertToDec({ values: value }, -1);
 SlaveNumberOfTotalCompressorHours = SlaveNumberOfTotalCompressorHours / 60;
 Device.api.getProperty(tagPropName)
   .then(property => {
-    property.value.SlaveNumberOfTotalCompressorHours = SlaveNumberOfTotalCompressorHours.toString() + " Hours";
+    if (!property.value){property.value = {}}
+    property.value.SlaveNumberOfTotalCompressorHours_Comp'''+str(compressorNo)+''' = SlaveNumberOfTotalCompressorHours.toString() + " Hours";
     Device.api.setProperty(tagPropName, {
       value: property.value,
       time: new Date().toISOString()
@@ -1846,12 +1875,13 @@ def writeSlaveNumberOfTotalCompressorHours_body():
 def setSlaveNumberOfLoadCompressorHours_body(compressorNo):
     return '''/**
 */
-const tagPropName = "SlaveNumberOfLoadCompressorHours_Comp''' + str(compressorNo) + '''";
+const tagPropName = "SlaveNumberOfLoadCompressorHours";
 let SlaveNumberOfLoadCompressorHours = Device.convertToDec({ values: value }, -1);
 SlaveNumberOfLoadCompressorHours = SlaveNumberOfLoadCompressorHours / 60;
 Device.api.getProperty(tagPropName)
   .then(property => {
-    property.value.SlaveNumberOfLoadCompressorHours = SlaveNumberOfLoadCompressorHours.toString() + " Hours";
+    if (!property.value){property.value = {}}
+    property.value.SlaveNumberOfLoadCompressorHours_Comp'''+ str(compressorNo)+''' = SlaveNumberOfLoadCompressorHours.toString() + " Hours";
     Device.api.setProperty(tagPropName, {
       value: property.value,
       time: new Date().toISOString()
@@ -1864,6 +1894,11 @@ Device.api.getProperty(tagPropName)
 
 def writeSlaveNumberOfLoadCompressorHours_body():
     return """/**
+    {
+      compNO: 1,
+      x: 1,
+      setValue: 120
+    }
 */
   let compNo = value.compressorNo;
   let args = {
@@ -1895,9 +1930,9 @@ def setSlaveMaintCounters_body(compressorNo):
  */
 let compNo = value.compressorNo;
 
-const maintCountersPropName = 'SlaveMaintCounters_Comp"""+ str(compressorNo) + """';
-const maintLogPropName      = 'SlaveMaintenanceLog_Comp"""+ str(compressorNo) + """';
-const maintCostsPropName    = 'SlaveMaintenanceCostList_Comp"""+ str(compressorNo) + """';
+const maintCountersPropName = 'SlaveMaintCounters';
+const maintLogPropName      = 'SlaveMaintenanceLogs';
+const maintCostsPropName    = 'SlaveMaintenanceCostLists';
 
 const maintTypes = [
   "airFilterChange",
@@ -1935,19 +1970,22 @@ async function f(value) {
     }
     
     let currCounters = Object.assign({}, await Device.api.getProperty(maintCountersPropName).then(p => p ? p.value : undefined));
-    
+    newCountersProp = Object.assign({}, currCounters);
+    currCounters = currCounters.slaveMaintCounters_Comp"""+str(compressorNo)+""";
+    newCountersProp.slaveMaintCounters_Comp"""+str(compressorNo)+""" = timeLeftInMinutes
+
     let newMaintCounters = await Device.api.setProperty(maintCountersPropName, {
-        value: timeLeftInMinutes,
+        value: newCountersProp,
         time: new Date().toISOString()
     })
      .then(property => property.value);
-    
+    newMaintCounters = newMaintCounters.slaveMaintCounters_Comp"""+str(compressorNo)+"""
     
     try {
         // check if any maintenance counter is reset, then make a log
         if (currCounters) {
             let mcost = await Device.api.getProperty(maintCostsPropName).then(p=>p.value) || defaultMaintCosts;
-            
+            mcost = mcost.slaveMaintLog_Comp"""+str(compressorNo)+"""
             let maintenanceLog = { items: [] };
             for (var i = 0; i < maintTypes.length; i++) {
                 if (newMaintCounters[maintTypes[i]] < currCounters[maintTypes[i]]) {
@@ -1957,10 +1995,13 @@ async function f(value) {
             }
             
             if (maintenanceLog.items.length > 0) {
-                await Device.api.setProperty(maintLogPropName, {
-                        value: maintenanceLog,
+              await Device.api.getProperty(maintLogPropName).then(property=>{
+                property.slaveMaintLog_Comp"""+str(compressorNo)+""" = maintenanceLog;
+                Device.api.setProperty(maintLogPropName, {
+                        value: property,
                         time: new Date().toISOString()
                     });
+                });
             }
         }
     }

@@ -1,10 +1,13 @@
 from connio.rest import Client
 from connio.rest.api.v3.account.propertyy import PropertyInstance
 from connio.rest.api.v3.account.method import MethodInstance
-
+from time import sleep
 from readwrite_methods import *
 from L200 import *
-
+from utility_methods import *
+from set_methods import *
+from readwrite_methods import *
+from query_methods import *
 def wire(client, name='LogikaL200', friendly="Logika L200 Controller", base="ModbusGateway"):
     # Create Logika L200 profile
     compressor = client.account.deviceprofiles.create(name=name, 
@@ -89,10 +92,10 @@ def wire(client, name='LogikaL200', friendly="Logika L200 Controller", base="Mod
     client.account.properties(compressor.id).create(name="SlaveMaintCounters", data_type='object', access_type='protected', publish_type='never')
     client.account.properties(compressor.id).create(name="SlaveMaintenanceLogs", data_type='object', access_type='protected', publish_type='never')
     client.account.properties(compressor.id).create(name="SlaveMaintenanceCostLists", data_type='object', access_type='protected', publish_type='never')
+    client.account.properties(compressor.id).create(name="M0xs", data_type='object', access_type='protected', publish_type='never')
+    client.account.properties(compressor.id).create(name="C0xs", data_type='object', access_type='protected', publish_type='never')
     #Clock Timer Properties
     client.account.properties(compressor.id).create(name="ClockTimers", data_type='object', access_type='protected', publish_type='never')
-
-
 
     #------ Add profile methods
     accessLevel2 = 'private'
@@ -374,3 +377,54 @@ def wire(client, name='LogikaL200', friendly="Logika L200 Controller", base="Mod
     client.account.methods(compressor.id).create(name='writeM0xs', method_impl= MethodInstance.MethodImplementation(writeM0Xx_body()), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='writeSlaveNumberOfTotalCompressorHours', method_impl= MethodInstance.MethodImplementation(writeSlaveNumberOfTotalCompressorHours_body()), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='writeSlaveNumberOfLoadCompressorHours', method_impl= MethodInstance.MethodImplementation(writeSlaveNumberOfLoadCompressorHours_body()), access_type=accessLevel4)
+   
+    #Base Methods
+    accessLevel1_1 = 'private'
+    accessLevel1 = 'protected'
+    client.account.methods(compressor.id).create(name='getEmptyState', method_impl= MethodInstance.MethodImplementation(getEmptyState_body()), access_type=accessLevel1, description="e.g. { 'value': 0, 'unit': '$' }")
+    client.account.methods(compressor.id).create(name='getCompressorInfo', method_impl= MethodInstance.MethodImplementation(getCompressorInfo_body()), access_type=accessLevel1)
+    client.account.methods(compressor.id).create(name='setLevel1Pwd', method_impl= MethodInstance.MethodImplementation(setLevelXPwd_body(1)), access_type=accessLevel1_1)
+    # dashboarding
+    client.account.methods(compressor.id).create(name='buildAggregateQueries', method_impl= MethodInstance.MethodImplementation(buildAggregateQueries_body()), access_type=accessLevel1_1)
+    client.account.methods(compressor.id).create(name='queryAggregates', method_impl= MethodInstance.MethodImplementation(queryAggregates_body()), access_type=accessLevel1_1)
+    client.account.methods(compressor.id).create(name='queryPropertySummary', method_impl= MethodInstance.MethodImplementation(queryPropertySummary_body()), access_type=accessLevel1)
+    client.account.methods(compressor.id).create(name='queryWarningAlarmSummary', method_impl= MethodInstance.MethodImplementation(queryWarningAlarmSummary_body()), access_type=accessLevel1)
+    client.account.methods(compressor.id).create(name='queryTimeToMaintenance', method_impl= MethodInstance.MethodImplementation(queryTimeToMaintenance_body()), access_type=accessLevel1_1)
+    client.account.methods(compressor.id).create(name='queryLoadRatio', method_impl= MethodInstance.MethodImplementation(queryLoadRatio_body()), access_type=accessLevel1_1)
+
+    client.account.methods(compressor.id).create(name='processCompressorStates', method_impl= MethodInstance.MethodImplementation(processCompressorStates_body()), access_type=accessLevel1_1)
+    client.account.methods(compressor.id).create(name='calculateAll', method_impl= MethodInstance.MethodImplementation(calculateAll_body()), access_type=accessLevel1_1)
+    client.account.methods(compressor.id).create(name='convertToHours', method_impl= MethodInstance.MethodImplementation(convertToHours_body()), access_type=accessLevel1_1)
+    client.account.methods(compressor.id).create(name='convertToDec', method_impl= MethodInstance.MethodImplementation(convertToDec_body()), access_type=accessLevel1_1)
+    client.account.methods(compressor.id).create(name='setAny', method_impl= MethodInstance.MethodImplementation(setAny_body()), access_type=accessLevel1_1)
+    client.account.methods(compressor.id).create(name='setSerialNumber', method_impl= MethodInstance.MethodImplementation(setSerialNumber_body()), access_type=accessLevel1_1)
+    client.account.methods(compressor.id).create(name='setLogikaModel', method_impl= MethodInstance.MethodImplementation(setLogikaModel_body()), access_type=accessLevel1_1)
+    client.account.methods(compressor.id).create(name='setLogikaFwVersion', method_impl= MethodInstance.MethodImplementation(setLogikaFwVersion_body()), access_type=accessLevel1_1)
+    client.account.methods(compressor.id).create(name='setAlarms', method_impl= MethodInstance.MethodImplementation(setAlarms_body()), access_type=accessLevel1_1)
+    client.account.methods(compressor.id).create(name='writeAnyTag', method_impl= MethodInstance.MethodImplementation(writeAnyTag_body()), access_type=accessLevel2, description="""
+    Bu method ile herhangi bir tag'i yazabilirsiniz. Gereken parametreler sunlar:
+
+    - setValue: Yazilacak deger
+    - addr: Tag'in modbus adresi
+    - size: Yazilacak tag'in uzunlugu - default 2 (word)
+
+    Ornegin:
+
+    { "setValue": 13, "addr": "0x401", "size": 2 } 
+    """)
+    client.account.methods(compressor.id).create(name='readAnyTag', method_impl= MethodInstance.MethodImplementation(readAnyTag_body()), access_type=accessLevel2, description="""
+    Bu method ile herhangi bir tag'i okumak icin gateway'e komut gonderebilirsiniz. Okunan deger tagValue isimli property icine yailir. 
+    Gereken parametreler sunlar:
+
+    - addr: Tag'in modbus adresi
+    - size: Okunacak tag'in uzunlugu - default 2 (word)
+
+    Ornegin:
+
+    { "addr": "0x401", "size": 2 } 
+    """)
+    client.account.methods(compressor.id).create(name='readSerialNumber', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('cfgSerialNumber')), access_type=accessLevel2)
+    client.account.methods(compressor.id).create(name='readLogikaModel', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('cfgLogikaModel')), access_type=accessLevel2)
+    client.account.methods(compressor.id).create(name='readLogikaFwVersion', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('cfgLogikaFwVersion')), access_type=accessLevel2)
+    client.account.methods(compressor.id).create(name='readLevel1Pwd', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('cfgLevel1Pwd')), access_type=accessLevel2)
+    client.account.methods(compressor.id).create(name='readControllerTime', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('controllerTime')), access_type=accessLevel2)
