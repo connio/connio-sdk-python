@@ -23,7 +23,8 @@ def wire(client, name='LogikaL200', friendly="Logika L200 Controller", base="Mod
     #------ Add base profile properties
     
     client.account.properties(compressor.id).create(name='tagValue', data_type='string', access_type='protected', publish_type='never')
-
+    
+    client.account.properties(compressor.id).create(name='icon', data_type='string', access_type='public', publish_type='never')
     client.account.properties(compressor.id).create(name='cfgSerialNumber', data_type='string', access_type='protected', publish_type='never')
     client.account.properties(compressor.id).create(name='cfgLogikaModel', data_type='string', access_type='protected', publish_type='never')
     client.account.properties(compressor.id).create(name='cfgLogikaFwVersion', data_type='string', access_type='protected', publish_type='never')    
@@ -365,18 +366,8 @@ def wire(client, name='LogikaL200', friendly="Logika L200 Controller", base="Mod
     client.account.methods(compressor.id).create(name='setControllerState', method_impl= MethodInstance.MethodImplementation(setControllerState_body()), access_type=accessLevel1_1)
     client.account.methods(compressor.id).create(name='setBlockingAlarm', method_impl= MethodInstance.MethodImplementation(setBlockingAlarm_body()), access_type=accessLevel1_1)
 
-    client.account.methods(compressor.id).create(name='getEmptyState', method_impl= MethodInstance.MethodImplementation(getEmptyState_body()), access_type=accessLevel1, description="e.g. { 'value': 0, 'unit': '$' }")
-    client.account.methods(compressor.id).create(name='getCompressorInfo', method_impl= MethodInstance.MethodImplementation(getCompressorInfo_body()), access_type=accessLevel1)
     client.account.methods(compressor.id).create(name='setLevel1Pwd', method_impl= MethodInstance.MethodImplementation(setLevelXPwd_body(1)), access_type=accessLevel1_1)
-    # dashboarding
-    client.account.methods(compressor.id).create(name='buildAggregateQueries', method_impl= MethodInstance.MethodImplementation(buildAggregateQueries_body()), access_type=accessLevel1_1)
-    client.account.methods(compressor.id).create(name='queryAggregates', method_impl= MethodInstance.MethodImplementation(queryAggregates_body()), access_type=accessLevel1_1)
-    client.account.methods(compressor.id).create(name='queryPropertySummary', method_impl= MethodInstance.MethodImplementation(queryPropertySummary_body()), access_type=accessLevel1)
-    client.account.methods(compressor.id).create(name='queryWarningAlarmSummary', method_impl= MethodInstance.MethodImplementation(queryWarningAlarmSummary_body()), access_type=accessLevel1)
-    client.account.methods(compressor.id).create(name='queryTimeToMaintenance', method_impl= MethodInstance.MethodImplementation(queryTimeToMaintenance_body()), access_type=accessLevel1_1)
-    client.account.methods(compressor.id).create(name='queryLoadRatio', method_impl= MethodInstance.MethodImplementation(queryLoadRatio_body()), access_type=accessLevel1_1)
 
-    client.account.methods(compressor.id).create(name='processCompressorStates', method_impl= MethodInstance.MethodImplementation(processCompressorStates_body()), access_type=accessLevel1_1)
     client.account.methods(compressor.id).create(name='calculateAll', method_impl= MethodInstance.MethodImplementation(calculateAll_body()), access_type=accessLevel1_1)
     client.account.methods(compressor.id).create(name='convertToHours', method_impl= MethodInstance.MethodImplementation(convertToHours_body()), access_type=accessLevel1_1)
     client.account.methods(compressor.id).create(name='convertToDec', method_impl= MethodInstance.MethodImplementation(convertToDec_body()), access_type=accessLevel1_1)
