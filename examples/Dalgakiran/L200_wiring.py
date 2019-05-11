@@ -1,7 +1,6 @@
 from connio.rest import Client
 from connio.rest.api.v3.account.propertyy import PropertyInstance
 from connio.rest.api.v3.account.method import MethodInstance
-from time import sleep
 from readwrite_methods import *
 from L200 import *
 from utility_methods import *
@@ -23,7 +22,7 @@ def wire(client, name='LogikaL200', friendly="Logika L200 Controller", base="Mod
     #------ Add base profile properties
     
     client.account.properties(compressor.id).create(name='tagValue', data_type='string', access_type='protected', publish_type='never')
-    
+
     client.account.properties(compressor.id).create(name='icon', data_type='string', access_type='public', publish_type='never')
     client.account.properties(compressor.id).create(name='cfgSerialNumber', data_type='string', access_type='protected', publish_type='never')
     client.account.properties(compressor.id).create(name='cfgLogikaModel', data_type='string', access_type='protected', publish_type='never')
