@@ -3274,7 +3274,7 @@ Bit mapped:
 -bit47..bit43: 5 bits, always set to 0
 
 */ 
-const tagPropName = "ClockTimer''' + str(timerNo) + '''";
+const tagPropName = "ClockTimers";
 
 let myvalue = { values: value };
 let first4Bytes = myvalue.slice(0,4);
@@ -3309,15 +3309,32 @@ clockTimer.startPressure = startPressure;
 let stopPressure = setPointPressure + deltaPressure;
 clockTimer.stopPressure = stopPressure;
 
-Device.api.setProperty(tagPropName, {
-    value: clockTimer,
-    time: new Date().toISOString()
- })
- .then(property => {
-    done(null, property.value);
- });
+Device.api.getProperty(tagPropName)
+    .then(property => {
+      if (!property.value){property.value = {}}
+      property.value.clockTimer''' + str(timerNo) + ''' = clockTimer
+      Device.api.setProperty(tagPropName, {
+          value: property.value,
+          time: new Date().toISOString()
+      })
+      .then(property => {
+          done(null, property.value);
+      });
+    });
 '''
+def readClockTimerIntoProperty_body(pname):
+    return """/**
 
+*/
+let pname = '""" + pname + """';
+let no = value.no;
+pname = pname + String(no);
+
+Device.readTagByPropKey(
+    { requestKey: pname,
+      done: r => done(null, r)
+});
+"""
 def readSlaveTagIntoProperty_body(pname):
     return """/**
 

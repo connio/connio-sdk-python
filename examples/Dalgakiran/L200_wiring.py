@@ -314,28 +314,7 @@ def wire(client, name='LogikaL200', friendly="Logika L200 Controller", base="Mod
     client.account.methods(compressor.id).create(name='readSlaveNumberOfTotalCompressorHours', method_impl= MethodInstance.MethodImplementation(readSlaveTagIntoProperty_body('SlaveNumberOfTotalCompressorHours')), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='readSlaveNumberOfLoadCompressorHours', method_impl= MethodInstance.MethodImplementation(readSlaveTagIntoProperty_body('SlaveNumberOfLoadCompressorHours')), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='readSlaveMaintCounters', method_impl= MethodInstance.MethodImplementation(readSlaveTagIntoProperty_body('SlaveMaintCounters')), access_type=accessLevel4)
-    # Clock Timer Read Methods
-    client.account.methods(compressor.id).create(name='readClockTimer0', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('ClockTimer0')), access_type=accessLevel4)
-    client.account.methods(compressor.id).create(name='readClockTimer1', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('ClockTimer1')), access_type=accessLevel4)
-    client.account.methods(compressor.id).create(name='readClockTimer2', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('ClockTimer2')), access_type=accessLevel4)
-    client.account.methods(compressor.id).create(name='readClockTimer3', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('ClockTimer3')), access_type=accessLevel4)
-    client.account.methods(compressor.id).create(name='readClockTimer4', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('ClockTimer4')), access_type=accessLevel4)
-    client.account.methods(compressor.id).create(name='readClockTimer5', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('ClockTimer5')), access_type=accessLevel4)
-    client.account.methods(compressor.id).create(name='readClockTimer6', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('ClockTimer6')), access_type=accessLevel4)
-    client.account.methods(compressor.id).create(name='readClockTimer7', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('ClockTimer7')), access_type=accessLevel4)
-    client.account.methods(compressor.id).create(name='readClockTimer8', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('ClockTimer8')), access_type=accessLevel4)
-    client.account.methods(compressor.id).create(name='readClockTimer9', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('ClockTimer9')), access_type=accessLevel4)
-    client.account.methods(compressor.id).create(name='readClockTimer10', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('ClockTimer10')), access_type=accessLevel4)
-    client.account.methods(compressor.id).create(name='readClockTimer11', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('ClockTimer11')), access_type=accessLevel4)
-    client.account.methods(compressor.id).create(name='readClockTimer12', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('ClockTimer12')), access_type=accessLevel4)
-    client.account.methods(compressor.id).create(name='readClockTimer13', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('ClockTimer13')), access_type=accessLevel4)
-    client.account.methods(compressor.id).create(name='readClockTimer14', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('ClockTimer14')), access_type=accessLevel4)
-    client.account.methods(compressor.id).create(name='readClockTimer15', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('ClockTimer15')), access_type=accessLevel4)
-    client.account.methods(compressor.id).create(name='readClockTimer16', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('ClockTimer16')), access_type=accessLevel4)
-    client.account.methods(compressor.id).create(name='readClockTimer17', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('ClockTimer17')), access_type=accessLevel4)
-    client.account.methods(compressor.id).create(name='readClockTimer18', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('ClockTimer18')), access_type=accessLevel4)
-    client.account.methods(compressor.id).create(name='readClockTimer19', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('ClockTimer19')), access_type=accessLevel4)
-    client.account.methods(compressor.id).create(name='readClockTimer20', method_impl= MethodInstance.MethodImplementation(readTagIntoProperty_body('ClockTimer20')), access_type=accessLevel4)
+    client.account.methods(compressor.id).create(name='readClockTimers', method_impl= MethodInstance.MethodImplementation(readClockTimerIntoProperty_body('ClockTimer')), access_type=accessLevel4)
 
     client.account.methods(compressor.id).create(name='writeTotalEnergyConsumption', method_impl= MethodInstance.MethodImplementation(writeTotalEnergyConsumption_body()), access_type=accessLevel4)
     client.account.methods(compressor.id).create(name='writeAirProduced', method_impl= MethodInstance.MethodImplementation(writeAirProduced_body()), access_type=accessLevel4)
@@ -381,6 +360,11 @@ def wire(client, name='LogikaL200', friendly="Logika L200 Controller", base="Mod
     #Base Methods
     accessLevel1_1 = 'private'
     accessLevel1 = 'protected'
+    client.account.methods(compressor.id).create(name='setAlarms', method_impl= MethodInstance.MethodImplementation(setAlarms_body()), access_type=accessLevel1_1)
+    client.account.methods(compressor.id).create(name='setNonAckAlarms', method_impl= MethodInstance.MethodImplementation(setNonAckAlarms_body()), access_type=accessLevel1_1)
+    client.account.methods(compressor.id).create(name='setControllerState', method_impl= MethodInstance.MethodImplementation(setControllerState_body()), access_type=accessLevel1_1)
+    client.account.methods(compressor.id).create(name='setBlockingAlarm', method_impl= MethodInstance.MethodImplementation(setBlockingAlarm_body()), access_type=accessLevel1_1)
+
     client.account.methods(compressor.id).create(name='getEmptyState', method_impl= MethodInstance.MethodImplementation(getEmptyState_body()), access_type=accessLevel1, description="e.g. { 'value': 0, 'unit': '$' }")
     client.account.methods(compressor.id).create(name='getCompressorInfo', method_impl= MethodInstance.MethodImplementation(getCompressorInfo_body()), access_type=accessLevel1)
     client.account.methods(compressor.id).create(name='setLevel1Pwd', method_impl= MethodInstance.MethodImplementation(setLevelXPwd_body(1)), access_type=accessLevel1_1)
