@@ -220,8 +220,8 @@ Asagidaki sekilde bakim ucretlerini girebilirsiniz:
     icon: kompresor resim dosyasinin adi
     elecCost: kompresorun kullanildigi bolgedeki elektrik birim fiyati ve para birimi
     """)
-    #client.account.methods(compressor.id).create(name='getDashboardParallel', method_impl= MethodInstance.MethodImplementation(getDashboard_body()), access_type='public')
-    client.account.methods(compressor.id).create(name='getDashboard', method_impl= MethodInstance.MethodImplementation(getDashboard_body()), access_type='public')
+    client.account.methods(compressor.id).create(name='getDashboard', method_impl= MethodInstance.MethodImplementation(getDashboard_body()), access_type='public', description="""
+Build the default dashboard view of the compressor. Some information must be populated by calling `preaggregate()` method ahead of time.""")
     client.account.methods(compressor.id).create(name='getLatestValues', method_impl= MethodInstance.MethodImplementation(getLatestValues_body()), access_type='public')
     client.account.methods(compressor.id).create(name='preaggregate', method_impl= MethodInstance.MethodImplementation(preaggregate_body()), access_type='public')
 
@@ -271,18 +271,18 @@ Asagidaki sekilde bakim ucretlerini girebilirsiniz:
     client.account.methods(compressor.id).create(name='queryTimeToMaintenance', method_impl= MethodInstance.MethodImplementation(queryTimeToMaintenance_body()), access_type=accessLevel1_1)
     client.account.methods(compressor.id).create(name='queryLoadRatio', method_impl= MethodInstance.MethodImplementation(queryLoadRatio_body()), access_type=accessLevel1_1)
 
+    client.account.methods(compressor.id).create(name='getConnectivity', method_impl= MethodInstance.MethodImplementation(getConnectivity_body()), access_type=accessLevel1_1, description="""
+/** @enum {string} */
+Connectivity = {
+  OFFLINE: 'offline',
+  ONLINE_ACTIVE: 'online-active',
+  ONLINE_INACTIVE: 'online-inactive',
+};""")
+    client.account.methods(compressor.id).create(name='common', method_impl= MethodInstance.MethodImplementation(common_body()), access_type=accessLevel1_1, description="""
+Common utils, constants, enums, etc""")
+
     client.account.methods(compressor.id).create(name='processCompressorStates', method_impl= MethodInstance.MethodImplementation(processCompressorStates_body()), access_type=accessLevel1_1)
     client.account.methods(compressor.id).create(name='calculateAll', method_impl= MethodInstance.MethodImplementation(calculateAll_body()), access_type=accessLevel1_1)
-
-
-    # client.account.methods(compressor.id).create(name='queryUsageHours', method_impl= MethodInstance.MethodImplementation(queryUsageHours_body()), access_type=accessLevel1_1)
-    # client.account.methods(compressor.id).create(name='queryEstimEnergyConsumption', method_impl= MethodInstance.MethodImplementation(queryEstimEnergyConsumption_body()), access_type=accessLevel1_1)
-    # client.account.methods(compressor.id).create(name='queryEstimPowerConsumption', method_impl= MethodInstance.MethodImplementation(queryEstimPowerConsumption_body()), access_type=accessLevel1_1)    
-    # client.account.methods(compressor.id).create(name='queryStoppages', method_impl= MethodInstance.MethodImplementation(queryStoppages_body()), access_type=accessLevel1_1)  
-    # client.account.methods(compressor.id).create(name='queryEstimCostOfRunning', method_impl= MethodInstance.MethodImplementation(queryEstimCostOfRunning_body()), access_type=accessLevel1_1)
-    # client.account.methods(compressor.id).create(name='queryOEE', method_impl= MethodInstance.MethodImplementation(queryOEE_body()), access_type=accessLevel1_1)
-    #client.account.methods(compressor.id).create(name='queryMtbf', method_impl= MethodInstance.MethodImplementation(queryMtbf_body()), access_type=accessLevel1_1)
-    #client.account.methods(compressor.id).create(name='queryMttr', method_impl= MethodInstance.MethodImplementation(queryMttr_body()), access_type=accessLevel1_1)  
 
     client.account.methods(compressor.id).create(name='convertToHours', method_impl= MethodInstance.MethodImplementation(convertToHours_body()), access_type=accessLevel1_1)
     client.account.methods(compressor.id).create(name='convertToDec', method_impl= MethodInstance.MethodImplementation(convertToDec_body()), access_type=accessLevel1_1)
@@ -305,8 +305,6 @@ Asagidaki sekilde bakim ucretlerini girebilirsiniz:
     client.account.methods(compressor.id).create(name='setCompressorState', method_impl= MethodInstance.MethodImplementation(setCompressorState_body()), access_type=accessLevel1_1)
     client.account.methods(compressor.id).create(name='setBlockingAlarm', method_impl= MethodInstance.MethodImplementation(setBlockingAlarm_body()), access_type=accessLevel1_1)
 
-    # client.account.methods(compressor.id).create(name='setRelayOutputs', method_impl= MethodInstance.MethodImplementation(setRelayOutputs_body()), access_type=accessLevel1_1)
-    # client.account.methods(compressor.id).create(name='setDigitalInputs', method_impl= MethodInstance.MethodImplementation(setDigitalInputs_body()), access_type=accessLevel1_1)
     client.account.methods(compressor.id).create(name='setScrewTemperature', method_impl= MethodInstance.MethodImplementation(setScrewTemperature_body()), access_type=accessLevel1_1)
     client.account.methods(compressor.id).create(name='setWorkingPressure', method_impl= MethodInstance.MethodImplementation(setWorkingPressure_body()), access_type=accessLevel1_1)
     client.account.methods(compressor.id).create(name='setControllerSupplyVoltage', method_impl= MethodInstance.MethodImplementation(setControllerSupplyVoltage_body()), access_type=accessLevel1_1)
@@ -383,15 +381,15 @@ def wire(keyID, keySecret):
 
     print('Creating the system.....')
 
-    #wireApp(client)
-    # wireGw(client)
-    # wireBase(client)
+    wireApp(client)
+    wireGw(client)
+    wireBase(client)
     
     # Wire different controller types
     L9c.wire(client)
     L26c.wire(client)
     L33c.wire(client)
-    L200c.wire(client)
+    # L200c.wire(client)
 
     # wireGw(client, 'ModbusGatewayXX', 'Modbus Gateway XX')
     # wireBase(client, 'BaseLogikaProfileXX', 'Logika Base XX', 'ModbusGatewayXX')
@@ -403,8 +401,17 @@ def wire(keyID, keySecret):
 
 if __name__ == '__main__':
 
-    keyID = os.environ.get('DK_ACCOUNT_KEYID', '_key_500600814475760930') #'_key_570946869128168926')
-    keySecret = os.environ.get('DK_ACCOUNT_KEYSECRET', '0b51ab06dc554165bda3db495eb00737') #'249d7cd1bde84549a76b30e4eafeac54')
+    # DK
+    # keyID = os.environ.get('DK_ACCOUNT_KEYID', '_key_597863750116322358') 
+    # keySecret = os.environ.get('DK_ACCOUNT_KEYSECRET', '3de1070b75f945c5a2406557ea29affc')
+
+    #Sub account 1
+    # keyID = os.environ.get('DK_ACCOUNT_KEYID', '_key_591833232575364370')
+    # keySecret = os.environ.get('DK_ACCOUNT_KEYSECRET', 'dafaeeb4b14a41ecbe438b29d9d93b2e')
+
+    # DEMO ICIN
+    keyID = os.environ.get('DK_ACCOUNT_KEYID', '_key_642643305188058986')
+    keySecret = os.environ.get('DK_ACCOUNT_KEYSECRET', '747f95c9b6a54e7d91811f810436a01e')
 
     if len(sys.argv) == 3:
         keyID = sys.argv[1]
