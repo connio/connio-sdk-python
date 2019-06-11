@@ -51,6 +51,7 @@ const Connectivity = {
 
 /** @enum {string} */
 const Property = {
+  ACTIVE_ALARMS: 'activeAlarms',
   ACTIVE: 'active',
   COMPRESSOR_STATE: 'compressorState',
   CONNECTION_STATUS: 'connectionStatus',
@@ -476,6 +477,7 @@ return {
   hasInverter: false,
   status: {
     code: 0,
+    label: '',
   },
 };
 """
@@ -649,7 +651,7 @@ const WARRANTY_PERIOD = 60;
 const EMPTY_VALUE = '—';
 
 /** @type {{ code: number }} */
-const EMPTY_STATUS = { code: 0 };
+const EMPTY_STATUS = { code: 0, label: '' };
 
 /**
  * @param {Date} date1
@@ -763,7 +765,12 @@ def getDashboard_body():
  * @requires Device/common
  */
 
-const { checkIsOffline, withDefaultValue, Property } = Device.common();
+const {
+  checkIsOffline,
+  getPropertyValue,
+  Property,
+  withDefaultValue,
+} = Device.common();
 
 /** @type {number} */
 const DEFAULT_PROPERTY_VALUE = 0;
@@ -806,6 +813,7 @@ async function main(context) {
 
   const requests = [
     Device.getCompressorInfo(),
+    Device.getActiveAlarm(),
     Device.api.getProperty(Property.PRESSURE),
     Device.api.getProperty(Property.TEMPERATURE),
   ];
@@ -821,6 +829,7 @@ async function main(context) {
 
   const [
     compressorInfo,
+    activeAlarm,
     pressure,
     temperature,
 
@@ -844,6 +853,8 @@ async function main(context) {
 
   Object.assign(context, {
     ...compressorInfo,
+
+    activeAlarm,
 
     /** @desc A leftover from `preaggregate → processCompressorStates` */
     periods: void 0,
@@ -925,7 +936,35 @@ Device.api
   .getProperty(Property.STATE)
   .then((property) => property.value || Device.getEmptyState(value))
   .then(main)
+  .then(currencyAdapter)
   .then((context) => done(null, context));
+
+/**
+ * @param {Object} property
+ * @param {string} currency
+ * @returns {Object}
+ */
+function updateCurrency(property, currency) {
+  return {
+    ...property,
+    unit: currency,
+  };
+}
+
+/**
+ * @param {Object} ctx context
+ * @returns {Object} Context with unified currencies
+ */
+function currencyAdapter(ctx) {
+  const { unit: currency } = ctx.costOfkWh;
+  const _updateCurrency = (x) => updateCurrency(x, currency);
+
+  return {
+    ...ctx,
+    costOfRunning: _updateCurrency(ctx.costOfRunning),
+    maintenance: _updateCurrency(ctx.maintenance),
+  };
+}
 """
 
 #
