@@ -271,7 +271,7 @@ Build the default dashboard view of the compressor. Some information must be pop
     client.account.methods(compressor.id).create(name='queryTimeToMaintenance', method_impl= MethodInstance.MethodImplementation(queryTimeToMaintenance_body()), access_type=accessLevel1_1)
     client.account.methods(compressor.id).create(name='queryLoadRatio', method_impl= MethodInstance.MethodImplementation(queryLoadRatio_body()), access_type=accessLevel1_1)
 
-    client.acocunt.methods(compressor.id).create(name='getActiveAlarm', method_impl= MethodInstance.MethodImplementation(getActiveAlarm_body()), access_type=accessLevel1_1)
+    client.account.methods(compressor.id).create(name='getActiveAlarm', method_impl= MethodInstance.MethodImplementation(getActiveAlarm_body()), access_type=accessLevel1_1)
     client.account.methods(compressor.id).create(name='getConnectivity', method_impl= MethodInstance.MethodImplementation(getConnectivity_body()), access_type=accessLevel1_1, description="""
 /** @enum {string} */
 Connectivity = {
