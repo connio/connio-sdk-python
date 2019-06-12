@@ -14,6 +14,7 @@
 # showOEE 
 # 
 # getConnectivity
+# getActiveAlarm
 #
 
 #
@@ -1054,6 +1055,38 @@ async function main() {
   const [connection, active] = await Promise.all(requests);
 
   return getConnectivity({ connection, activity: active });
+}
+
+return main();
+"""
+
+def getActiveAlarm_body():
+  return """/**
+ * @namespace BaseLogikaProfile
+ *
+ * @private
+ * @function getActiveAlarm
+ * @returns {Object|void}
+ *
+ * @requires Device/common
+ */
+
+const { getPropertyValue, Property } = Device.common();
+
+/** @type {Object} */
+const DEFAULT_PROPERTY_VALUE = {};
+
+/**
+ * @async
+ * @returns {Object|void}
+ */
+async function main() {
+  const { items: [activeAlarm] = [] } = await getPropertyValue(
+    Property.ACTIVE_ALARMS,
+    DEFAULT_PROPERTY_VALUE,
+  );
+
+  return activeAlarm;
 }
 
 return main();
