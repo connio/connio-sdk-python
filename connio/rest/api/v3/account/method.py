@@ -1,5 +1,4 @@
 
-from connio.base import deserialize
 from connio.base import serialize
 from connio.base import values
 from connio.base.instance_context import InstanceContext
@@ -287,7 +286,7 @@ class MethodContext(InstanceContext):
         data = values.of({
             'name': name,
             'friendlyName': friendly_name,
-            'methodImpl': serialize.methodImplementation(method_impl.body, method_impl.lang),
+            'methodImpl': serialize.methodImplementation(method_impl),
         })
 
         payload = self._version.update(
@@ -329,8 +328,10 @@ class MethodInstance(InstanceResource):
         :returns: connio.rest.api.v3.account.method.MethodInstance
         :rtype: connio.rest.api.v3.account.method.MethodInstance
         """
-        super(MethodInstance, self).__init__(version)
+        from connio.base import deserialize
 
+        super(MethodInstance, self).__init__(version)
+        
         # Marshaled Properties
         self._properties = {
             'account_id': payload['accountId'],

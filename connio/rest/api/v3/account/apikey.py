@@ -1,5 +1,4 @@
 
-from connio.base import deserialize
 from connio.base import values
 from connio.base.instance_context import InstanceContext
 from connio.base.instance_resource import InstanceResource
@@ -119,6 +118,8 @@ class ApiKeyInstance(InstanceResource):
         :returns: connio.rest.api.v3.account.apikey.ApiKeyInstance
         :rtype: connio.rest.api.v3.account.apikey.ApiKeyInstance
         """
+        from connio.base import deserialize
+
         super(ApiKeyInstance, self).__init__(version)
 
         # Marshaled Properties

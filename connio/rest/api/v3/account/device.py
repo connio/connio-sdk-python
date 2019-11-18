@@ -1,5 +1,4 @@
 
-from connio.base import deserialize
 from connio.base import serialize
 from connio.base import values
 from connio.base.instance_context import InstanceContext
@@ -394,6 +393,8 @@ class DeviceInstance(InstanceResource):
         :returns: connio.rest.api.v3.account.device.DeviceInstance
         :rtype: connio.rest.api.v3.account.device.DeviceInstance
         """
+        from connio.base import deserialize
+
         super(DeviceInstance, self).__init__(version)
 
         # Marshaled Properties
