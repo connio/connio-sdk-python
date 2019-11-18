@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from connio.rest import Client
 from connio.rest.api.v3.account.propertyy import PropertyInstance
 from connio.rest.api.v3.account.method import MethodInstance

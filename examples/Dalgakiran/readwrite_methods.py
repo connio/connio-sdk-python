@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # ~~ Read/Write methods ~~
 #
 # readSerialNumber / cfgSerialNumber

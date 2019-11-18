@@ -1,3 +1,4 @@
+# coding: utf-8
 import os
 import time
 
@@ -411,8 +412,8 @@ if __name__ == '__main__':
     # keySecret = os.environ.get('DK_ACCOUNT_KEYSECRET', 'dafaeeb4b14a41ecbe438b29d9d93b2e')
 
     # DEMO ICIN
-    keyID = os.environ.get('DK_ACCOUNT_KEYID', '_key_642643305188058986')
-    keySecret = os.environ.get('DK_ACCOUNT_KEYSECRET', '747f95c9b6a54e7d91811f810436a01e')
+    keyID = os.environ.get('DK_ACCOUNT_KEYID', '_key_570247852999996422')
+    keySecret = os.environ.get('DK_ACCOUNT_KEYSECRET', 'b21ab06e026840ea9081f213375aa40d')
 
     if len(sys.argv) == 3:
         keyID = sys.argv[1]
