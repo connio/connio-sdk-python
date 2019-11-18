@@ -68,7 +68,7 @@ class ConnioHttpClient(HttpClient):
             timeout=timeout,
         )
         
-        _logger.info('{method} Response: {status} {text}'.format(method=method, status=response.status_code, text=response.text))
+        _logger.info(u'{method} Response: {status} {text}'.format(method=method, status=response.status_code, text=response.text))
 
         self.last_response = Response(int(response.status_code), response.text)
 
