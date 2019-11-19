@@ -1,6 +1,4 @@
 
-from connio.base import deserialize
-from connio.base import serialize
 from connio.base import values
 from connio.base.instance_context import InstanceContext
 from connio.base.instance_resource import InstanceResource
@@ -42,6 +40,8 @@ class PropertyList(ListResource):
         :returns: Newly created PropertyInstance
         :rtype: connio.rest.api.v3.account.property.PropertyInstance
         """
+        from connio.base import serialize
+
         data = values.of({
             'name': name,
             'ownerId': self._solution['owner_id'],
@@ -288,6 +288,8 @@ class PropertyContext(InstanceContext):
         :returns: Updated PropertyInstance
         :rtype: connio.rest.api.v3.account.property.PropertyInstance
         """
+        from connio.base import serialize
+
         data = values.of({
             'name': name,
             'friendlyName': friendly_name,
@@ -389,8 +391,10 @@ class PropertyInstance(InstanceResource):
         :returns: connio.rest.api.v3.account.property.PropertyInstance
         :rtype: connio.rest.api.v3.account.property.PropertyInstance
         """
-        super(PropertyInstance, self).__init__(version)
+        from connio.base import deserialize
 
+        super(PropertyInstance, self).__init__(version)
+        
         # Marshaled Properties
         self._properties = {
             'account_id': payload['accountId'],

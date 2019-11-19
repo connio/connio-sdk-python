@@ -154,7 +154,7 @@ def plan(plan):
 def methodImplementation(impl):
     """
     Serialize a method implementation object to JSON
-    :param measurement: MethodInstance.MethodImplementation
+    :param impl: MethodInstance.MethodImplementation
     :return: jsonified string represenation of obj 
     """    
     from connio.rest.api.v3.account.method import MethodInstance
