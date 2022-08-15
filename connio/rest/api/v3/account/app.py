@@ -320,7 +320,7 @@ class AppContext(InstanceContext):
         })
 
         payload = self._version.update(
-            'POST',
+            'PUT',
             self._uri,
             data=data,
         )
