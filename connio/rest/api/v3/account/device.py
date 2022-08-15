@@ -8,6 +8,10 @@ from connio.base.page import Page
 
 from connio.rest.api.v3.account.apikey import ApiKeyContext
 
+HTTP_POST = "POST"
+HTTP_GET = "GET"
+HTTP_PUT = "PUT"
+
 class DeviceList(ListResource):
     """  """
 
@@ -58,7 +62,7 @@ class DeviceList(ListResource):
         })
 
         payload = self._version.create(
-            'POST',
+            HTTP_POST,
             self._uri,
             data=data,
         )
@@ -71,21 +75,21 @@ class DeviceList(ListResource):
 
         """        
         payload = self._version.create(
-            'POST',
+            HTTP_POST,
             self._uri + '/bulk',
             data=devices,
         )
 
         return payload
 
-    def stream(self, friendly_name=values.unset, short_code=values.unset,
+    def stream(self, profile_id=values.unset, friendly_name=values.unset, short_code=values.unset,
                limit=None, page_size=None):
         """
         Streams DeviceInstance records from the API as a generator stream.
         This operation lazily loads records as efficiently as possible until the limit
         is reached.
         The results are returned as a generator, so this operation is memory efficient.
-
+        :param unicode profile_id: Filter by profile name 
         :param unicode friendly_name: Filter by friendly name
         :param int limit: Upper limit for the number of records to return. stream()
                           guarantees to never return more than limit.  Default is no limit
@@ -99,12 +103,12 @@ class DeviceList(ListResource):
         """
         limits = self._version.read_limits(limit, page_size)
 
-        page = self.page(friendly_name=friendly_name, page_size=limits['page_size'], )
+        page = self.page(profile_id=profile_id, friendly_name=friendly_name, page_size=limits['page_size'], )
 
         return self._version.stream(page, limits['limit'], limits['page_limit'])
 
     def list(self, friendly_name=values.unset, short_code=values.unset, limit=None,
-             page_size=None):
+             page_size=None, profile_id=None):
         """
         Lists DeviceInstance records from the API as a list.
         Unlike stream(), this operation is eager and will load `limit` records into
@@ -125,9 +129,10 @@ class DeviceList(ListResource):
             friendly_name=friendly_name,
             limit=limit,
             page_size=page_size,
+            profile_id=profile_id
         ))
 
-    def page(self, friendly_name=values.unset, page_number=values.unset,
+    def page(self, friendly_name=values.unset, profile_id=values.unset, page_number=values.unset,
              page_size=values.unset):
         """
         Retrieve a single page of DeviceInstance records from the API.
@@ -144,10 +149,11 @@ class DeviceList(ListResource):
             'friendlyName': friendly_name,
             'pageNo': page_number,
             'pageSize': page_size,
+            'is_a': profile_id
         })
 
         response = self._version.page(
-            'GET',
+            HTTP_GET,
             self._uri,
             params=params,
         )
@@ -165,7 +171,7 @@ class DeviceList(ListResource):
         :rtype: connio.rest.api.v3.account.device.DevicePage
         """
         response = self._version.domain.client.request(
-            'GET',
+            HTTP_GET,
             target_url,
         )
 
@@ -250,6 +256,8 @@ class DevicePage(Page):
 
 
 class DeviceContext(InstanceContext):
+    ID_KEY = "id"
+
     """  """
 
     def __init__(self, version, account_id, id):
@@ -280,7 +288,7 @@ class DeviceContext(InstanceContext):
         params = values.of({})
 
         payload = self._version.fetch(
-            'GET',
+            HTTP_GET,
             self._uri,
             params=params,
         )
@@ -292,7 +300,7 @@ class DeviceContext(InstanceContext):
             id=self._solution['id'],
         )
 
-    def update(self, name=values.unset, friendly_name=values.unset, apps=values.unset, 
+    def update(self, name=values.unset, friendly_name=values.unset, apps=values.unset,
                 description=values.unset, tags=values.unset, period=values.unset, location=values.unset,
                 custom_ids=values.unset, status=values.unset, annotate_with_location=values.unset, annotate_with_meta=values.unset):
         """
@@ -319,7 +327,7 @@ class DeviceContext(InstanceContext):
         })
 
         payload = self._version.update(
-            'PUT',
+            HTTP_PUT,
             self._uri,
             data=data,
         )
@@ -343,7 +351,6 @@ class DeviceContext(InstanceContext):
     @property
     def apikey(self):
         """
-        
         :returns: connio.rest.api.v3.account.apikey.ApiKeyInstance
         :rtype: connio.rest.api.v3.account.apikey.ApiKeyInstance
         """
@@ -356,6 +363,34 @@ class DeviceContext(InstanceContext):
             )
         return self._apikey.fetch()
 
+    def insert_property_value(self, payload, use_device_key=False):
+        device_id = self._solution['id']
+        if(not use_device_key):
+            return self._version.fetch(HTTP_POST, f'data/devices/{device_id}', data=payload)
+
+        return self._version.fetch(HTTP_POST, f'data/devices/{device_id}', data=payload, auth=(self.apikey.id, self.apikey.secret))
+
+    def call_method(self, payload, method_name):
+        device_id = self._solution[self.ID_KEY]
+        return self._version.fetch(HTTP_POST, f'data/devices/{device_id}/methods/{method_name}', data=payload)
+
+        return self._version.fetch('post', f'data/devices/{device_id}', data=payload)
+
+    def read_property_historical(self, property_name, query):
+        device_id = self._solution['id']
+        return self._version.fetch('post', f'data/devices/{device_id}/properties/{property_name}/query', data=query)
+
+    def read_events(self, page_size, page_no, admin_auth):
+        device_id = self._solution['id']
+        return self._version.fetch('get', f'sys/data/devices/{device_id}?pageSize={page_size}&pageNo={page_no}', auth=admin_auth)
+
+    def state(self):
+        """
+        Return device state as dict
+        """
+        device_id = self._solution[self.ID_KEY]
+        return self._version.fetch(HTTP_GET, f'data/devices/{device_id}')
+
     def __repr__(self):
         """
         Provide a friendly representation
@@ -365,6 +400,7 @@ class DeviceContext(InstanceContext):
         """
         context = ' '.join('{}={}'.format(k, v) for k, v in self._solution.items())
         return '<Connio.Api.V3.DeviceContext {}>'.format(context)
+
 
 
 class DeviceInstance(InstanceResource):
@@ -382,7 +418,8 @@ class DeviceInstance(InstanceResource):
             self.alt = alt
         
     class Location:
-        def __init__(self, zone, geo):
+        def __init__(self, zone, geo, props=values.unset):
+            self._properties = props
             self.zone = zone
             self.geo = geo
 
@@ -574,7 +611,22 @@ class DeviceInstance(InstanceResource):
         :rtype: datetime
         """
         return self._properties['date_updated']
-    
+
+    @property
+    def state(self):
+        """
+        :returns: A string that uniquely identifies this device
+        :rtype: unicode
+        """
+        return self._proxy.state()
+
+    def call_method(self, payload, method_name):
+        """
+        :returns: Whatever method returns
+        :rtype: unicode
+        """
+        return self._proxy.call_method(payload, method_name)
+
     def fetch(self):
         """
         Fetch a DeviceInstance
@@ -583,6 +635,15 @@ class DeviceInstance(InstanceResource):
         :rtype: connio.rest.api.v3.account.device.DeviceInstance
         """
         return self._proxy.fetch()
+
+    def insert_property_value(self, payload, use_device_key=False):
+        return self._proxy.insert_property_value(payload, use_device_key)
+
+    def read_property_historical(self, property_name, query):
+        return self._proxy.read_property_historical(property_name, query)
+
+    def read_events(self, page_size, page_no, admin_auth):
+        return self._proxy.read_events(page_size, page_no, admin_auth)
 
     def update(self, 
                 name=values.unset, 

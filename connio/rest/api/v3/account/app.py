@@ -41,6 +41,7 @@ class AppList(ListResource):
         :returns: Newly created AppInstance
         :rtype: connio.rest.api.v3.account.device.AppInstance
         """
+
         data = values.of({
             'name': name,
             'profile': profile,
@@ -58,7 +59,7 @@ class AppList(ListResource):
 
         return AppInstance(self._version, payload, account_id=self._solution['account_id'], )    
 
-    def stream(self, friendly_name=values.unset, short_code=values.unset,
+    def stream(self, friendly_name=values.unset, profile_id=values.unset, short_code=values.unset,
                limit=None, page_size=None):
         """
         Streams AppInstance records from the API as a generator stream.
@@ -79,12 +80,13 @@ class AppList(ListResource):
         """
         limits = self._version.read_limits(limit, page_size)
 
-        page = self.page(friendly_name=friendly_name, page_size=limits['page_size'], )
+        page = self.page(profile_id=profile_id,
+                         friendly_name=friendly_name, page_size=limits['page_size'], )
 
         return self._version.stream(page, limits['limit'], limits['page_limit'])
 
     def list(self, friendly_name=values.unset, short_code=values.unset, limit=None,
-             page_size=None):
+             page_size=None, profile_id=None):
         """
         Lists AppInstance records from the API as a list.
         Unlike stream(), this operation is eager and will load `limit` records into
@@ -105,11 +107,12 @@ class AppList(ListResource):
             friendly_name=friendly_name,
             limit=limit,
             page_size=page_size,
+            profile_id=profile_id
         ))
 
     def page(self, friendly_name=values.unset,
              page_token=values.unset, page_number=values.unset,
-             page_size=values.unset):
+             page_size=values.unset, profile_id=values.unset):
         """
         Retrieve a single page of AppInstance records from the API.
         Request is executed immediately
@@ -127,6 +130,7 @@ class AppList(ListResource):
             'PageToken': page_token,
             'Page': page_number,
             'PageSize': page_size,
+            'is_a': profile_id
         })
 
         response = self._version.page(
@@ -275,6 +279,23 @@ class AppContext(InstanceContext):
             id=self._solution['id'],
         )
 
+    def state(self):
+        """
+        Return device state as dict
+        """
+        app_id = self._solution['id']
+        return self._version.fetch('get', f'data/apps/{app_id}')
+
+    def insert_property_value(self, payload, auth_key=None):
+        app_id = self._solution['id']
+        if auth_key is None:
+            return self._version.fetch('post', f'data/apps/{app_id}', data=payload)
+        return self._version.fetch('post', f'data/apps/{app_id}', data=payload, auth=auth_key)
+        
+    def call_method(self, payload, method_name):
+        app_id = self._solution['id']
+        return self._version.fetch('post', f'data/apps/{app_id}/methods/{method_name}', data=payload)
+
     def update(self, name=values.unset, friendly_name=values.unset,
                 description=values.unset, tags=values.unset, status=values.unset):
         """
@@ -394,6 +415,24 @@ class AppInstance(InstanceResource):
                 id=self._solution['id'],
             )
         return self._context
+
+    def insert_property_value(self, payload, auth_key=None):
+        return self._proxy.insert_property_value(payload, auth_key)
+
+    @property
+    def state(self):
+        """
+        :returns: A string that uniquely identifies this device
+        :rtype: unicode
+        """
+        return self._proxy.state()
+
+    def call_method(self, payload, method_name):
+        """
+        :returns: Whatever method returns
+        :rtype: unicode
+        """
+        return self._proxy.call_method(payload, method_name)
 
     @property
     def id(self):

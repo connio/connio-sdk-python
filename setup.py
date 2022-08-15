@@ -1,58 +1,49 @@
-from __future__ import with_statement
-import sys
+
 from setuptools import setup, find_packages
+import requests
+import json
 
-__version__ = None
-with open('connio/__init__.py') as f:
-    exec(f.read())
+try:
+    from packaging.version import parse
+except ImportError:
+    from pip._vendor.packaging.version import parse
 
-# To install the connio-python library, open a Terminal shell, then run this
-# file by typing:
-#
-# python setup.py install
-#
-# You need to have the setuptools module installed. Try reading the setuptools
-# documentation: http://pypi.python.org/pypi/setuptools
+
+URL_PATTERN = 'https://pypi.python.org/pypi/{package}/json'
+NAME = 'conniosdk'
+
+
+def get_version(package, url_pattern=URL_PATTERN):
+    """Return version of package on pypi.python.org using json."""
+    req = requests.get(url_pattern.format(package=package))
+    version = parse('0')
+    if req.status_code == requests.codes.ok:
+        j = json.loads(req.text.encode(req.encoding))
+        releases = j.get('releases', [])
+        for release in releases:
+            ver = parse(release)
+            if not ver.is_prerelease:
+                version = max(version, ver)
+    return version
+
+
+latest_version = float(str(get_version(NAME)))
+new_version = format(latest_version + 0.011, '.2f')
 
 setup(
-    name = "connio",
-    version = __version__,
-    description = "Connio API client ",
-    author = "Connio Inc.",
-    author_email = "help@conio.com",
-    url = "https://github.com/connio/connio-sdk-python/",
+    name=NAME,
+    version=new_version,
+    description='Connio Python SDK',
     keywords = ["connio"],
-    install_requires = [
-        "pytz",
-        "PyJWT >= 1.4.2",
-        "paho-mqtt >= 1.4.0",
-    ],
-    extras_require={
-        ':python_version<"3.0"': [
-            "requests[security] >= 2.0.0",
-        ],
-        ':python_version>="3.0"': [
-            "requests >= 2.0.0",
-            "pysocks",
-        ],
-    },
-    packages = find_packages(exclude=['tests', 'tests.*']),
-    include_package_data=True,
-    classifiers = [
-        "Development Status :: 3 - Alpha",
-        "Intended Audience :: Developers",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
-        "Programming Language :: Python",
-        "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3.3",
-        "Programming Language :: Python :: 3.4",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
-        "Topic :: Software Development :: Embedded Systems",
-        "Topic :: Software Development :: Libraries :: Python Modules",
-        "Topic :: Software Development :: Libraries :: Application Frameworks",
-        ],
+    author_email='admin@digiterra.com.tr',
+    packages=find_packages(include=['connio', 'connio.*']),
+    install_requires=['pytz',
+                      'six',
+                      'requests',
+                      'paho_mqtt',
+                      'simplejson',
+                      'twilio'],  # external packages as dependencies,
+
     long_description = """\
     Python Connio Helper Library
     ----------------------------
@@ -65,3 +56,4 @@ setup(
 
      LICENSE The Connio Python Helper Library is distributed under the MIT
     License """ )
+)

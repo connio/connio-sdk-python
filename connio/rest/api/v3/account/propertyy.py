@@ -8,7 +8,7 @@ from connio.base.page import Page
 class PropertyList(ListResource):
     """  """
 
-    def __init__(self, version, account_id, owner_id):
+    def __init__(self, version, account_id, owner_id, tags=values.unset):
         """
         Initialize the PropertyList
 
@@ -21,9 +21,18 @@ class PropertyList(ListResource):
         super(PropertyList, self).__init__(version)
 
         # Path Solution
-        self._solution = {'account_id': account_id, 'owner_id': owner_id, }
-        self._uri = '/accounts/{account_id}/properties?owner={owner_id}'.format(**self._solution)
+        self._solution = {'account_id': account_id, 'owner_id': owner_id, 'tags': tags}
+        uri = f'/accounts/{account_id}/properties?owner={owner_id}'
 
+        if(tags is not values.unset):
+            uri += '&tags='
+
+            for tag in tags:
+                uri += f'{tag},'
+
+            uri = uri[:-1]
+
+        self._uri = uri
 
     def create(self, name, data_type, access_type, publish_type, friendly_name=values.unset, description=values.unset,
                 tags=values.unset, measurement=values.unset, retention=values.unset, boundaries=values.unset, locked=values.unset):
@@ -224,7 +233,7 @@ class PropertyPage(Page):
         """
         :return: 
         """
-        return '{}/accounts/{}/properties?ownerId={}&pageNo={}&pageSize={}'    
+        return f'{{}}/accounts/{{}}/properties?ownerId={self._solution["owner_id"]}&pageNo={{}}&pageSize={{}}'
 
     def __repr__(self):
         """
@@ -277,8 +286,17 @@ class PropertyContext(InstanceContext):
             account_id=self._solution['account_id'],
             id=self._solution['id'],
         )
+    def delete(self):
+        """
+        Delete the Property Instance
+        """
 
-    def update(self, name=values.unset, friendly_name=values.unset, measurement=values.unset):
+        self._version.delete(
+            'DELETE',
+            self._uri
+        )
+
+    def update(self, name=values.unset, friendly_name=values.unset, measurement=values.unset, tags=values.unset):
         """
         Update the PropertyInstance
 
@@ -294,6 +312,7 @@ class PropertyContext(InstanceContext):
             'name': name,
             'friendlyName': friendly_name,
             'measurement': serialize.measurement(measurement),
+            'tags': tags
         })
 
         payload = self._version.update(
@@ -319,7 +338,6 @@ class PropertyContext(InstanceContext):
         context = ' '.join('{}={}'.format(k, v) for k, v in self._solution.items())
         return '<Connio.Api.V3.PropertyContext {}>'.format(context)
 
-
 class PropertyInstance(InstanceResource):
     """  """
 
@@ -327,11 +345,22 @@ class PropertyInstance(InstanceResource):
         def __init__(self, label, symbol):
             self.label = label
             self.symbol = symbol
-        
+
+        def __eq__(self, other):
+            if type(self) is not type(other):
+                return False
+            return self.label == other.label and self.symbol == other.symbol
+
     class Measurement(object):
-        def __init__(self, type, unit):
+        def __init__(self, type, unit, props):
+            self._properties = props
             self.type = type
             self.unit = unit
+
+        def __eq__(self, other):
+            if type(self) is not type(other):
+                return False
+            return self.type == other.type and self.unit == other.unit
 
     class Boundaries(object):
         class Geofence:
@@ -341,26 +370,44 @@ class PropertyInstance(InstanceResource):
                 self.radius = radius
                 self.inside = inside
 
-        def __init__(self, size=None, min=None, max=None, set=None, geofence=None):
+        def __init__(self, size=values.unset, min=values.unset, max=values.unset, set=values.unset, geofence=values.unset, props=values.unset):
             self.size = size
             self.min = min
             self.max = max
             self.set = set
-            if geofence is not None:
+            self._properties = props
+
+            if geofence is not values.unset:
                 self.lat = geofence.lat
                 self.lon = geofence.lon
                 self.radius = geofence.radius
                 self.inside = geofence.inside
             else:
-                self.lat = None
-                self.lon = None
-                self.radius = None
-                self.inside = None
+                self.lat = values.unset
+                self.lon = values.unset
+                self.radius = values.unset
+                self.inside = values.unset
 
+        def __eq__(self, other):
+            if type(self) is not type(other):
+                return False
+            return (
+                self.size == other.size and
+                self.min == other.min and
+                self.max == other.max and
+                self.set == other.set and
+                self.lat == other.lat and
+                self.lon == other.lon and
+                self.radius == other.radius and
+                self.inside == other.inside
+            )
 
     class Context(object):
-        def __init__(self, type=None):
+        def __init__(self, type=values.unset):
             self.type = type
+
+        def __eq__(self, other):
+            return self.type == other.type
 
     class Condition(object):
         class ConditionType:
@@ -368,21 +415,41 @@ class PropertyInstance(InstanceResource):
             CHANGED = "changed"
             CHANGED_BY_X = "changedx"
 
-        def __init__(self, when=None, value=None):
+        def __init__(self, when=values.unset, value=values.unset, props=values.unset):
             self.when = when
             self.value = value
-
+            self._properties = props
+        def __eq__(self, other):
+            if type(self) is not type(other):
+                return False
+            return (
+                self.when == other.when and
+                self.value == other.value
+            )
     class Retention(object):
         class RetentionType:
             MOSTRECENT = "mostrecent"
             HISTORICAL = "historical"
 
-        def __init__(self, type=RetentionType.HISTORICAL, context=None, lifetime=None, capacity=None, condition=None):
+        def __init__(self, type=values.unset, context=values.unset, lifetime=values.unset, capacity=values.unset, condition=values.unset, props=values.unset):
             self.type = type
             self.context = context
             self.lifetime = lifetime
             self.capacity = capacity
             self.condition = condition
+            self._properties = props
+
+        def __eq__(self, other):
+            if type(self) is not type(other):
+                return False
+            return (
+                self.capacity == other.capacity and
+                self.type == other.type and
+                self.context == other.context and
+                self.lifetime == other.lifetime and
+                self.condition == other.condition
+
+                )
 
     def __init__(self, version, payload, account_id, id=None):
         """
@@ -392,11 +459,9 @@ class PropertyInstance(InstanceResource):
         :rtype: connio.rest.api.v3.account.property.PropertyInstance
         """
         from connio.base import deserialize
-
         super(PropertyInstance, self).__init__(version)
-        
         # Marshaled Properties
-        self._properties = {
+        self._properties = values.of({
             'account_id': payload['accountId'],
             'id': payload['id'],
             'owner_id': payload['ownerId'],
@@ -415,7 +480,7 @@ class PropertyInstance(InstanceResource):
             'locked': payload['locked'],        
             'date_created': deserialize.iso8601_datetime(payload['dateCreated']),
             'date_updated': deserialize.iso8601_datetime(payload['dateModified']),
-        }
+        })
 
         # Context
         self._context = None
@@ -492,7 +557,7 @@ class PropertyInstance(InstanceResource):
         :returns:
         :rtype: unicode
         """
-        return self._properties['description']
+        return self._properties.get('description')
 
     @property
     def tags(self):
@@ -500,7 +565,7 @@ class PropertyInstance(InstanceResource):
         :returns:
         :rtype: unicode
         """
-        return self._properties['tags']
+        return self._properties.get('tags')
 
     @property
     def inherited(self):
@@ -540,7 +605,7 @@ class PropertyInstance(InstanceResource):
         :returns:
         :rtype: unicode
         """
-        return self._properties['retention']
+        return self._properties.get('retention')
 
     @property
     def boundaries(self):
@@ -548,7 +613,7 @@ class PropertyInstance(InstanceResource):
         :returns:
         :rtype: unicode
         """
-        return self._properties['boundaries']
+        return self._properties.get('boundaries')
 
     @property
     def measurement(self):
@@ -556,7 +621,7 @@ class PropertyInstance(InstanceResource):
         :returns:
         :rtype: unicode
         """
-        return self._properties['measurement']
+        return self._properties.get('measurement')
 
     @property
     def locked(self):
@@ -591,7 +656,14 @@ class PropertyInstance(InstanceResource):
         """
         return self._proxy.fetch()
 
-    def update(self, friendly_name=values.unset, name=values.unset, measurement=values.unset):
+    def delete(self):
+        """
+        Delete property instance
+        """
+
+        return self._proxy.delete()
+
+    def update(self, friendly_name=values.unset, name=values.unset, measurement=values.unset, tags=values.unset):
         """
         Update the PropertyInstance
 
@@ -605,10 +677,30 @@ class PropertyInstance(InstanceResource):
             friendly_name=friendly_name,
             name=name,
             measurement=measurement,
+            tags=tags
         )
 
     def __getitem__(self, key):
         return self._properties[key]
+
+    def __eq__(self, other):
+        if type(self) is not type(other):
+            return False
+        return (
+            self.data_type == other.data_type and
+            self.name == other.name and
+            self.friendly_name == other.friendly_name and
+            self.description == other.description and
+            self.tags == other.tags and
+            self.data_type == other.data_type and
+            self.access_type == other.access_type and
+            self.publish_type == other.publish_type and
+            self.retention == other.retention and
+            self.boundaries == other.boundaries and
+            self.measurement == other.measurement and
+            self.locked == other.locked and
+            self.inherited == other.inherited
+            )
 
     def __repr__(self):
         """

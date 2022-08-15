@@ -219,7 +219,7 @@ class MethodPage(Page):
         """
         :return: 
         """
-        return '{}/accounts/{}/methods?ownerId={}&pageNo={}&pageSize={}'    
+        return f'{{}}/accounts/{{}}/methods?ownerId={self._solution["owner_id"]}&pageNo={{}}&pageSize={{}}' 
 
     def __repr__(self):
         """
@@ -273,6 +273,15 @@ class MethodContext(InstanceContext):
             id=self._solution['id'],
         )
 
+    def delete(self):
+        """
+        Delete Method Instance
+        """
+        return self._version.delete(
+            'DELETE',
+            self._uri
+        )
+
     def update(self, name=values.unset, friendly_name=values.unset, method_impl=values.unset):
         """
         Update the MethodInstance
@@ -312,14 +321,29 @@ class MethodContext(InstanceContext):
         context = ' '.join('{}={}'.format(k, v) for k, v in self._solution.items())
         return '<Connio.Api.V3.MethodContext {}>'.format(context)
 
+    def __eq__(self, other):
+        self_context = self.fetch()
+        other_context = other.fetch()
+        return self_context == other_context
 
 class MethodInstance(InstanceResource):
     """  """
 
     class MethodImplementation:
-        def __init__(self, body, lang='javascript'):
+        def __init__(self, body, lang='javascript', props=None):
             self.body = body
             self.lang = lang
+            self._properties = props
+
+        def __eq__(self, other):
+            if not (hasattr(other, "body") and hasattr(other, "lang")):
+                return False
+            if not (hasattr(self, "body") and hasattr(self, "lang")):
+                return False
+            return (
+                self.body == other.body and
+                self.lang == other.lang
+                )
 
     def __init__(self, version, payload, account_id, id=None):
         """
@@ -425,7 +449,7 @@ class MethodInstance(InstanceResource):
         :returns:
         :rtype: unicode
         """
-        return self._properties['description']
+        return self._properties.get('description')
 
     @property
     def tags(self):
@@ -433,7 +457,7 @@ class MethodInstance(InstanceResource):
         :returns:
         :rtype: unicode
         """
-        return self._properties['tags']
+        return self._properties.get('tags')
 
     @property
     def inherited(self):
@@ -492,6 +516,9 @@ class MethodInstance(InstanceResource):
         """
         return self._proxy.fetch()
 
+    def delete(self):
+        return self._proxy.delete()
+
     def update(self, name=values.unset, friendly_name=values.unset, method_impl=values.unset):
         """
         Update the MethodInstance
@@ -520,3 +547,12 @@ class MethodInstance(InstanceResource):
         """
         context = ' '.join('{}={}'.format(k, v) for k, v in self._solution.items())
         return '<Connio.Api.V3.MethodInstance {}>'.format(context)
+
+    def __eq__(self, other):
+        return(
+            self.access_type == other.access_type and
+            self.description == other.description and
+            self.friendly_name == other.friendly_name and
+            self.locked == other.locked and
+            self.method_impl == other.method_impl
+        )
