@@ -34,7 +34,6 @@ setup(
     name=NAME,
     version=new_version,
     description='Connio Python SDK',
-    keywords = ["connio"],
     author_email='admin@digiterra.com.tr',
     packages=find_packages(include=['connio', 'connio.*']),
     install_requires=['pytz',
@@ -42,18 +41,6 @@ setup(
                       'requests',
                       'paho_mqtt',
                       'simplejson',
-                      'twilio'],  # external packages as dependencies,
-
-    long_description = """\
-    Python Connio Helper Library
-    ----------------------------
-
-    DESCRIPTION
-    The Connio Python SDK simplifies the process of making admin and data requests 
-    to the Connio platform using the Connio REST API.
-    The Connio REST API lets to you create devices, write data into device properties,
-    and much more.  See https://www.github.com/connio/connio-sdk-python for more information.
-
-     LICENSE The Connio Python Helper Library is distributed under the MIT
-    License """ 
+                      'twilio'],  # external packages as dependencies
+    long_description = """Python Connio Helper Library""" 
 )

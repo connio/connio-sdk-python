@@ -296,6 +296,10 @@ class AppContext(InstanceContext):
         app_id = self._solution['id']
         return self._version.fetch('post', f'data/apps/{app_id}/methods/{method_name}', data=payload)
 
+    def read_property_historical(self, property_name, query):
+        app_id = self._solution['id']
+        return self._version.fetch('post', f'data/apps/{device_id}/properties/{property_name}/query', data=query)
+
     def update(self, name=values.unset, friendly_name=values.unset,
                 description=values.unset, tags=values.unset, status=values.unset):
         """
