@@ -55,5 +55,5 @@ setup(
     and much more.  See https://www.github.com/connio/connio-sdk-python for more information.
 
      LICENSE The Connio Python Helper Library is distributed under the MIT
-    License """ )
+    License """ 
 )
