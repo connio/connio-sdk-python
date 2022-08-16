@@ -1,6 +1,5 @@
 # pip install conniosdk
 from connio.rest import Client
-from connio.rest.api.v3.account import device
 
 HOST = "http://167.99.129.128:8081"
 USERNAME = "_key_1391176590598140988"
@@ -12,15 +11,15 @@ def example():
 
     ## Get devices or apps as stream
     devices = client.account.devices.stream()
-    apps = client.account.apps.stream()
+    apps    = client.account.apps.stream()
 
     ## Get devices or apps as list
     devicesList = client.account.devices.list()
-    appsList = client.account.apps.list()
+    appsList    = client.account.apps.list()
 
     ## Get all names from stream
     deviceNames = list(device.name for device in devices) # ["device1", "device2"]
-    appNames = list(app.name for app in apps)
+    appNames    = list(app.name for app in apps)
 
     ## Get single device by id and get its state
     deviceById = client.account.devices("_dev_1127454099228059958")
@@ -31,20 +30,20 @@ def example():
     appByName    = client.account.apps("Downtime")
 
     ## Reach device state
-    state = deviceByName.state() # {"active": "---", "StationCode": 15}
+    state    = deviceByName.state() # {"active": "---", "StationCode": 15}
     appState = appById.state()
 
     ## get current property value from state 
-    property = state.get("active") # "---"
-    appProperty =state.get("active")
+    property    = state.get("active") # "---"
+    appProperty = state.get("active")
 
     ## Query Historical property values
-    queryResult = deviceByName.read_property_historical("active",{ })# Query object: https://docs.connio.com/reference/querying-historical-data
+    queryResult    = deviceByName.read_property_historical("active",{ })# Query object: https://docs.connio.com/reference/querying-historical-data
     appQueryResult = appByName.read_property_historical("active",{ })
     # Example Output: {'sampleSize': 3, 'results': [{'ref': {'id': '_prp_1109250878923636601', 'qname': 'device$active', 'objectId': '_dev_1127454099228059958'}, 'values': [{'t': '2021-10-30T17:22:25.092Z', 'v': '---'}, {'t': '2021-11-01T14:17:20.2Z', 'v': '---'}, {'t': '2021-11-01T15:33:21.761Z', 'v': '---'}], 'groupBy': [{'GroupByType': {'type': 'text'}}], 'attributes': {'protocol': ['imsg', 'rest'], 'source': ['object']}}]}
 
     ## Get latest datapoint with time
-    current = deviceById.read_property_historical("active", {"limit": 1, "order": "desc"}) # {'sampleSize': 1, 'results': [{'ref': {'id': '_prp_1109250878923636601', 'qname': 'device$active', 'objectId': '_dev_1127454099228059958'}, 'values': [{'t': '2021-11-01T15:33:21.761Z', 'v': '---'}], 'groupBy': [{'GroupByType': {'type': 'text'}}], 'attributes': {'protocol': ['imsg', 'rest'], 'source': ['object']}}]}
+    current    = deviceById.read_property_historical("active", {"limit": 1, "order": "desc"}) # {'sampleSize': 1, 'results': [{'ref': {'id': '_prp_1109250878923636601', 'qname': 'device$active', 'objectId': '_dev_1127454099228059958'}, 'values': [{'t': '2021-11-01T15:33:21.761Z', 'v': '---'}], 'groupBy': [{'GroupByType': {'type': 'text'}}], 'attributes': {'protocol': ['imsg', 'rest'], 'source': ['object']}}]}
     appCurrent = appByName.read_property_historical("DownTimeCauses", {"limit": 1, "order": "desc"})
 
     ## Change device name and friendly name
@@ -94,7 +93,7 @@ def example():
     subaccounts = list(subaccountsStream)
 
     subaccountsStream = client.accounts.stream()
-    subaccount = next(subaccountsStream)
+    subaccount        = next(subaccountsStream)
 
     ### Get subaccount device
     subAccountDevices = subaccount.devices("_dev_1127454099228059958") # All above methods can be used with subaccount instance
