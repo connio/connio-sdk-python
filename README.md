@@ -34,7 +34,7 @@ master = client.accounts.get().fetch()
 print('Master account: ' + master.name)
 ```
 
-### Accessing entites
+### Accessing entities
 
 ``` py
 ## Get devices or apps as stream
