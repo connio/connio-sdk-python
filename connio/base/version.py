@@ -74,7 +74,6 @@ class Version(object):
             timeout=timeout,
             allow_redirects=allow_redirects,
         )
-
         if response.status_code < 200 or response.status_code >= 300:
             raise self.exception(method, uri, response, 'Unable to fetch record')
 

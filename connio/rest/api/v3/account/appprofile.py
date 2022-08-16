@@ -56,7 +56,6 @@ class AppProfileList(ListResource):
             'imageUrl': image_url,
             'locked': locked,
         })
-
         payload = self._version.create(
             'POST',
             self._uri,

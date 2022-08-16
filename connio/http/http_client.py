@@ -49,12 +49,12 @@ class ConnioHttpClient(HttpClient):
         }
 
         if params:
-            _logger.info('{method} Request: {url}?{query}'.format(query=urlencode(params), **kwargs))
-            _logger.info('PARAMS: {params}'.format(**kwargs))
+            _logger.debug('{method} Request: {url}?{query}'.format(query=urlencode(params), **kwargs))
+            _logger.debug('PARAMS: {params}'.format(**kwargs))
         else:
-            _logger.info('{method} Request: {url}'.format(**kwargs))
+            _logger.debug('{method} Request: {url}'.format(**kwargs))
         if data:
-            _logger.info('PAYLOAD: {json}'.format(**kwargs))
+            _logger.debug('PAYLOAD: {json}'.format(**kwargs))
 
         self.last_response = None
         session = self.session or Session()
@@ -68,7 +68,8 @@ class ConnioHttpClient(HttpClient):
             timeout=timeout,
         )
         
-        _logger.info(u'{method} Response: {status} {text}'.format(method=method, status=response.status_code, text=response.text))
+        _logger.debug(u'{method} Response: {status} {text}'.format(
+            method=method, status=response.status_code, text=response.text))
 
         self.last_response = Response(int(response.status_code), response.text)
 

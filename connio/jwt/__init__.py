@@ -3,7 +3,10 @@ import sys
 
 from twilio.jwt import compat
 
-if sys.version_info[0] == 3 and sys.version_info[1] == 2:
+PYTHON_VERSION_MAJOR = 3
+PYTHON_VERSION_MINOR = 2
+
+if sys.version_info[0] == PYTHON_VERSION_MAJOR and sys.version_info[1] == PYTHON_VERSION_MINOR:
     # PyJWT expects hmac.compare_digest to exist even under python 3.2
     hmac.compare_digest = compat.compare_digest
 

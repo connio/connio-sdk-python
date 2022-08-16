@@ -279,7 +279,6 @@ class AccountContext(InstanceContext):
         :rtype: connio.rest.api.v3.account.AccountInstance
         """
         params = values.of({})
-
         payload = self._version.fetch(
             'GET',
             self._uri,
@@ -405,7 +404,7 @@ class AccountContext(InstanceContext):
             self._apps = AppList(self._version, account_id=self._solution['id'], )
         return self._apps
 
-    def properties(self, owner_id):
+    def properties(self, owner_id, tags=values.unset):
         """
         Access the properties
 
@@ -414,7 +413,7 @@ class AccountContext(InstanceContext):
         """
         from connio.rest.api.v3.account.propertyy import PropertyList
 
-        self._properties = PropertyList(self._version, account_id=self._solution['id'], owner_id=owner_id, )
+        self._properties = PropertyList(self._version, account_id=self._solution['id'], owner_id=owner_id, tags=tags)
         return self._properties
 
     def methods(self, owner_id):

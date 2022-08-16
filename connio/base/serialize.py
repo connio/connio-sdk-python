@@ -80,12 +80,11 @@ def measurement(measurement):
     :return: jsonified string represenation of obj 
     """    
     if measurement is values.unset or measurement is None:
-        return None
-        
-    return { 
+        return values.unset
+    return values.of({ 
         'type': measurement.type, 
-        'unit': { 'label': measurement.unit.label, 'symbol': measurement.unit.symbol } 
-    }
+        'unit': values.of({ 'label': measurement.unit.label, 'symbol': measurement.unit.symbol })
+    })
 
 def boundaries(boundaries):
     """
@@ -94,18 +93,18 @@ def boundaries(boundaries):
     :return: jsonified string represenation of obj 
     """    
     if boundaries is values.unset or boundaries is None:
-        return None
+        return values.unset
         
-    return { 
-        'size': boundaries.get('size', None),
-        'min': boundaries.get('min', None),
-        'max': boundaries.get('max', None),
-        'set': boundaries.get('set', None),
-        'lat': boundaries.get('lat', None),
-        'lon': boundaries.get('lon', None),
-        'radius': boundaries.get('radius', None),
-        'inside': boundaries.get('inside', None),
-    }
+    return values.of({ 
+        'size': boundaries.size,
+        'min': boundaries.min,
+        'max': boundaries.max,
+        'set': boundaries.set,
+        'lat': boundaries.lat,
+        'lon': boundaries.lon,
+        'radius': boundaries.radius,
+        'inside': boundaries.inside,
+    })
     
 def retention(retention):
     """
@@ -114,21 +113,22 @@ def retention(retention):
     :return: jsonified string represenation of obj 
     """    
     from connio.rest.api.v3.account.propertyy import PropertyInstance
-
     if retention is values.unset or retention is None:
-        return None
-
-    retentionType = 'historical'
+        return values.unset
+    retentionType = values.unset
     if retention.type == PropertyInstance.Retention.RetentionType.MOSTRECENT:
         retentionType = 'mostrecent'
-
-    return { 
+    elif retention.type == PropertyInstance.Retention.RetentionType.HISTORICAL:
+        retentionType = 'historical'
+    return_obj = {
         'type': retentionType,
-        'context': { 'type': retention.context.type },
+        'context': values.of({'type': retention.context.type}),
         'lifetime': retention.lifetime,
         'capacity': retention.capacity,
-        'condition': { 'when': retention.condition.when, 'value': retention.condition.value }
     }
+    if(retention.type == PropertyInstance.Retention.RetentionType.HISTORICAL):
+        return_obj['condition'] = values.of({'when': retention.condition.when, 'value': retention.condition.value})
+    return values.of(return_obj)
 
 def location(loc):
     """
