@@ -4,6 +4,6 @@ nose
 six
 requests>=2.0.0
 socksipy-branch
-PyJWT==2.4.0
+PyJWT==2.12.0
 twine
 paho-mqtt
